@@ -147,7 +147,7 @@ home_metadata:
   - val: 街头
     label: 现状
 scores:
-  popularity: 4
+  popularity: 6
   dispute: 7
   absurdity: 8
   slice: 6

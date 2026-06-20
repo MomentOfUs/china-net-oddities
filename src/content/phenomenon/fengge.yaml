@@ -194,8 +194,8 @@ home_metadata:
   - val: '2024.1'
     label: 封禁
 scores:
-  popularity: 5
-  dispute: 8
+  popularity: 6
+  dispute: 9
   absurdity: 9
   slice: 7
   narrative: 8

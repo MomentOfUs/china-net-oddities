@@ -96,12 +96,12 @@ ribbon:
 - text: 二进宫
   type: danger
 scores:
-  popularity: 8
+  popularity: 7
   dispute: 10
   absurdity: 10
-  slice: 9
+  slice: 7
   narrative: 8
-  native: 4
+  native: 7
 subtitle: 打假狂人 · 靖国神社撒尿涂鸦 · 敲诈勒索二进宫
 tags:
 - icon: '锤'

@@ -139,7 +139,7 @@ home_metadata:
   - val: 撕裂
     label: 舆论等级
 scores:
-  popularity: 8
+  popularity: 6
   dispute: 9
   absurdity: 10
   slice: 8
