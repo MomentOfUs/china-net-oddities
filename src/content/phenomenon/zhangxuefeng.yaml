@@ -153,3 +153,10 @@ home_metadata:
     label: 心源性猝死
   - val: '18999'
     label: 最高套餐(元)
+scores:
+  popularity: 8
+  dispute: 9
+  absurdity: 6
+  slice: 8
+  narrative: 9
+  native: 6

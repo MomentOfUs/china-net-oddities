@@ -21,6 +21,15 @@ const entryHero = getHero(slug, data.hero);
 
 const hasHero = !!entryHero;
 const isSvgPlaceholder = hasHero && entryHero.endsWith('.svg');
+
+const scores = data.scores || {
+  popularity: 5,
+  dispute: 5,
+  absurdity: 5,
+  slice: 5,
+  narrative: 5,
+  native: 5,
+};
 ---
 <Layout title={`${data.title} · 互联网奇观 · 人物档案馆`}>
   <a class="back-link" href="/">← 返回档案目录</a>
@@ -67,7 +76,7 @@ const isSvgPlaceholder = hasHero && entryHero.endsWith('.svg');
       <div class="hero-text">
         <div class="tag">档案 {data.hero_tag}</div>
         {data.hero_type && <div class="type">{data.hero_type}</div>}
-        <h1>{data.title}</h1>
+        <h1 class="decrypt-text" data-text={data.title}>{data.title}</h1>
         <div class="sub" set:html={data.subtitle}></div>
       </div>
     </div>
@@ -119,6 +128,62 @@ const isSvgPlaceholder = hasHero && entryHero.endsWith('.svg');
           </div>
         </div>
       ))}
+    </div>
+
+    <!-- ── 奇观综合评分评估板 ── -->
+    <div class="evaluation-section">
+      <div class="st">▎奇观综合指数评估</div>
+      <div class="eval-grid">
+        <div class="radar-container">
+          <svg id="radar-chart" width="220" height="220" viewBox="0 0 220 220" style="overflow:visible">
+            <!-- 动态渲染 SVG 雷达图 -->
+          </svg>
+        </div>
+        <div class="eval-scores">
+          <div class="score-item" data-index="0" data-val={scores.popularity}>
+            <span class="sn">国民度</span>
+            <div class="sb-wrap">
+              <div class="sb-bar"></div>
+            </div>
+            <span class="sv">{scores.popularity}</span>
+          </div>
+          <div class="score-item" data-index="1" data-val={scores.dispute}>
+            <span class="sn">争议性</span>
+            <div class="sb-wrap">
+              <div class="sb-bar"></div>
+            </div>
+            <span class="sv">{scores.dispute}</span>
+          </div>
+          <div class="score-item" data-index="2" data-val={scores.absurdity}>
+            <span class="sn">荒诞性</span>
+            <div class="sb-wrap">
+              <div class="sb-bar"></div>
+            </div>
+            <span class="sv">{scores.absurdity}</span>
+          </div>
+          <div class="score-item" data-index="3" data-val={scores.slice}>
+            <span class="sn">时代切片性</span>
+            <div class="sb-wrap">
+              <div class="sb-bar"></div>
+            </div>
+            <span class="sv">{scores.slice}</span>
+          </div>
+          <div class="score-item" data-index="4" data-val={scores.narrative}>
+            <span class="sn">叙事弧光</span>
+            <div class="sb-wrap">
+              <div class="sb-bar"></div>
+            </div>
+            <span class="sv">{scores.narrative}</span>
+          </div>
+          <div class="score-item" data-index="5" data-val={scores.native}>
+            <span class="sn">互联网原生性</span>
+            <div class="sb-wrap">
+              <div class="sb-bar"></div>
+            </div>
+            <span class="sv">{scores.native}</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     {data.body_grid && data.body_grid.length > 0 && (
@@ -217,9 +282,322 @@ const isSvgPlaceholder = hasHero && entryHero.endsWith('.svg');
     <div class="footer" set:html={data.footer} />
   </div>
   <div class="imprint"><span>◈</span> 档 案 馆 藏 <span>◈</span></div>
+  <script is:inline define:vars={{ scores }}>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. 解密动效 (Decrypt Effect)
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%@#$*&+-=_?';
+      const decryptEls = document.querySelectorAll('.decrypt-text');
+      
+      decryptEls.forEach(el => {
+        const originalText = el.getAttribute('data-text') || el.textContent;
+        let iterations = 0;
+        const interval = setInterval(() => {
+          el.textContent = originalText.split('').map((char, index) => {
+            if (index < iterations) {
+              return originalText[index];
+            }
+            return chars[Math.floor(Math.random() * chars.length)];
+          }).join('');
+          
+          if (iterations >= originalText.length) {
+            clearInterval(interval);
+            el.textContent = originalText;
+          }
+          iterations += 1/3;
+        }, 30);
+      });
+
+      // 2. 动态 SVG 雷达图生成与动画
+      const radar = document.getElementById('radar-chart');
+      if (!radar) return;
+
+      const labels = ['国民度', '争议性', '荒诞性', '时代切片', '叙事弧光', '原生性'];
+      const dimensions = ['popularity', 'dispute', 'absurdity', 'slice', 'narrative', 'native'];
+      const values = dimensions.map(d => scores[d] || 5);
+      const center = 110;
+      const maxRadius = 75;
+      const angleStep = Math.PI / 3;
+
+      // 创建 SVG 命名空间的元素助手
+      function createSVGEl(type, attrs = {}) {
+        const el = document.createElementNS('http://www.w3.org/2000/svg', type);
+        for (const [key, val] of Object.entries(attrs)) {
+          el.setAttribute(key, val);
+        }
+        return el;
+      }
+
+      // 绘制 5 层背景同心六边形网格 (2, 4, 6, 8, 10 分)
+      for (let level = 1; level <= 5; level++) {
+        const radius = (level / 5) * maxRadius;
+        const points = [];
+        for (let i = 0; i < 6; i++) {
+          const angle = i * angleStep - Math.PI / 2;
+          const x = center + radius * Math.cos(angle);
+          const y = center + radius * Math.sin(angle);
+          points.push(`${x},${y}`);
+        }
+        radar.appendChild(createSVGEl('polygon', {
+          class: 'radar-grid',
+          points: points.join(' ')
+        }));
+      }
+
+      // 绘制 6 条轴线与文本标签
+      for (let i = 0; i < 6; i++) {
+        const angle = i * angleStep - Math.PI / 2;
+        
+        // 轴线
+        const axisX = center + maxRadius * Math.cos(angle);
+        const axisY = center + maxRadius * Math.sin(angle);
+        radar.appendChild(createSVGEl('line', {
+          class: 'radar-axis',
+          x1: center,
+          y1: center,
+          x2: axisX,
+          y2: axisY
+        }));
+
+        // 文本标签位置
+        const textRadius = maxRadius + 18;
+        const textX = center + textRadius * Math.cos(angle);
+        let textY = center + textRadius * Math.sin(angle);
+        if (i === 0) textY -= 2;      // 顶部
+        else if (i === 3) textY += 8; // 底部
+        else textY += 3;              // 两侧
+
+        const textEl = createSVGEl('text', {
+          class: 'radar-label',
+          x: textX,
+          y: textY,
+          'data-index': i
+        });
+        textEl.textContent = labels[i];
+        radar.appendChild(textEl);
+      }
+
+      // 绘制实际得分多边形
+      const poly = createSVGEl('polygon', {
+        class: 'radar-poly',
+        points: Array(6).fill(`${center},${center}`).join(' ')
+      });
+      radar.appendChild(poly);
+
+      // 绘制顶点圆点
+      const dots = [];
+      for (let i = 0; i < 6; i++) {
+        const dot = createSVGEl('circle', {
+          class: 'radar-dot',
+          cx: center,
+          cy: center,
+          r: 3,
+          'data-index': i
+        });
+        radar.appendChild(dot);
+        dots.push(dot);
+      }
+
+      // 动态生长动画逻辑
+      let startTime = null;
+      const duration = 800; 
+
+      function animate(timestamp) {
+        if (!startTime) startTime = timestamp;
+        const progress = Math.min((timestamp - startTime) / duration, 1);
+        const easeProgress = 1 - Math.pow(1 - progress, 3);
+
+        const currentPoints = [];
+        for (let i = 0; i < 6; i++) {
+          const angle = i * angleStep - Math.PI / 2;
+          const currentVal = values[i] * easeProgress;
+          const radius = (currentVal / 10) * maxRadius;
+          const x = center + radius * Math.cos(angle);
+          const y = center + radius * Math.sin(angle);
+          
+          currentPoints.push(`${x},${y}`);
+          
+          dots[i].setAttribute('cx', x);
+          dots[i].setAttribute('cy', y);
+        }
+        
+        poly.setAttribute('points', currentPoints.join(' '));
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          const progressBars = document.querySelectorAll('.score-item .sb-bar');
+          progressBars.forEach(bar => {
+            const item = bar.closest('.score-item');
+            const val = item.getAttribute('data-val');
+            bar.style.width = (val * 10) + '%';
+          });
+        }
+      }
+
+      setTimeout(() => {
+        requestAnimationFrame(animate);
+      }, 150);
+
+      // 双向 hover 联动
+      const scoreItems = document.querySelectorAll('.score-item');
+      const labelEls = document.querySelectorAll('.radar-label');
+
+      function highlightIndex(index) {
+        if (index === null) {
+          scoreItems.forEach(item => item.classList.remove('active'));
+          labelEls.forEach(label => label.classList.remove('active'));
+          dots.forEach(dot => dot.classList.remove('active'));
+        } else {
+          scoreItems[index].classList.add('active');
+          const label = Array.from(labelEls).find(l => l.getAttribute('data-index') == index);
+          if (label) label.classList.add('active');
+          dots[index].classList.add('active');
+        }
+      }
+
+      scoreItems.forEach(item => {
+        item.addEventListener('mouseenter', () => {
+          const idx = item.getAttribute('data-index');
+          highlightIndex(idx);
+        });
+        item.addEventListener('mouseleave', () => {
+          highlightIndex(null);
+        });
+      });
+
+      dots.forEach(dot => {
+        dot.addEventListener('mouseenter', () => {
+          const idx = dot.getAttribute('data-index');
+          highlightIndex(idx);
+        });
+        dot.addEventListener('mouseleave', () => {
+          highlightIndex(null);
+        });
+      });
+    });
+  </script>
 </Layout>
 
 <style>
+  /* ── 奇观综合评分评估板 ── */
+  .evaluation-section {
+    padding: 30px 36px 24px;
+    border-bottom: 1px solid rgba(197, 168, 128, 0.18);
+  }
+  .eval-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1.3fr;
+    gap: 30px;
+    align-items: center;
+    margin-top: 18px;
+  }
+  .radar-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding: 10px 0;
+  }
+  .eval-scores {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .score-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 11px;
+    color: #8a7a6a;
+    transition: all 0.3s;
+    cursor: default;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+  }
+  .score-item:hover, .score-item.active {
+    background: rgba(197, 168, 128, 0.05);
+    border-color: rgba(197, 168, 128, 0.15);
+    color: #e6dfd3;
+  }
+  .score-item .sn {
+    width: 90px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .score-item .sb-wrap {
+    flex: 1;
+    height: 4px;
+    background: rgba(13, 11, 9, 0.6);
+    position: relative;
+    overflow: hidden;
+  }
+  .score-item .sb-bar {
+    height: 100%;
+    background: rgba(197, 168, 128, 0.25);
+    transition: width 0.8s cubic-bezier(0.165, 0.84, 0.44, 1), background 0.3s;
+    width: 0%;
+  }
+  .score-item:hover .sb-bar, .score-item.active .sb-bar {
+    background: rgba(197, 168, 128, 0.65);
+    box-shadow: 0 0 8px rgba(197, 168, 128, 0.3);
+  }
+  .score-item .sv {
+    font-size: 14px;
+    font-family: 'Times New Roman', Georgia, serif;
+    font-weight: bold;
+    color: #c5a880;
+    width: 16px;
+    text-align: right;
+  }
+
+  /* ── 动态 SVG 样式 ── */
+  .radar-container :global(polygon.radar-grid) {
+    fill: none;
+    stroke: rgba(197, 168, 128, 0.1);
+    stroke-width: 1;
+  }
+  .radar-container :global(line.radar-axis) {
+    stroke: rgba(197, 168, 128, 0.15);
+    stroke-dasharray: 2 2;
+  }
+  .radar-container :global(text.radar-label) {
+    fill: #7a6a5a;
+    font-size: 9px;
+    letter-spacing: 1px;
+    font-family: 'Noto Serif SC', serif;
+    text-anchor: middle;
+    transition: fill 0.3s;
+    cursor: default;
+  }
+  .radar-container :global(text.radar-label.active) {
+    fill: #c5a880;
+    font-weight: bold;
+  }
+  .radar-container :global(polygon.radar-poly) {
+    stroke: #c5a880;
+    stroke-width: 1.5;
+    fill: rgba(197, 168, 128, 0.15);
+    transition: fill 0.3s, stroke 0.3s;
+  }
+  .radar-container :global(polygon.radar-poly:hover) {
+    fill: rgba(197, 168, 128, 0.28);
+    stroke: #e6dfd3;
+  }
+  .radar-container :global(circle.radar-dot) {
+    fill: #0c0a09;
+    stroke: #c5a880;
+    stroke-width: 1.5;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+  .radar-container :global(circle.radar-dot:hover),
+  .radar-container :global(circle.radar-dot.active) {
+    fill: #c5a880;
+    r: 5px;
+    filter: drop-shadow(0 0 4px rgba(197,168,128,0.5));
+  }
   /* ── Custom Scrollbar (全局自定义暗金滚动条) ── */
   :global(::-webkit-scrollbar) {
     width: 8px;

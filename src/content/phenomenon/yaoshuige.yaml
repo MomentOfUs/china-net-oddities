@@ -147,3 +147,10 @@ home_metadata:
     label: 被封纪录
   - val: 抽象
     label: 代名词
+scores:
+  popularity: 8
+  dispute: 7
+  absurdity: 10
+  slice: 8
+  narrative: 8
+  native: 10

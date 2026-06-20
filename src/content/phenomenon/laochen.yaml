@@ -150,3 +150,10 @@ home_metadata:
     label: 辞去公职
   - val: 后悔
     label: 公开道歉
+scores:
+  popularity: 7
+  dispute: 9
+  absurdity: 8
+  slice: 8
+  narrative: 9
+  native: 8

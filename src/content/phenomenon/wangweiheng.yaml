@@ -144,3 +144,10 @@ home_metadata:
     label: 买不起甜甜圈
   - val: 街头
     label: 现状
+scores:
+  popularity: 4
+  dispute: 7
+  absurdity: 8
+  slice: 6
+  narrative: 6
+  native: 7

@@ -139,3 +139,10 @@ home_metadata:
     label: 争议
   - val: 真实
     label: 人设质疑
+scores:
+  popularity: 6
+  dispute: 8
+  absurdity: 9
+  slice: 6
+  narrative: 8
+  native: 9

@@ -128,3 +128,10 @@ home_metadata:
     label: 被送回
   - val: 智力二级
     label: 诊断
+scores:
+  popularity: 7
+  dispute: 8
+  absurdity: 8
+  slice: 8
+  narrative: 9
+  native: 6

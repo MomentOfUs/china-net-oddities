@@ -141,3 +141,10 @@ home_metadata:
     label: 被封平台
   - val: ∞
     label: 假号数量
+scores:
+  popularity: 9
+  dispute: 10
+  absurdity: 8
+  slice: 9
+  narrative: 8
+  native: 10

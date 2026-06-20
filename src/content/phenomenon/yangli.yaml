@@ -132,3 +132,10 @@ home_metadata:
     label: 代言风波
   - val: 符号
     label: 不可回避
+scores:
+  popularity: 8
+  dispute: 10
+  absurdity: 6
+  slice: 9
+  narrative: 7
+  native: 7

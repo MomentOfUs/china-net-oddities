@@ -147,3 +147,10 @@ home_metadata:
     label: 参赛次数
   - val: 健丑
     label: 抽象至极
+scores:
+  popularity: 5
+  dispute: 6
+  absurdity: 9
+  slice: 5
+  narrative: 8
+  native: 9

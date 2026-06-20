@@ -145,3 +145,10 @@ home_metadata:
     label: B站转型
   - val: 刀酱
     label: coser新身份
+scores:
+  popularity: 7
+  dispute: 7
+  absurdity: 9
+  slice: 7
+  narrative: 8
+  native: 10

@@ -146,3 +146,10 @@ home_metadata:
     label: 辍学
   - val: 抽象
     label: 当代生活
+scores:
+  popularity: 6
+  dispute: 6
+  absurdity: 8
+  slice: 8
+  narrative: 7
+  native: 9

@@ -147,3 +147,10 @@ home_metadata:
     label: 传世圣经
   - val: 全网
     label: 鬼畜狂欢
+scores:
+  popularity: 9
+  dispute: 8
+  absurdity: 10
+  slice: 7
+  narrative: 8
+  native: 10

@@ -65,6 +65,21 @@ const phenomenon = defineCollection({
         label: z.any(),
       })).optional().default([]),
     }).optional().nullable(),
+    scores: z.object({
+      popularity: z.number().min(0).max(10).default(5),
+      dispute: z.number().min(0).max(10).default(5),
+      absurdity: z.number().min(0).max(10).default(5),
+      slice: z.number().min(0).max(10).default(5),
+      narrative: z.number().min(0).max(10).default(5),
+      native: z.number().min(0).max(10).default(5),
+    }).optional().default({
+      popularity: 5,
+      dispute: 5,
+      absurdity: 5,
+      slice: 5,
+      narrative: 5,
+      native: 5,
+    }),
   }),
 });
 

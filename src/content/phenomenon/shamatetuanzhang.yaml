@@ -146,3 +146,10 @@ home_metadata:
     label: 亚文化标本
   - val: 寸头
     label: 回归平凡
+scores:
+  popularity: 7
+  dispute: 6
+  absurdity: 9
+  slice: 9
+  narrative: 8
+  native: 8

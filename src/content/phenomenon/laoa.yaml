@@ -132,3 +132,10 @@ home_metadata:
     label: 争议爆发
   - val: 撕裂
     label: 舆论等级
+scores:
+  popularity: 8
+  dispute: 9
+  absurdity: 10
+  slice: 8
+  narrative: 6
+  native: 10

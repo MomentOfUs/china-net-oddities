@@ -138,3 +138,10 @@ home_metadata:
     label: 日均生活费
   - val: 4元
     label: 一瓶红牛
+scores:
+  popularity: 7
+  dispute: 7
+  absurdity: 7
+  slice: 10
+  narrative: 7
+  native: 8

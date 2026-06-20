@@ -129,3 +129,10 @@ home_metadata:
     label: 翻车
   - val: 封禁
     label: 账号
+scores:
+  popularity: 8
+  dispute: 10
+  absurdity: 9
+  slice: 9
+  narrative: 9
+  native: 9

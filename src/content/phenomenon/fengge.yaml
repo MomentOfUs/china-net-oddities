@@ -134,3 +134,10 @@ home_metadata:
     label: 巅峰播放
   - val: '2024'
     label: 封禁
+scores:
+  popularity: 5
+  dispute: 8
+  absurdity: 9
+  slice: 7
+  narrative: 8
+  native: 9

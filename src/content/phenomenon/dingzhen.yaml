@@ -157,3 +157,10 @@ home_metadata:
     label: 话题阅读
   - val: 国企
     label: 有编制网红
+scores:
+  popularity: 9
+  dispute: 8
+  absurdity: 7
+  slice: 8
+  narrative: 7
+  native: 9

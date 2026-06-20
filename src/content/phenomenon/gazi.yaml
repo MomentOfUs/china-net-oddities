@@ -138,3 +138,10 @@ home_metadata:
     label: 2021年度热词
   - val: 2200万
     label: 最高负债
+scores:
+  popularity: 8
+  dispute: 8
+  absurdity: 9
+  slice: 6
+  narrative: 8
+  native: 9

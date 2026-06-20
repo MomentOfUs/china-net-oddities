@@ -157,3 +157,10 @@ home_metadata:
     label: 主演总票房
   - val: 10/10
     label: 争议指数
+scores:
+  popularity: 10
+  dispute: 7
+  absurdity: 5
+  slice: 7
+  narrative: 5
+  native: 1

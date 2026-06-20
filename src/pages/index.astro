@@ -8,10 +8,22 @@ import { Image } from 'astro:assets';
 
 const rawEntries = await getCollection('phenomenon');
 
+const getCategory = (tag) => {
+  const t = tag || '';
+  if (t.includes('网红') || t.includes('整活') || t.includes('鬼畜') || t.includes('大红大绿') || t.includes('流量') || t.includes('主播')) {
+    return '网红整活';
+  }
+  if (t.includes('图腾') || t.includes('符号') || t.includes('风暴眼') || t.includes('领袖') || t.includes('导师') || t.includes('狂飙') || t.includes('标志')) {
+    return '文化符号';
+  }
+  return '时代草根';
+};
+
 // 按照 home_metadata 进行列表整理
 const entries = rawEntries.map(item => {
   const data = item.data;
   const metaInfo = data.home_metadata || { tag: '未分类', meta: '', stats: [] };
+  const scores = data.scores || { popularity: 5, dispute: 5, absurdity: 5, slice: 5, narrative: 5, native: 5 };
   return {
     filename: `/${item.id}.html`,
     avatar: getAvatar(item.id, data.avatar),
@@ -19,6 +31,8 @@ const entries = rawEntries.map(item => {
     tag: metaInfo.tag,
     meta: metaInfo.meta,
     stats: metaInfo.stats || [],
+    category: getCategory(metaInfo.tag),
+    scores: scores
   };
 });
 ---
@@ -37,10 +51,68 @@ const entries = rawEntries.map(item => {
     </div>
 
     <div class="entries">
-      <div class="entry-head" style="margin-bottom:20px">馆 藏 目 录</div>
+      <div class="entry-head" style="margin-bottom:12px">馆 藏 目 录</div>
+      
+      <!-- 卷宗分类选择器 -->
+      <div class="filter-tabs">
+        <button class="filter-tab active" data-cat="all">全部卷宗</button>
+        <button class="filter-tab" data-cat="网红整活">网红与整活</button>
+        <button class="filter-tab" data-cat="文化符号">文化图腾</button>
+        <button class="filter-tab" data-cat="时代草根">时代草根</button>
+      </div>
+
+      <!-- 动态评分筛选器面板 -->
+      <div class="score-filters-panel">
+        <div class="panel-trigger" onclick="toggleScoreFilter()">
+          <span>⚙ 动态机密指标筛选器 (展开/收起)</span>
+          <span class="trigger-arrow">▼</span>
+        </div>
+        <div class="panel-content">
+          <div class="filter-row">
+            <div class="filter-col">
+              <span class="fl">国民度 ≥ <b id="val-popularity">0</b></span>
+              <input type="range" class="filter-slider" id="slide-popularity" min="0" max="10" value="0" />
+            </div>
+            <div class="filter-col">
+              <span class="fl">争议性 ≥ <b id="val-dispute">0</b></span>
+              <input type="range" class="filter-slider" id="slide-dispute" min="0" max="10" value="0" />
+            </div>
+            <div class="filter-col">
+              <span class="fl">荒诞性 ≥ <b id="val-absurdity">0</b></span>
+              <input type="range" class="filter-slider" id="slide-absurdity" min="0" max="10" value="0" />
+            </div>
+          </div>
+          <div class="filter-row" style="margin-top:10px">
+            <div class="filter-col">
+              <span class="fl">时代切片性 ≥ <b id="val-slice">0</b></span>
+              <input type="range" class="filter-slider" id="slide-slice" min="0" max="10" value="0" />
+            </div>
+            <div class="filter-col">
+              <span class="fl">叙事弧光 ≥ <b id="val-narrative">0</b></span>
+              <input type="range" class="filter-slider" id="slide-narrative" min="0" max="10" value="0" />
+            </div>
+            <div class="filter-col">
+              <span class="fl">原生性 ≥ <b id="val-native">0</b></span>
+              <input type="range" class="filter-slider" id="slide-native" min="0" max="10" value="0" />
+            </div>
+          </div>
+          <div style="text-align:right;margin-top:12px">
+            <button class="reset-filter-btn" onclick="resetFilters()">重置筛选条件</button>
+          </div>
+        </div>
+      </div>
+
       <div class="entries-grid">
         {entries.map(entry => (
-          <div class="fc-wrapper" style="position:relative">
+          <div class="fc-wrapper phenomenon-card" 
+               style="position:relative; transition: opacity 0.4s ease, transform 0.4s ease"
+               data-category={entry.category}
+               data-popularity={entry.scores.popularity}
+               data-dispute={entry.scores.dispute}
+               data-absurdity={entry.scores.absurdity}
+               data-slice={entry.scores.slice}
+               data-narrative={entry.scores.narrative}
+               data-native={entry.scores.native}>
             <div class="folder-tab">人物档案</div>
             <a class="featured" href={entry.filename}>
               <Image 
@@ -166,10 +238,239 @@ const entries = rawEntries.map(item => {
     function openAdmin() {
       window.location.href = '/admin';
     }
+    /* ── 动态指标面板的收起/展开 ── */
+    window.toggleScoreFilter = function() {
+      const panel = document.querySelector('.score-filters-panel');
+      panel.classList.toggle('open');
+    }
+
+    // 过滤逻辑
+    let currentCategory = 'all';
+    const sliders = ['popularity', 'dispute', 'absurdity', 'slice', 'narrative', 'native'];
+    const filterValues = {
+      popularity: 0,
+      dispute: 0,
+      absurdity: 0,
+      slice: 0,
+      narrative: 0,
+      native: 0
+    };
+
+    function applyFilters() {
+      const cards = document.querySelectorAll('.phenomenon-card');
+
+      cards.forEach(card => {
+        const cat = card.getAttribute('data-category');
+        const scores = {
+          popularity: parseInt(card.getAttribute('data-popularity') || '0'),
+          dispute: parseInt(card.getAttribute('data-dispute') || '0'),
+          absurdity: parseInt(card.getAttribute('data-absurdity') || '0'),
+          slice: parseInt(card.getAttribute('data-slice') || '0'),
+          narrative: parseInt(card.getAttribute('data-narrative') || '0'),
+          native: parseInt(card.getAttribute('data-native') || '0')
+        };
+
+        const catMatch = (currentCategory === 'all' || cat === currentCategory);
+
+        let scoreMatch = true;
+        for (const s of sliders) {
+          if (scores[s] < filterValues[s]) {
+            scoreMatch = false;
+            break;
+          }
+        }
+
+        if (catMatch && scoreMatch) {
+          card.style.display = 'block';
+          // 延迟应用透明度以显示淡入动画
+          setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'scale(1)';
+          }, 20);
+        } else {
+          card.style.opacity = '0';
+          card.style.transform = 'scale(0.95)';
+          setTimeout(() => {
+            if (card.style.opacity === '0') {
+              card.style.display = 'none';
+            }
+          }, 400);
+        }
+      });
+    }
+
+    // 绑定分类 Tab 事件
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentCategory = tab.getAttribute('data-cat');
+        applyFilters();
+      });
+    });
+
+    // 绑定滑动条事件
+    sliders.forEach(s => {
+      const slider = document.getElementById('slide-' + s);
+      const valLabel = document.getElementById('val-' + s);
+      if (slider && valLabel) {
+        slider.addEventListener('input', (e) => {
+          const val = parseInt(e.target.value);
+          valLabel.textContent = val;
+          filterValues[s] = val;
+          applyFilters();
+        });
+      }
+    });
+
+    // 重置按钮
+    window.resetFilters = function() {
+      sliders.forEach(s => {
+        const slider = document.getElementById('slide-' + s);
+        const valLabel = document.getElementById('val-' + s);
+        if (slider && valLabel) {
+          slider.value = 0;
+          valLabel.textContent = '0';
+          filterValues[s] = 0;
+        }
+      });
+      applyFilters();
+    }
   </script>
 </Layout>
 
 <style>
+  /* ── 卷宗过滤分类 Tabs ── */
+  .filter-tabs {
+    display: flex;
+    gap: 12px;
+    margin: 0 36px 16px;
+    flex-wrap: wrap;
+  }
+  .filter-tab {
+    background: rgba(13, 11, 9, 0.6);
+    border: 1px solid rgba(197, 168, 128, 0.18);
+    color: #8a7a6a;
+    padding: 6px 16px;
+    font-size: 10px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    font-family: 'Noto Serif SC', serif;
+    transition: all 0.3s;
+  }
+  .filter-tab:hover {
+    border-color: rgba(197, 168, 128, 0.45);
+    color: #c5a880;
+    background: rgba(197, 168, 128, 0.04);
+  }
+  .filter-tab.active {
+    background: rgba(197, 168, 128, 0.12);
+    border-color: rgba(197, 168, 128, 0.6);
+    color: #e6dfd3;
+    box-shadow: 0 0 8px rgba(197, 168, 128, 0.1);
+  }
+
+  /* ── 机密指标筛选面板 ── */
+  .score-filters-panel {
+    margin: 0 36px 24px;
+    border: 1px solid rgba(197, 168, 128, 0.15);
+    background: rgba(13, 11, 9, 0.3);
+  }
+  .panel-trigger {
+    padding: 10px 18px;
+    font-size: 9px;
+    color: #8a7a6a;
+    letter-spacing: 2px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(197, 168, 128, 0.02);
+    transition: background 0.3s, color 0.3s;
+    user-select: none;
+  }
+  .panel-trigger:hover {
+    background: rgba(197, 168, 128, 0.06);
+    color: #c5a880;
+  }
+  .trigger-arrow {
+    transition: transform 0.3s;
+    font-size: 8px;
+  }
+  .score-filters-panel.open .trigger-arrow {
+    transform: rotate(180deg);
+  }
+  .panel-content {
+    padding: 16px 20px;
+    border-top: 1px solid rgba(197, 168, 128, 0.1);
+    display: none;
+  }
+  .score-filters-panel.open .panel-content {
+    display: block;
+  }
+  .filter-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .filter-col {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .filter-col .fl {
+    font-size: 10px;
+    color: #7a6a5a;
+    letter-spacing: 1px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .filter-col b {
+    color: #c5a880;
+    font-family: 'Times New Roman', Georgia, serif;
+  }
+  .filter-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 3px;
+    background: rgba(197, 168, 128, 0.15);
+    outline: none;
+    border-radius: 2px;
+    transition: background 0.3s;
+  }
+  .filter-slider:hover {
+    background: rgba(197, 168, 128, 0.3);
+  }
+  .filter-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #c5a880;
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(197, 168, 128, 0.4);
+    transition: transform 0.2s;
+  }
+  .filter-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.3);
+  }
+  .reset-filter-btn {
+    background: transparent;
+    border: 1px solid rgba(197, 168, 128, 0.25);
+    color: #8a7a6a;
+    font-size: 9px;
+    padding: 4px 10px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    transition: all 0.3s;
+  }
+  .reset-filter-btn:hover {
+    border-color: rgba(197, 168, 128, 0.55);
+    color: #e6dfd3;
+    background: rgba(197, 168, 128, 0.05);
+  }
   /* ── Parchment Container ── */
   .wrap{
     max-width:1100px;margin:48px auto;position:relative;z-index:2;

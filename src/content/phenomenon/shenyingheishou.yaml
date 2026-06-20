@@ -145,3 +145,10 @@ home_metadata:
     label: 大厦崩塌
   - val: 超级形态
     label: yygq持续
+scores:
+  popularity: 6
+  dispute: 5
+  absurdity: 9
+  slice: 6
+  narrative: 7
+  native: 9

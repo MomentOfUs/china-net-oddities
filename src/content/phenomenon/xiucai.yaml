@@ -151,3 +151,10 @@ home_metadata:
     label: 封号
   - val: 封禁
     label: 税收违法
+scores:
+  popularity: 7
+  dispute: 8
+  absurdity: 9
+  slice: 7
+  narrative: 8
+  native: 9

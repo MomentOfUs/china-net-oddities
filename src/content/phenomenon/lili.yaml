@@ -148,3 +148,10 @@ home_metadata:
     label: 嘴臭连麦出圈
   - val: 快手
     label: 永久封禁
+scores:
+  popularity: 7
+  dispute: 8
+  absurdity: 9
+  slice: 7
+  narrative: 7
+  native: 10

@@ -146,3 +146,10 @@ home_metadata:
     label: B站爆红
   - val: 二次元
     label: 教父转型
+scores:
+  popularity: 7
+  dispute: 7
+  absurdity: 10
+  slice: 8
+  narrative: 8
+  native: 10

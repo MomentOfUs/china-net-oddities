@@ -151,3 +151,10 @@ home_metadata:
     label: 年收入
   - val: 29万
     label: 虎扑男神票
+scores:
+  popularity: 5
+  dispute: 7
+  absurdity: 8
+  slice: 5
+  narrative: 8
+  native: 8
