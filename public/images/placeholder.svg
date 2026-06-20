@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <defs>
+    <filter id="noise">
+      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="5" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+    <linearGradient id="bg" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#191512"/>
+      <stop offset="50%" stop-color="#14110e"/>
+      <stop offset="100%" stop-color="#100d09"/>
+    </linearGradient>
+    <linearGradient id="vignette" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="rgba(180,140,80,0.02)" />
+      <stop offset="40%" stop-color="transparent"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0.45)"/>
+    </linearGradient>
+    <!-- Daguerreotype plate tone -->
+    <linearGradient id="plate" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="rgba(60,50,40,0.15)"/>
+      <stop offset="50%" stop-color="rgba(40,35,30,0.08)"/>
+      <stop offset="100%" stop-color="rgba(50,40,30,0.2)"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Base background -->
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <rect width="800" height="600" fill="transparent" filter="url(#noise)" opacity="0.035"/>
+  <rect width="800" height="600" fill="url(#vignette)"/>
+
+  <!-- Outer decorative border -->
+  <rect x="36" y="36" width="728" height="528" fill="none" stroke="rgba(140,120,100,0.06)" stroke-width="1"/>
+  <rect x="40" y="40" width="720" height="520" fill="none" stroke="rgba(100,80,60,0.1)" stroke-width="1"/>
+
+  <!-- Photo plate area (oval frame) -->
+  <ellipse cx="400" cy="240" rx="200" ry="150" fill="url(#plate)" stroke="rgba(140,120,100,0.15)" stroke-width="1"/>
+  <!-- Double oval line -->
+  <ellipse cx="400" cy="240" rx="196" ry="146" fill="none" stroke="rgba(140,120,100,0.06)" stroke-width="1"/>
+  <!-- Plate inner glow -->
+  <ellipse cx="400" cy="240" rx="190" ry="140" fill="none" stroke="rgba(200,170,120,0.03)" stroke-width=".5"/>
+
+  <!-- Dashed photo-reticle marks at oval edges -->
+  <line x1="200" y1="240" x2="180" y2="240" stroke="rgba(140,120,100,0.1)" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="600" y1="240" x2="620" y2="240" stroke="rgba(140,120,100,0.1)" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="400" y1="90" x2="400" y2="70" stroke="rgba(140,120,100,0.1)" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="400" y1="390" x2="400" y2="410" stroke="rgba(140,120,100,0.1)" stroke-width="1" stroke-dasharray="4,3"/>
+
+  <!-- Crosshair / center mark -->
+  <circle cx="400" cy="240" r="3" fill="none" stroke="rgba(140,120,100,0.08)" stroke-width=".5"/>
+  <line x1="395" y1="240" x2="385" y2="240" stroke="rgba(140,120,100,0.06)" stroke-width=".5"/>
+  <line x1="405" y1="240" x2="415" y2="240" stroke="rgba(140,120,100,0.06)" stroke-width=".5"/>
+  <line x1="400" y1="235" x2="400" y2="225" stroke="rgba(140,120,100,0.06)" stroke-width=".5"/>
+  <line x1="400" y1="245" x2="400" y2="255" stroke="rgba(140,120,100,0.06)" stroke-width=".5"/>
+
+  <!-- Ornamental corner clasps (outer frame) -->
+  <!-- Top-left -->
+  <path d="M54 54 L90 54 L90 58 L58 58 L58 90 L54 90 Z" fill="rgba(140,120,100,0.06)"/>
+  <!-- Top-right -->
+  <path d="M746 54 L710 54 L710 58 L742 58 L742 90 L746 90 Z" fill="rgba(140,120,100,0.06)"/>
+  <!-- Bottom-left -->
+  <path d="M54 546 L90 546 L90 542 L58 542 L58 510 L54 510 Z" fill="rgba(140,120,100,0.06)"/>
+  <!-- Bottom-right -->
+  <path d="M746 546 L710 546 L710 542 L742 542 L742 510 L746 510 Z" fill="rgba(140,120,100,0.06)"/>
+
+  <!-- Typography - Museum plate label -->
+  <!-- Upper text -->
+  <text x="400" y="430" text-anchor="middle" font-family="'Times New Roman',Georgia,serif" font-size="11" fill="rgba(160,130,100,0.15)" letter-spacing="12">PORTRAIT</text>
+  <text x="400" y="452" text-anchor="middle" font-family="'Times New Roman',Georgia,serif" font-size="8" fill="rgba(160,130,100,0.1)" letter-spacing="6">ARCHIVAL RECORD · 待 补</text>
+
+  <!-- Decorative rule -->
+  <line x1="300" y1="462" x2="500" y2="462" stroke="rgba(140,120,100,0.06)" stroke-width="1"/>
+  <line x1="320" y1="466" x2="480" y2="466" stroke="rgba(100,80,60,0.04)" stroke-width=".5"/>
+
+  <!-- Plate number / catalog reference -->
+  <text x="400" y="495" text-anchor="middle" font-family="'Courier New',monospace" font-size="7" fill="rgba(100,80,60,0.12)" letter-spacing="4">—— 影 像 资 料 待 录 入 ——</text>
+
+  <!-- Museum label bottom -->
+  <text x="400" y="540" text-anchor="middle" font-family="'Times New Roman',Georgia,serif" font-size="6" fill="rgba(80,65,50,0.12)" letter-spacing="8">互 联 网 奇 观 · 人 物 档 案 馆</text>
+</svg>

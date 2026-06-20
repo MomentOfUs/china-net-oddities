@@ -12,3 +12,8 @@ __pycache__/
 
 # Site generated files
 /tmp/site-out/
+node_modules
+
+# Astro
+.astro/
+dist/
