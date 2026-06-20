@@ -41,6 +41,14 @@ data_grid:
 - label: 年收入
   unit: 元/年
   value: 约300万
+
+- label: 抖音粉丝
+  unit: 截至2025.8
+  value: 180万
+
+- label: 总获赞
+  unit: 累计
+  value: 2323万
 - label: 婚姻状况
   unit: ''
   value: 已离

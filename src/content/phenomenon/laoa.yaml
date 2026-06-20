@@ -8,7 +8,13 @@ body_grid:
   value: 斯奎奇大王
 - label: 核心标签
   sub: 反复封禁
-  value: <span class="hr">牢A</span>
+  value: 封号斗士 · 时代代言人
+- label: 出生
+  sub: 籍贯
+  value: 1995年 · 黑龙江大庆
+- label: B站数据
+  sub: 截至2026.4
+  value: 344.9万粉丝 · 193视频 · 6730万播放
 - label: 身份背景
   sub: 美国留学生
   value: 西雅图打工 · 敏感话题主播

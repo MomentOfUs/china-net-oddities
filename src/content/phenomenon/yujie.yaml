@@ -3,6 +3,15 @@ body_grid:
 - label: 本名
   sub: 真实姓名
   value: 常小雨
+- label: 出生地
+  sub: 籍贯
+  value: 辽宁本溪
+- label: 家庭背景
+  sub: 幼年
+  value: 自幼丧父，由祖辈抚养
+- label: 转型前
+  sub: 2018-2021
+  value: 从事种植业，经营农家乐
 - label: 平台
   sub: 短视频
   value: 东北雨姐（战狼版李子柒）
