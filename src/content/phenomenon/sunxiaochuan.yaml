@@ -3,6 +3,15 @@ body_grid:
 - label: 本名
   sub: 真名
   value: 孙笑川
+- label: 生日
+  sub: 出生
+  value: 1990年5月12日
+- label: 出生地
+  sub: 籍贯
+  value: 四川成都
+- label: 现状
+  sub: 当前
+  value: 工地监工·游戏博主·兼歌手
 - label: 知名ID
   sub: 多个马甲
   value: 带带大师兄 · 孙🐶 · 网恋教父
