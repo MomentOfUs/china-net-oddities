@@ -131,8 +131,8 @@ home_metadata:
     label: 账号
 scores:
   popularity: 8
-  dispute: 10
+  dispute: 8
   absurdity: 9
-  slice: 9
-  narrative: 9
+  slice: 7
+  narrative: 7
   native: 9
