@@ -229,9 +229,12 @@ const scores = data.scores || {
     )}
 
     {data.quote && (
-      <div class="pull-quote">
-        <div class="pq" set:html={data.quote.text}></div>
-        <div class="ps" set:html={data.quote.source}></div>
+      <div class="section" style="padding:20px 34px">
+        <div class="st">▎经典语录</div>
+        <div class="pull-quote" style="border:none;padding:0">
+          <div class="pq" set:html={data.quote.text}></div>
+          <div class="ps" set:html={data.quote.source}></div>
+        </div>
       </div>
     )}
 
@@ -247,24 +250,33 @@ const scores = data.scores || {
     )}
 
     {data.quote_list && data.quote_list.length > 0 && (
-      <div class="qlist">
-        <div class="qs">
-          {data.quote_list.map(q => (
-            <Fragment set:html={q} /><br /><br />
-          ))}
+      <div class="section" style="padding:20px 34px">
+        <div class="st">▎更多言论</div>
+        <div class="qlist" style="border:none;padding:0">
+          <div class="qs">
+            {data.quote_list.map(q => (
+              <Fragment set:html={q} /><br /><br />
+            ))}
+          </div>
         </div>
       </div>
     )}
 
     {data.video && (
-      <div class="video-wrap">
-        <iframe src={`${data.video}&autoplay=0`} allowfullscreen></iframe>
+      <div class="section" style="padding:20px 34px">
+        <div class="st">▎相关视频</div>
+        <div class="video-wrap" style="border:none;padding:0">
+          <iframe src={`${data.video}&autoplay=0`} allowfullscreen></iframe>
+        </div>
       </div>
     )}
 
     {data.comment && (
-      <div class="cmt">
-        <div class="ct" set:html={data.comment} />
+      <div class="section" style="padding:20px 34px">
+        <div class="st">▎档案注脚</div>
+        <div class="cmt" style="border:none;padding:0">
+          <div class="ct" set:html={data.comment} />
+        </div>
       </div>
     )}
 
@@ -276,20 +288,26 @@ const scores = data.scores || {
     )}
 
     {data.tags && data.tags.length > 0 && (
-      <div class="tag-strip">
-        {data.tags.map(t => <span>{t}</span>)}
+      <div class="section" style="padding:20px 34px">
+        <div class="st">▎标签</div>
+        <div class="tag-strip" style="border:none;padding:0">
+          {data.tags.map(t => <span>{t}</span>)}
+        </div>
       </div>
     )}
 
     {data.end_section && data.end_section.length > 0 && (
-      <div class="end-section">
-        {data.end_section.map(e => (
-          <div>
-            <div class="en" set:html={e.num}></div>
-            <div class="eu" set:html={e.unit}></div>
-            <div class="ed" set:html={e.desc} />
-          </div>
-        ))}
+      <div class="section" style="padding:20px 34px">
+        <div class="st">▎档案印象</div>
+        <div class="end-section" style="border:none;padding:0">
+          {data.end_section.map(e => (
+            <div>
+              <div class="en" set:html={e.num}></div>
+              <div class="eu" set:html={e.unit}></div>
+              <div class="ed" set:html={e.desc} />
+            </div>
+          ))}
+        </div>
       </div>
     )}
 
