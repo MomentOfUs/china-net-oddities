@@ -1,10 +1,11 @@
 import type { APIRoute } from 'astro';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { resolvePath, getAdminToken } from '../../../utils/pathHelper';
 
 export const POST: APIRoute = async ({ request }) => {
   const token = request.headers.get('X-Admin-Token');
-  if (token !== 'xiaolongxia2024') {
+  if (token !== getAdminToken()) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
@@ -31,10 +32,25 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const buffer = Buffer.from(matches[2], 'base64');
-    let filename = `${slug}-avatar.jpg`;
+    const publicDir = resolvePath('public/images');
+    const distDir = resolvePath('dist/client/images');
     
-    const publicDir = path.resolve('public/images');
-    const distDir = path.resolve('dist/client/images');
+    // 确保两处目录存在
+    await fs.mkdir(publicDir, { recursive: true });
+    try {
+      await fs.mkdir(distDir, { recursive: true });
+    } catch {}
+
+    // 提取真实的图片扩展名
+    let ext = 'jpg';
+    const mime = matches[1].toLowerCase();
+    if (mime === 'image/png') ext = 'png';
+    else if (mime === 'image/gif') ext = 'gif';
+    else if (mime === 'image/svg+xml') ext = 'svg';
+    else if (mime === 'image/webp') ext = 'webp';
+    else if (mime === 'image/jpeg' || mime === 'image/jpg') ext = 'jpg';
+
+    let filename = '';
 
     if (type === 'avatar-alt') {
       let files: string[] = [];
@@ -55,25 +71,44 @@ export const POST: APIRoute = async ({ request }) => {
         nextIndex++;
       }
       
-      let ext = 'jpg';
-      const mime = matches[1].toLowerCase();
-      if (mime === 'image/png') ext = 'png';
-      else if (mime === 'image/gif') ext = 'gif';
-      else if (mime === 'image/svg+xml') ext = 'svg';
-      else if (mime === 'image/webp') ext = 'webp';
-      else if (mime === 'image/jpeg' || mime === 'image/jpg') ext = 'jpg';
-      
       filename = `${slug}-avatar-alt-${nextIndex}.${ext}`;
+    } else {
+      filename = `${slug}-avatar.${ext}`;
+      
+      // 清理可能存在的其它后缀的旧主头像
+      const formats = ['jpg', 'jpeg', 'png', 'webp', 'svg', 'gif'];
+      for (const fmt of formats) {
+        if (fmt === ext) continue;
+        try {
+          await fs.unlink(path.join(publicDir, `${slug}-avatar.${fmt}`));
+        } catch {}
+        try {
+          await fs.unlink(path.join(distDir, `${slug}-avatar.${fmt}`));
+        } catch {}
+      }
+
+      // 同步更新 YAML 配置文件中的 avatar 字段
+      const yamlPath = resolvePath('src/content/phenomenon', `${slug}.yaml`);
+      try {
+        let yamlContent = await fs.readFile(yamlPath, 'utf-8');
+        const newAvatarUrl = `/images/${filename}`;
+        if (yamlContent.match(/^avatar:\s*/m)) {
+          yamlContent = yamlContent.replace(/^avatar:\s*.*$/m, `avatar: ${newAvatarUrl}`);
+        } else {
+          yamlContent = `avatar: ${newAvatarUrl}\n${yamlContent}`;
+        }
+        await fs.writeFile(yamlPath, yamlContent, 'utf-8');
+      } catch (err) {
+        console.error('Failed to update yaml avatar:', err);
+      }
     }
 
-    await fs.mkdir(publicDir, { recursive: true });
     await fs.writeFile(path.join(publicDir, filename), buffer);
 
     try {
-      await fs.mkdir(distDir, { recursive: true });
       await fs.writeFile(path.join(distDir, filename), buffer);
     } catch {
-      // 忽略编译产物目录可能不存在的情况
+      // 忽略编译产物目录写入失败的情况
     }
 
     return new Response(JSON.stringify({ ok: true, url: `/images/${filename}` }), {

@@ -1,10 +1,11 @@
 import type { APIRoute } from 'astro';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { resolvePath, getAdminToken } from '../../../utils/pathHelper';
 
 export const POST: APIRoute = async ({ request }) => {
   const token = request.headers.get('X-Admin-Token');
-  if (token !== 'xiaolongxia2024') {
+  if (token !== getAdminToken()) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
@@ -21,20 +22,27 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    const filename = `${slug}-avatar-alt-${index}.jpg`;
-    const publicPath = path.resolve('public/images', filename);
-    const distPath = path.resolve('dist/client/images', filename);
+    const publicDir = resolvePath('public/images');
+    const distDir = resolvePath('dist/client/images');
 
+    const formats = ['jpg', 'jpeg', 'png', 'webp', 'svg', 'gif'];
     let deleted = false;
-    try {
-      await fs.unlink(publicPath);
-      deleted = true;
-    } catch {}
 
-    try {
-      await fs.unlink(distPath);
-      deleted = true;
-    } catch {}
+    for (const fmt of formats) {
+      const filename = `${slug}-avatar-alt-${index}.${fmt}`;
+      const publicPath = path.join(publicDir, filename);
+      const distPath = path.join(distDir, filename);
+
+      try {
+        await fs.unlink(publicPath);
+        deleted = true;
+      } catch {}
+
+      try {
+        await fs.unlink(distPath);
+        deleted = true;
+      } catch {}
+    }
 
     if (deleted) {
       return new Response(JSON.stringify({ ok: true }), {

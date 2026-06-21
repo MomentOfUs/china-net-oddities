@@ -1,11 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { resolvePath } from './pathHelper';
 
 const IMG_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.svg'];
 
 function resolveImage(slug: string, suffix = ''): string | null {
-  const publicDir = path.resolve('public/images');
-  const distDir = path.resolve('dist/client/images');
+  const publicDir = resolvePath('public/images');
+  const distDir = resolvePath('dist/client/images');
 
   for (const ext of IMG_EXTENSIONS) {
     const filename = `${slug}${suffix}${ext}`;

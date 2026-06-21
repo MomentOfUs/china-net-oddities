@@ -1,10 +1,11 @@
 import type { APIRoute } from 'astro';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { resolvePath, getAdminToken } from '../../utils/pathHelper';
 
 export const GET: APIRoute = async ({ request }) => {
   const token = request.headers.get('X-Admin-Token');
-  if (token !== 'xiaolongxia2024') {
+  if (token !== getAdminToken()) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
@@ -30,7 +31,7 @@ export const GET: APIRoute = async ({ request }) => {
       });
     }
 
-    const filePath = path.resolve('src/content/phenomenon', `${slug}.yaml`);
+    const filePath = resolvePath('src/content/phenomenon', `${slug}.yaml`);
     
     let yamlContent = '';
     try {

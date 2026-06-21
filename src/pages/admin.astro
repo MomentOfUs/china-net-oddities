@@ -12,6 +12,8 @@ rawEntries.forEach(item => {
 });
 ---
 <Layout title="机密档案后台 · 图片管理">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+  <script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
   <div id="app"></div>
   <div id="toast" class="toast"></div>
 
@@ -23,6 +25,20 @@ rawEntries.forEach(item => {
     <div class="modal-actions" onclick="event.stopPropagation()">
       <button class="btn btn-primary" onclick="setAvatarFromPreview()">设为当前头像</button>
       <button class="btn" style="margin-left: 10px" onclick="closePreview()">关闭</button>
+    </div>
+  </div>
+
+  <!-- 图片裁剪 Modal (3:4 证件照比例) -->
+  <div id="crop-modal" class="modal" onclick="closeCropModal()">
+    <div class="crop-modal-content" onclick="event.stopPropagation()">
+      <div class="crop-title">📷 框选证件照显示区域</div>
+      <div class="crop-container">
+        <img id="crop-preview-img" src="" style="display: block; max-width: 100%; max-height: 100%;">
+      </div>
+      <div class="modal-actions" style="margin-top: 15px; margin-bottom: 5px; text-align: right;">
+        <button class="btn" onclick="closeCropModal()">取消</button>
+        <button class="btn btn-primary" style="margin-left: 10px;" onclick="confirmCrop()">确认并保存为证件照</button>
+      </div>
     </div>
   </div>
 
@@ -338,21 +354,73 @@ rawEntries.forEach(item => {
       }
     }
 
+    let activeCropper = null;
+    let currentCropCallback = null;
+
+    window.openCropModal = function(imageSrc, aspectRatio, callback) {
+      const modal = document.getElementById('crop-modal');
+      const img = document.getElementById('crop-preview-img');
+      img.src = imageSrc;
+      modal.style.display = 'block';
+
+      if (activeCropper) activeCropper.destroy();
+      
+      // 初始化 Cropper.js 实例，限制 aspectRatio 为 3 / 4，禁止拖出边界
+      activeCropper = new Cropper(img, {
+        aspectRatio: aspectRatio,
+        viewMode: 1,
+        dragMode: 'move',
+        background: false,
+        autoCropArea: 0.9,
+      });
+
+      currentCropCallback = callback;
+    };
+
+    window.closeCropModal = function() {
+      const modal = document.getElementById('crop-modal');
+      modal.style.display = 'none';
+      if (activeCropper) {
+        activeCropper.destroy();
+        activeCropper = null;
+      }
+      currentCropCallback = null;
+    };
+
+    window.confirmCrop = async function() {
+      if (!activeCropper || !currentCropCallback) return;
+
+      // 证件照格式导出为 360x480 的高质量 JPEG
+      const canvas = activeCropper.getCroppedCanvas({
+        width: 360,
+        height: 480,
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: 'high'
+      });
+
+      const croppedBase64 = canvas.toDataURL('image/jpeg', 0.88);
+      await currentCropCallback(croppedBase64);
+      closeCropModal();
+    };
+
     async function setAvatar(slug,url){
       if(url.includes('placeholder')) return;
-      if(!confirm('确认将 '+SLUG_NAMES[slug]+' 的前台展示头像替换为此图片吗？')) return;
-      toast('正在处理头像替换...');
+      toast('正在加载源图片进行框选裁剪...');
       try{
         const cleanUrl = url.split('?')[0]; // 去除时间戳
         const r=await fetch(cleanUrl);
         const blob=await r.blob();
         const reader=new FileReader();
-        reader.onload=async function(){
-          try{
-            await api('/admin/upload-image',{method:'POST',body:JSON.stringify({slug,image:reader.result,type:'avatar'})});
-            toast(SLUG_NAMES[slug]+' 的头像已更新');
-            await renderTabContent();
-          }catch(e){toast('更新失败: '+e.message)}
+        reader.onload=function(){
+          // 弹出 3:4 证件照裁剪 Modal
+          openCropModal(reader.result, 3 / 4, async (croppedBase64) => {
+            toast('正在保存证件照...');
+            try{
+              await api('/admin/upload-image',{method:'POST',body:JSON.stringify({slug,image:croppedBase64,type:'avatar'})});
+              toast(SLUG_NAMES[slug]+' 的证件照头像已更新');
+              await renderTabContent();
+            }catch(e){toast('更新失败: '+e.message)}
+          });
         };
         reader.readAsDataURL(blob);
       }catch(e){toast('下载原图失败，可能由于跨域或临时失效: '+e.message)}
@@ -1439,6 +1507,37 @@ timeline:
     text-align: center;
     margin-top: 15px;
     margin-bottom: 40px;
+  }
+
+  /* 图片裁剪 Modal 样式 (3:4 证件照比例) */
+  .crop-modal-content {
+    margin: 60px auto;
+    display: block;
+    width: 90%;
+    max-width: 500px;
+    background: #0f0d0b;
+    border: 1px solid rgba(197, 168, 128, 0.4);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.85);
+    border-radius: 4px;
+    padding: 20px;
+    animation: zoomIn 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+  }
+  .crop-title {
+    font-size: 15px;
+    color: #c5a880;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(197, 168, 128, 0.2);
+    padding-bottom: 10px;
+    font-weight: 600;
+  }
+  .crop-container {
+    width: 100%;
+    height: 420px;
+    background: #050403;
+    border: 1px solid rgba(197, 168, 128, 0.1);
+    overflow: hidden;
+    position: relative;
   }
 
   /* 登录晃动效果 */

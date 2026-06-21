@@ -1,18 +1,20 @@
 import type { APIRoute } from 'astro';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { resolvePath, getAdminToken } from '../../../utils/pathHelper';
 
 export const GET: APIRoute = async ({ request }) => {
   const token = request.headers.get('X-Admin-Token');
-  if (token !== 'xiaolongxia2024') {
+  if (token !== getAdminToken()) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
     });
   }
 
-  const dir = path.resolve('src/content/phenomenon');
+  const dir = resolvePath('src/content/phenomenon');
   try {
+    await fs.mkdir(dir, { recursive: true });
     const files = await fs.readdir(dir);
     const list = [];
     for (const file of files) {

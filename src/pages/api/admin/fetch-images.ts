@@ -2,10 +2,11 @@ import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { resolvePath, getAdminToken } from '../../../utils/pathHelper';
 
 export const POST: APIRoute = async ({ request }) => {
   const token = request.headers.get('X-Admin-Token');
-  if (token !== 'xiaolongxia2024') {
+  if (token !== getAdminToken()) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
@@ -64,8 +65,8 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    const publicDir = path.resolve('public/images');
-    const distDir = path.resolve('dist/client/images');
+    const publicDir = resolvePath('public/images');
+    const distDir = resolvePath('dist/client/images');
     await fs.mkdir(publicDir, { recursive: true });
     await fs.mkdir(distDir, { recursive: true });
 

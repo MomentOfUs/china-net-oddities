@@ -2,10 +2,11 @@ import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { resolvePath, getAdminToken } from '../../../utils/pathHelper';
 
 export const GET: APIRoute = async ({ request }) => {
   const token = request.headers.get('X-Admin-Token');
-  if (token !== 'xiaolongxia2024') {
+  if (token !== getAdminToken()) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
@@ -16,9 +17,10 @@ export const GET: APIRoute = async ({ request }) => {
     const entries = await getCollection('phenomenon');
     const statusObj: Record<string, any> = {};
 
-    const publicImagesDir = path.resolve('public/images');
+    const publicImagesDir = resolvePath('public/images');
     let files: string[] = [];
     try {
+      await fs.mkdir(publicImagesDir, { recursive: true });
       files = await fs.readdir(publicImagesDir);
     } catch (e) {
       console.warn('public/images directory not found or empty', e);
@@ -27,8 +29,8 @@ export const GET: APIRoute = async ({ request }) => {
     for (const entry of entries) {
       const slug = entry.id;
       
-      const publicPath = path.resolve('public/images', `${slug}-avatar.jpg`);
-      const distPath = path.resolve('dist/client/images', `${slug}-avatar.jpg`);
+      const publicPath = resolvePath('public/images', `${slug}-avatar.jpg`);
+      const distPath = resolvePath('dist/client/images', `${slug}-avatar.jpg`);
       
       let hasAvatar = false;
       try {

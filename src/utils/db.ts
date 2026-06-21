@@ -1,7 +1,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { resolvePath } from './pathHelper';
 
-const DATA_DIR = path.resolve('data');
+const DATA_DIR = resolvePath('data');
 
 export async function getVisitorCount(): Promise<number> {
   const file = path.join(DATA_DIR, 'visitor_count.json');
