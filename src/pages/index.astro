@@ -33,7 +33,8 @@ const entries = rawEntries.map(item => {
     stats: metaInfo.stats || [],
     searchText: (data.title + ' ' + (metaInfo.meta || '') + ' ' + (data.tags || []).join(' ') + ' ' + (data.subtitle || '') + ' ' + (metaInfo.tag || '')).toLowerCase(),
     category: getCategory(metaInfo.tag),
-    scores: scores
+    scores: scores,
+    score: Object.values(scores).reduce((a, b) => a + b, 0)
   };
 }).sort((a, b) => a.title.localeCompare(b.title, 'zh-cn'));
 ---
