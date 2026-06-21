@@ -1,0 +1,25 @@
+/* Noto Serif SC - Self-hosted */
+@font-face {
+  font-family: 'Noto Serif SC';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Noto Serif SC'), local('NotoSerifSC-Regular'),
+       url('/fonts/NotoSerifSC-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Noto Serif SC';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Noto Serif SC SemiBold'), local('NotoSerifSC-SemiBold'),
+       url('/fonts/NotoSerifSC-SemiBold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Noto Serif SC';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Noto Serif SC Bold'), local('NotoSerifSC-Bold'),
+       url('/fonts/NotoSerifSC-Bold.woff2') format('woff2');
+}
