@@ -410,6 +410,7 @@ rawEntries.forEach(item => {
         const cleanUrl = url.split('?')[0]; // 去除时间戳
         const r=await fetch(cleanUrl);
         const blob=await r.blob();
+        const reader=new FileReader();
         reader.onload=function(){
           // 弹出 3:4 证件照裁剪 Modal
           openCropModal(reader.result, 3 / 4, async (croppedBase64) => {
