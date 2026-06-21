@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <rect width="200" height="200" fill="#1a1a2e"/>
+  <circle cx="100" cy="75" r="40" fill="#2d2d44"/>
+  <ellipse cx="100" cy="145" rx="55" ry="50" fill="#2d2d44"/>
+  <circle cx="85" cy="68" r="4" fill="#c5a880"/>
+  <circle cx="115" cy="68" r="4" fill="#c5a880"/>
+  <path d="M90 82 Q100 90 110 82" stroke="#c5a880" stroke-width="2" fill="none"/>
+  <path d="M100 75 L100 48" stroke="#c5a880" stroke-width="1.5" opacity="0.3"/>
+  <circle cx="100" cy="45" r="5" fill="#c5a880" opacity="0.2"/>
+  <!-- 装饰 -->
+  <text x="100" y="185" text-anchor="middle" font-family="serif" font-size="10" fill="#8a7a6a" letter-spacing="3">铁山靠</text>
+</svg>
