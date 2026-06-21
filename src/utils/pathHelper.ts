@@ -1,18 +1,17 @@
 import path from 'node:path';
 import fs from 'node:fs';
+import jwt from 'jsonwebtoken';
 
 let cachedProjectRoot: string | null = null;
 
 export function getProjectRoot(): string {
   if (cachedProjectRoot) return cachedProjectRoot;
 
-  // 如果指定了环境变量，优先使用
   if (process.env.PROJECT_ROOT) {
     cachedProjectRoot = path.resolve(process.env.PROJECT_ROOT);
     return cachedProjectRoot;
   }
 
-  // 从当前运行目录往上找，直到找到包含 package.json 的目录
   let currentDir = process.cwd();
   const rootDir = path.parse(currentDir).root;
 
@@ -24,7 +23,6 @@ export function getProjectRoot(): string {
     currentDir = path.dirname(currentDir);
   }
 
-  // 默认降级为进程当前目录
   cachedProjectRoot = process.cwd();
   return cachedProjectRoot;
 }
@@ -35,4 +33,26 @@ export function resolvePath(...paths: string[]): string {
 
 export function getAdminToken(): string {
   return process.env.ADMIN_TOKEN || 'xiaolongxia2024';
+}
+
+// === JWT 动态会话持久化与签名算法 ===
+
+/**
+ * 签发具有 2 小时有效期的管理员 JSON Web Token (JWT)
+ */
+export function generateToken(payload: object): string {
+  const secret = getAdminToken();
+  return jwt.sign(payload, secret, { expiresIn: '2h' });
+}
+
+/**
+ * 解密并验证 JWT Token，如果合法返回解密后的载荷，否则返回 null
+ */
+export function verifyToken(tokenString: string): any {
+  const secret = getAdminToken();
+  try {
+    return jwt.verify(tokenString, secret);
+  } catch {
+    return null;
+  }
 }

@@ -1,12 +1,12 @@
 import type { APIRoute } from 'astro';
 import { exec } from 'node:child_process';
-import { getAdminToken, getProjectRoot } from '../../../utils/pathHelper';
+import { getProjectRoot, verifyToken } from '../../../utils/pathHelper';
 
 let isBuilding = false;
 
 export const POST: APIRoute = async ({ request }) => {
   const token = request.headers.get('X-Admin-Token');
-  if (token !== getAdminToken()) {
+  if (!token || !verifyToken(token)) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }

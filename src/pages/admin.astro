@@ -132,11 +132,11 @@ rawEntries.forEach(item => {
     async function login(){
       const val = document.getElementById('token-input').value;
       if(!val) { toast('请输入密钥'); return; }
-      TOKEN=val;
       try{
-        const r=await fetch(API+'/admin/verify',{method:'POST',headers:{'X-Admin-Token':TOKEN}});
+        const r=await fetch(API+'/admin/verify',{method:'POST',headers:{'X-Admin-Token':val}});
         const d=await r.json();
-        if(!d.ok) throw new Error('fail');
+        if(!d.ok || !d.token) throw new Error('fail');
+        TOKEN=d.token;
         localStorage.setItem('admin_token',TOKEN);
         loadDashboard();
       }catch(e){
@@ -841,7 +841,15 @@ timeline:
       if(saved){
         TOKEN=saved;
         fetch(API+'/admin/verify',{method:'POST',headers:{'X-Admin-Token':TOKEN}})
-          .then(r=>r.json()).then(d=>{if(d.ok)loadDashboard();else showLogin()}).catch(()=>showLogin());
+          .then(r=>r.json()).then(d=>{
+            if(d.ok && d.token){
+              TOKEN=d.token;
+              localStorage.setItem('admin_token',TOKEN);
+              loadDashboard();
+            }else{
+              showLogin();
+            }
+          }).catch(()=>showLogin());
       }else showLogin();
     }
   </script>
@@ -1882,5 +1890,128 @@ timeline:
     margin-top: 24px;
     display: flex;
     align-items: center;
+  }
+
+  /* ── 移动端响应式适配 ── */
+  @media (max-width: 768px) {
+    body {
+      padding: 12px 12px 24px;
+    }
+    
+    /* 登录窗口 */
+    .login-container {
+      margin: 40px auto;
+      padding: 30px 20px;
+      width: 92%;
+      box-sizing: border-box;
+    }
+    .login-container h1 {
+      font-size: 18px;
+    }
+    
+    /* 管理端头部 */
+    .admin-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 16px;
+      padding-bottom: 16px;
+    }
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .header-actions .btn {
+      flex: 1;
+      text-align: center;
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+    
+    /* 导航 Tab */
+    .admin-tabs {
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 6px;
+      gap: 4px;
+      margin-bottom: 20px;
+    }
+    .tab-btn {
+      padding: 8px 14px;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+    
+    /* 图片档案卡片 */
+    .entry {
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .entry-header {
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .avatar-badge {
+      margin-left: 0;
+      width: 100%;
+      text-align: left;
+      padding: 3px 0;
+    }
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .action-row .btn {
+      flex: 1;
+      min-width: 100px;
+      padding: 8px;
+      font-size: 11px;
+    }
+    .upload-zone {
+      padding: 10px;
+    }
+    
+    /* CMS 编辑器 */
+    .cms-container {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .cms-sidebar {
+      padding: 12px;
+    }
+    .cms-list {
+      max-height: 200px;
+    }
+    .cms-workspace {
+      padding: 16px;
+    }
+    .editor-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+    .editor-mode-switch {
+      width: 100%;
+    }
+    .editor-mode-switch button {
+      flex: 1;
+      text-align: center;
+    }
+    
+    /* 表单与编辑器 */
+    .form-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .editor-footer {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+    .editor-footer .btn {
+      width: 100%;
+      text-align: center;
+    }
   }
 </style>

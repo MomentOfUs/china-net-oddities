@@ -3,11 +3,11 @@ import { getCollection } from 'astro:content';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import sharp from 'sharp';
-import { resolvePath, getAdminToken } from '../../../utils/pathHelper';
+import { resolvePath, verifyToken } from '../../../utils/pathHelper';
 
 export const POST: APIRoute = async ({ request }) => {
   const token = request.headers.get('X-Admin-Token');
-  if (token !== getAdminToken()) {
+  if (!token || !verifyToken(token)) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }

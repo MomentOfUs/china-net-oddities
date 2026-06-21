@@ -40,9 +40,23 @@ const scores = data.scores || {
           <>
             <div class="hero-pattern-sm" />
             <div class="hero-overlay" />
-            <div class="hero-portrait">
-              <img class="portrait-svg" src={entryHero} alt={data.title} />
-            </div>
+            {entryAvatar && !entryAvatar.endsWith('placeholder-avatar.svg') ? (
+              <div class="hero-portrait">
+                <Image 
+                  src={entryAvatar} 
+                  alt={data.title} 
+                  width={200} 
+                  height={200} 
+                  format="webp" 
+                  inferSize={true}
+                  class="portrait-img"
+                />
+              </div>
+            ) : (
+              <div class="hero-portrait">
+                <img class="portrait-svg" src={entryHero} alt={data.title} />
+              </div>
+            )}
           </>
         ) : (
           <>
@@ -641,7 +655,18 @@ const scores = data.scores || {
   }
 
   /* ── Hero ── */
-  .hero{position:relative;height:480px;overflow:hidden;background:linear-gradient(135deg,#0b0907 0%,#1a1714 45%,#0f0d0b 100%)}
+  .hero {
+    position: relative;
+    height: 520px;
+    overflow: hidden;
+    background: linear-gradient(135deg,#0b0907 0%,#1a1714 45%,#0f0d0b 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 24px 20px 24px;
+    box-sizing: border-box;
+  }
   .hero::after{
     content:'';position:absolute;bottom:0;left:32px;right:32px;height:1px;
     background:linear-gradient(90deg,transparent,rgba(197,168,128,0.25) 10%,rgba(197,168,128,0.12) 50%,rgba(197,168,128,0.25) 90%,transparent)
@@ -660,20 +685,24 @@ const scores = data.scores || {
     background:linear-gradient(0deg,#0c0a09 0%,rgba(12,10,9,0.15) 25%,transparent 40%,rgba(12,10,9,0.3) 55%,rgba(12,10,9,0.85) 100%)}
 
   /* ── Portrait Frame ── */
-  .hero-portrait{
-    position:absolute;top:35%;left:50%;z-index:3;
-    transform:translate(-50%,-50%);
-    width:190px;height:190px;border-radius:4px;
-    overflow:hidden;
-    border:3px double rgba(197,168,128,0.4);
-    box-shadow:0 0 0 8px rgba(12,10,9,0.85), 0 10px 35px rgba(0,0,0,0.65), 0 0 20px rgba(197,168,128,0.12);
-    background:#0c0a09;
+  .hero-portrait {
+    position: relative;
+    z-index: 3;
+    width: 180px;
+    height: 180px;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 3px double rgba(197,168,128,0.4);
+    box-shadow: 0 0 0 8px rgba(12,10,9,0.85), 0 10px 35px rgba(0,0,0,0.65), 0 0 20px rgba(197,168,128,0.12);
+    background: #0c0a09;
     transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s ease;
+    margin-bottom: 24px;
+    flex-shrink: 0;
   }
   .hero-portrait:hover {
     border-color: rgba(197, 168, 128, 0.7);
     box-shadow: 0 0 0 8px rgba(12,10,9,0.85), 0 15px 45px rgba(0,0,0,0.8), 0 0 30px rgba(197,168,128,0.3);
-    transform: translate(-50%, -52%) scale(1.02);
+    transform: translateY(-5px) scale(1.02);
   }
   .hero-portrait :global(img){
     width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block;
@@ -687,8 +716,14 @@ const scores = data.scores || {
   }
 
   /* ── Hero Text ── */
-  .hero-text{
-    position:absolute;bottom:0;left:0;right:0;padding:85px 36px 32px;text-align:center;z-index:2
+  .hero-text {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    width: 100%;
+    max-width: 800px;
+    padding: 0 24px;
+    box-sizing: border-box;
   }
   .hero-text .tag{
     font-size:9px;letter-spacing:8px;color:#8a7a6a;text-transform:uppercase;margin-bottom:14px;
@@ -1004,12 +1039,13 @@ const scores = data.scores || {
   @media(max-width:720px){
     .wrap{margin:20px 8px}
     .back-link{top:10px;left:10px;font-size:8px;padding:4px 10px}
-    .hero{height:360px;}
-    .hero-text{padding:70px 20px 24px}
+    .hero{height:420px;padding:30px 16px 20px;box-sizing:border-box}
+    .hero-portrait{width:130px;height:130px;position:relative;top:auto;left:auto;transform:none;margin-bottom:16px}
+    .hero-portrait:hover{transform:translateY(-3px) scale(1.02)}
+    .hero-text{position:relative;bottom:auto;left:auto;right:auto;padding:0 10px}
     .hero-text .tag::before,.hero-text .tag::after{display:none}
     .hero-text .tag{font-size:8px;letter-spacing:5px}
-    .hero-text h1{font-size:48px;letter-spacing:14px}
-    .hero-portrait{width:150px;height:150px;top:33%}
+    .hero-text h1{font-size:36px;letter-spacing:10px}
     .main-stat{grid-template-columns:1fr}
     .main-stat>div:first-child{border-right:none;border-bottom:1px solid rgba(197,168,128,0.15)}
     .main-stat>div:first-child::after{display:none}
@@ -1025,5 +1061,10 @@ const scores = data.scores || {
     .pull-quote .pq{font-size:17px;letter-spacing:6px}
     .pull-quote::before,.pull-quote::after{font-size:48px}
     .section,.essay,.cmt,.qlist{padding-left:20px;padding-right:20px}
+    .ribbon{grid-template-columns:repeat(2,1fr)}
+    .ribbon>div{border-right:none;border-bottom:1px solid rgba(197, 168, 128, 0.15)}
+    .ribbon>div:nth-child(odd){border-right:1px solid rgba(197, 168, 128, 0.15)}
+    .ribbon>div:nth-child(3),.ribbon>div:nth-child(4){border-bottom:none}
+    .eval-grid{grid-template-columns:1fr;gap:20px}
   }
 </style>
