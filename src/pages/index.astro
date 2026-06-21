@@ -35,7 +35,7 @@ const entries = rawEntries.map(item => {
     category: getCategory(metaInfo.tag),
     scores: scores
   };
-});
+}).sort((a, b) => a.title.localeCompare(b.title, 'zh-cn'));
 ---
 <Layout title="中国互联网奇观 · 人物档案馆">
   <div class="wrap">
