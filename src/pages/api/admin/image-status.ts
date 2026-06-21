@@ -1,7 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getCollection } from 'astro:content';
 import fs from 'node:fs/promises';
-import path from 'node:path';
 import { resolvePath, verifyToken } from '../../../utils/pathHelper';
 
 export const GET: APIRoute = async ({ request }) => {
@@ -14,27 +12,50 @@ export const GET: APIRoute = async ({ request }) => {
   }
 
   try {
-    const entries = await getCollection('phenomenon');
+    const phenomenonDir = resolvePath('src/content/phenomenon');
+    let slugList: string[] = [];
+    try {
+      const files = await fs.readdir(phenomenonDir);
+      slugList = files
+        .filter(f => f.endsWith('.yaml'))
+        .map(f => f.replace(/\.yaml$/, ''))
+        .sort();
+    } catch {
+      return new Response(JSON.stringify({ error: 'Failed to read content' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     const statusObj: Record<string, any> = {};
 
     const publicImagesDir = resolvePath('public/images');
-    let files: string[] = [];
+    let imageFiles: string[] = [];
     try {
       await fs.mkdir(publicImagesDir, { recursive: true });
-      files = await fs.readdir(publicImagesDir);
+      imageFiles = await fs.readdir(publicImagesDir);
     } catch (e) {
       console.warn('public/images directory not found or empty', e);
     }
 
-    for (const entry of entries) {
-      const slug = entry.id;
-      const declaredAvatar = entry.data.avatar;
+    for (const slug of slugList) {
+      // 直接读 YAML 文件，避免 Astro getCollection 缓存
+      let declaredAvatar = '';
+      const yamlPath = resolvePath('src/content/phenomenon', `${slug}.yaml`);
+      try {
+        const yamlText = await fs.readFile(yamlPath, 'utf-8');
+        const match = yamlText.match(/^avatar:\s*(.*)$/m);
+        if (match && match[1].trim() !== '') {
+          declaredAvatar = match[1].trim();
+        }
+      } catch {}
+      
       let avatarUrl = `/images/placeholder-avatar.svg`;
       let hasAvatar = false;
 
-      // 1. 如果 YAML 里声明了头像路径，我们先验证它物理上是否存在
-      if (declaredAvatar && declaredAvatar.trim() !== '') {
-        const cleanUrl = declaredAvatar.split('?')[0]; // 去除时间戳
+      // 1. 如果 YAML 里声明了头像路径，验证物理存在
+      if (declaredAvatar) {
+        const cleanUrl = declaredAvatar.split('?')[0];
         if (cleanUrl.startsWith('/images/')) {
           const relPath = cleanUrl.replace(/^\/images\//, '');
           const publicPath = resolvePath('public/images', relPath);
@@ -54,7 +75,6 @@ export const GET: APIRoute = async ({ request }) => {
             }
           }
         } else {
-          // 网络外链图片直接认为有效
           hasAvatar = true;
           avatarUrl = declaredAvatar;
         }
@@ -98,7 +118,7 @@ export const GET: APIRoute = async ({ request }) => {
       const pattern = new RegExp(`^${slug}-avatar-alt-(\\d+)\\.(jpg|jpeg|png|webp|svg)$`, 'i');
       
       // 过滤匹配的文件
-      const matchedFiles = files.filter(file => pattern.test(file));
+      const matchedFiles = imageFiles.filter(file => pattern.test(file));
       
       // 按序号进行升序排序
       matchedFiles.sort((a, b) => {
