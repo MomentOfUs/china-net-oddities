@@ -410,14 +410,15 @@ rawEntries.forEach(item => {
         const cleanUrl = url.split('?')[0]; // 去除时间戳
         const r=await fetch(cleanUrl);
         const blob=await r.blob();
-        const reader=new FileReader();
         reader.onload=function(){
           // 弹出 3:4 证件照裁剪 Modal
           openCropModal(reader.result, 3 / 4, async (croppedBase64) => {
             toast('正在保存证件照...');
             try{
               await api('/admin/upload-image',{method:'POST',body:JSON.stringify({slug,image:croppedBase64,type:'avatar'})});
-              toast(SLUG_NAMES[slug]+' 的证件照头像已更新');
+              toast(SLUG_NAMES[slug]+' 的证件照头像已更新，正在重新生成前台主页...');
+              // 自动触发重新构建，刷新预渲染的首页
+              api('/admin/rebuild',{method:'POST'}).catch(()=>{});
               await renderTabContent();
             }catch(e){toast('更新失败: '+e.message)}
           });
