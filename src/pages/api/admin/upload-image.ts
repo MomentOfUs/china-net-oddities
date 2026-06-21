@@ -1,17 +1,8 @@
 import type { APIRoute } from 'astro';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import sharp from 'sharp';
 import { resolvePath, getAdminToken } from '../../../utils/pathHelper';
-
-function getExt(mime: string): string {
-  const m = mime.toLowerCase();
-  if (m === 'image/png') return 'png';
-  if (m === 'image/gif') return 'gif';
-  if (m === 'image/svg+xml') return 'svg';
-  if (m === 'image/webp') return 'webp';
-  if (m === 'image/jpeg' || m === 'image/jpg') return 'jpg';
-  return 'jpg';
-}
 
 export const POST: APIRoute = async ({ request }) => {
   const token = request.headers.get('X-Admin-Token');
@@ -41,35 +32,40 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    const buffer = Buffer.from(matches[2], 'base64');
-    const ext = getExt(matches[1]);
+    const rawBuffer = Buffer.from(matches[2], 'base64');
 
-    // === 头像替换：写入 avatars/ 目录 + 更新 YAML ===
+    // === 头像替换：3:4 证件照裁剪 + 自动转 WebP + 更新 YAML ===
     if (type === 'avatar') {
+      const ext = 'webp';
       const avatarFilename = `${slug}.${ext}`;
       const avatarDir = resolvePath('public/images/avatars');
       const avatarDistDir = resolvePath('dist/client/images/avatars');
 
+      // 使用 sharp 优化裁剪，强锁 3:4 比例，尺寸限定在 360x480 并输出 webp
+      const optimizedBuffer = await sharp(rawBuffer)
+        .resize(360, 480, { fit: 'cover' })
+        .webp({ quality: 85 })
+        .toBuffer();
+
       await fs.mkdir(avatarDir, { recursive: true });
-      await fs.writeFile(path.join(avatarDir, avatarFilename), buffer);
+      await fs.writeFile(path.join(avatarDir, avatarFilename), optimizedBuffer);
       
       try {
         await fs.mkdir(avatarDistDir, { recursive: true });
-        await fs.writeFile(path.join(avatarDistDir, avatarFilename), buffer);
+        await fs.writeFile(path.join(avatarDistDir, avatarFilename), optimizedBuffer);
       } catch {}
 
-      // 清理旧扩展名文件
-      for (const oldExt of ['jpg', 'jpeg', 'png', 'webp', 'svg', 'gif']) {
-        if (oldExt !== ext) {
-          for (const dir of [avatarDir, avatarDistDir]) {
-            try {
-              await fs.unlink(path.join(dir, `${slug}.${oldExt}`));
-            } catch {}
-          }
+      // 清理以往可能存在的其它所有后缀的旧头像文件，防缓存污染
+      const oldExtensions = ['jpg', 'jpeg', 'png', 'svg', 'gif'];
+      for (const oldExt of oldExtensions) {
+        for (const dir of [avatarDir, avatarDistDir]) {
+          try {
+            await fs.unlink(path.join(dir, `${slug}.${oldExt}`));
+          } catch {}
         }
       }
 
-      // 更新 YAML 中 avatar 字段（文本替换）
+      // 同步更新对应 YAML 配置文件中的 avatar 属性为最新 webp 路径
       const yamlPath = resolvePath('src/content/phenomenon', `${slug}.yaml`);
       try {
         let yamlText = await fs.readFile(yamlPath, 'utf-8');
@@ -85,7 +81,7 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    // === 备选图上传 ===
+    // === 备选图上传：自动限宽 800px + 压缩为 WebP ===
     if (type === 'avatar-alt') {
       const publicDir = resolvePath('public/images');
       const distDir = resolvePath('dist/client/images');
@@ -97,6 +93,7 @@ export const POST: APIRoute = async ({ request }) => {
         files = await fs.readdir(publicDir);
       } catch {}
 
+      // 寻找可用的备选图序号
       const pattern = new RegExp(`^${slug}-avatar-alt-(\\d+)\\.(jpg|jpeg|png|webp|svg)$`, 'i');
       const indexes = files
         .map(file => {
@@ -108,12 +105,19 @@ export const POST: APIRoute = async ({ request }) => {
       let nextIndex = 1;
       while (indexes.includes(nextIndex)) nextIndex++;
 
-      const filename = `${slug}-avatar-alt-${nextIndex}.${ext}`;
-      await fs.writeFile(path.join(publicDir, filename), buffer);
+      const filename = `${slug}-avatar-alt-${nextIndex}.webp`;
+
+      // 对备选图进行限宽 800px 缩放，并压缩为 webp，极大地降低带宽和磁盘占用
+      const optimizedBuffer = await sharp(rawBuffer)
+        .resize({ width: 800, withoutEnlargement: true })
+        .webp({ quality: 80 })
+        .toBuffer();
+
+      await fs.writeFile(path.join(publicDir, filename), optimizedBuffer);
       
       try {
         await fs.mkdir(distDir, { recursive: true });
-        await fs.writeFile(path.join(distDir, filename), buffer);
+        await fs.writeFile(path.join(distDir, filename), optimizedBuffer);
       } catch {}
 
       return new Response(JSON.stringify({ ok: true, url: `/images/${filename}` }), {

@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import sharp from 'sharp';
 import { resolvePath, getAdminToken } from '../../../utils/pathHelper';
 
 export const POST: APIRoute = async ({ request }) => {
@@ -110,21 +111,20 @@ export const POST: APIRoute = async ({ request }) => {
         if (!imgRes.ok) continue;
         
         const arrayBuffer = await imgRes.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
+        const rawBuffer = Buffer.from(arrayBuffer);
         
-        const contentType = imgRes.headers.get('content-type') || '';
-        let ext = 'jpg';
-        if (contentType.includes('image/png')) ext = 'png';
-        else if (contentType.includes('image/webp')) ext = 'webp';
-        else if (contentType.includes('image/svg+xml')) ext = 'svg';
-        else if (contentType.includes('image/gif')) ext = 'gif';
+        // 限制网络下载图宽度最大为 800px 且无放大，转换为 WebP 压缩存储
+        const optimizedBuffer = await sharp(rawBuffer)
+          .resize({ width: 800, withoutEnlargement: true })
+          .webp({ quality: 80 })
+          .toBuffer();
         
         const nextIndex = await getNextIndex();
-        const filename = `${slug}-avatar-alt-${nextIndex}.${ext}`;
+        const filename = `${slug}-avatar-alt-${nextIndex}.webp`;
         
-        await fs.writeFile(path.join(publicDir, filename), buffer);
+        await fs.writeFile(path.join(publicDir, filename), optimizedBuffer);
         try {
-          await fs.writeFile(path.join(distDir, filename), buffer);
+          await fs.writeFile(path.join(distDir, filename), optimizedBuffer);
         } catch {}
         
         savedCount++;
@@ -132,7 +132,7 @@ export const POST: APIRoute = async ({ request }) => {
           break; // 最多保存3张
         }
       } catch (err) {
-        console.error(`Failed to download image ${imgUrl}:`, err);
+        console.error(`Failed to download and process image ${imgUrl}:`, err);
       }
     }
 
