@@ -28,20 +28,67 @@ export const GET: APIRoute = async ({ request }) => {
 
     for (const entry of entries) {
       const slug = entry.id;
-      
-      const publicPath = resolvePath('public/images', `${slug}-avatar.jpg`);
-      const distPath = resolvePath('dist/client/images', `${slug}-avatar.jpg`);
-      
+      const declaredAvatar = entry.data.avatar;
+      let avatarUrl = `/images/placeholder-avatar.svg`;
       let hasAvatar = false;
-      try {
-        await fs.access(publicPath);
-        hasAvatar = true;
-      } catch {
-        try {
-          await fs.access(distPath);
+
+      // 1. 如果 YAML 里声明了头像路径，我们先验证它物理上是否存在
+      if (declaredAvatar && declaredAvatar.trim() !== '') {
+        const cleanUrl = declaredAvatar.split('?')[0]; // 去除时间戳
+        if (cleanUrl.startsWith('/images/')) {
+          const relPath = cleanUrl.replace(/^\/images\//, '');
+          const publicPath = resolvePath('public/images', relPath);
+          const distPath = resolvePath('dist/client/images', relPath);
+
+          try {
+            await fs.access(publicPath);
+            hasAvatar = true;
+            avatarUrl = cleanUrl;
+          } catch {
+            try {
+              await fs.access(distPath);
+              hasAvatar = true;
+              avatarUrl = cleanUrl;
+            } catch {
+              hasAvatar = false;
+            }
+          }
+        } else {
+          // 网络外链图片直接认为有效
           hasAvatar = true;
-        } catch {
-          hasAvatar = false;
+          avatarUrl = declaredAvatar;
+        }
+      }
+
+      // 2. 如果没有声明或声明的图片失效，我们按格式顺序轮询匹配本地存在的图片
+      if (!hasAvatar) {
+        const extensions = ['jpg', 'jpeg', 'png', 'webp', 'svg', 'gif'];
+        for (const ext of extensions) {
+          const checkPaths = [
+            `avatars/${slug}.${ext}`,
+            `${slug}-avatar.${ext}`,
+            `${slug}.${ext}`
+          ];
+          for (const p of checkPaths) {
+            const publicPath = resolvePath('public/images', p);
+            const distPath = resolvePath('dist/client/images', p);
+            let found = false;
+            try {
+              await fs.access(publicPath);
+              found = true;
+            } catch {
+              try {
+                await fs.access(distPath);
+                found = true;
+              } catch {}
+            }
+            if (found) {
+              hasAvatar = true;
+              avatarUrl = `/images/${p}`;
+              break;
+            }
+          }
+          if (hasAvatar) break;
         }
       }
 
@@ -69,7 +116,7 @@ export const GET: APIRoute = async ({ request }) => {
 
       statusObj[slug] = {
         hasAvatar,
-        avatarUrl: `/images/${slug}-avatar.jpg`,
+        avatarUrl,
         altCount: altUrls.length,
         altUrls: altUrls
       };
