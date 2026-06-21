@@ -133,7 +133,7 @@ rawEntries.forEach(item => {
       const val = document.getElementById('token-input').value;
       if(!val) { toast('请输入密钥'); return; }
       try{
-        const r=await fetch(API+'/admin/verify',{method:'POST',headers:{'X-Admin-Token':val}});
+        const r=await fetch(API+'/admin/verify',{method:'POST',headers:{'X-Admin-Token':val,'Content-Type':'application/json'}});
         const d=await r.json();
         if(!d.ok || !d.token) throw new Error('fail');
         TOKEN=d.token;
