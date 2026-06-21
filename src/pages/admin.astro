@@ -350,7 +350,9 @@ rawEntries.forEach(item => {
         reader.onload=async function(){
           try{
             await api('/admin/upload-image',{method:'POST',body:JSON.stringify({slug,image:reader.result,type:'avatar'})});
-            toast(SLUG_NAMES[slug]+' 的头像已更新');
+            toast(SLUG_NAMES[slug]+' 的头像已更新，正在重新生成首页...');
+            // 触发重新构建，刷新预渲染的首页
+            api('/admin/rebuild',{method:'POST'}).catch(()=>{});
             await renderTabContent();
           }catch(e){toast('更新失败: '+e.message)}
         };
