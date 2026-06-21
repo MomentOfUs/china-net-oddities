@@ -40,7 +40,7 @@ const scores = data.scores || {
           <>
             <div class="hero-pattern-sm" />
             <div class="hero-overlay" />
-            {entryAvatar && !entryAvatar.endsWith('placeholder-avatar.svg') ? (
+            {entryAvatar && !entryAvatar.endsWith('.svg') && !entryAvatar.endsWith('placeholder-avatar.svg') ? (
               <div class="hero-portrait">
                 <Image 
                   src={entryAvatar} 
@@ -54,7 +54,7 @@ const scores = data.scores || {
               </div>
             ) : (
               <div class="hero-portrait">
-                <img class="portrait-svg" src={entryHero} alt={data.title} />
+                <img class="portrait-svg" src={entryAvatar || entryHero} alt={data.title} />
               </div>
             )}
           </>
@@ -62,7 +62,7 @@ const scores = data.scores || {
           <>
             <img class="hero-img is-photo" src={entryHero} alt={data.title} />
             <div class="hero-overlay" />
-            {entryAvatar && (
+            {entryAvatar && !entryAvatar.endsWith('.svg') && !entryAvatar.endsWith('placeholder-avatar.svg') ? (
               <div class="hero-portrait">
                 <Image 
                   src={entryAvatar} 
@@ -74,7 +74,11 @@ const scores = data.scores || {
                   class="portrait-img"
                 />
               </div>
-            )}
+            ) : (
+              <div class="hero-portrait">
+                <img class="portrait-svg" src={entryAvatar || entryHero} alt={data.title} />
+              </div>
+            )
           </>
         )
       )}

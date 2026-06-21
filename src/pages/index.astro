@@ -128,6 +128,9 @@ const entries = rawEntries.map(item => {
                data-native={entry.scores.native}>
             <div class="folder-tab">人物档案</div>
             <a class="featured" href={entry.filename}>
+              {entry.avatar && entry.avatar.endsWith('.svg') ? (
+                <img src={entry.avatar} alt={entry.title} class="fc-img" width={360} height={360} />
+              ) : (
               <Image 
                 src={entry.avatar} 
                 alt={entry.title} 
@@ -137,6 +140,7 @@ const entries = rawEntries.map(item => {
                 inferSize={true}
                 class="fc-img" 
               />
+              )}
               <div class="fc-body">
                 <div class="fc-tag">{entry.tag}</div>
                 <div class="fc-title">{entry.title}</div>
