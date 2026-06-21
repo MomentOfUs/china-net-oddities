@@ -103,9 +103,15 @@ const entries = rawEntries.map(item => {
         </div>
       </div>
 
-      <div class="search-bar">
-        <input type="text" id="searchInput" class="search-input" placeholder="搜索人物姓名、标签、关键词…" oninput="doSearch()" autocomplete="off" />
-        <span id="searchCount" class="search-count"></span>
+      <div class="search-section">
+        <div class="search-bar">
+          <span class="search-label">▎档案检索</span>
+          <div class="search-inner">
+            <input type="text" id="searchInput" class="search-input" placeholder="姓名 · 标签 · 关键词" oninput="doSearch()" autocomplete="off" />
+            <span id="searchClear" class="search-clear" onclick="document.getElementById('searchInput').value='';applyFilters();this.style.opacity='0'">✕</span>
+          </div>
+          <span id="searchCount" class="search-count"></span>
+        </div>
       </div>
 
       <div class="entries-grid">
@@ -321,6 +327,11 @@ const entries = rawEntries.map(item => {
     }
 
     window.doSearch = function() {
+      const input = document.getElementById('searchInput');
+      const clearBtn = document.getElementById('searchClear');
+      if (input && clearBtn) {
+        clearBtn.style.opacity = input.value ? '1' : '0';
+      }
       applyFilters();
     }
 
@@ -563,7 +574,20 @@ const entries = rawEntries.map(item => {
     background:linear-gradient(90deg,rgba(197,168,128,0.25) 15%,rgba(197,168,128,0.05) 50%,transparent)
   }
 
+  /* ── Search Bar ── */
+  .search-section{margin:0 36px 20px}
+  .search-bar{display:flex;align-items:center;gap:14px;padding:12px 18px;background:rgba(13,11,9,0.4);border:1px solid rgba(197,168,128,0.08)}
+  .search-label{font-size:10px;color:#7a6a5a;letter-spacing:5px;text-transform:uppercase;white-space:nowrap;font-family:'Times New Roman',Georgia,serif;border-right:1px solid rgba(197,168,128,0.12);padding-right:14px}
+  .search-inner{flex:1;display:flex;align-items:center;gap:8px}
+  .search-input{flex:1;padding:8px 10px;background:rgba(8,7,6,0.6);border:1px solid transparent;color:#c8baaa;font-family:'Noto Serif SC',serif;font-size:13px;letter-spacing:2px;outline:none;transition:all .3s}
+  .search-input::placeholder{color:#5a4a3a;letter-spacing:3px;font-weight:300;font-size:11px}
+  .search-input:focus{background:rgba(8,7,6,0.8);border-color:rgba(197,168,128,0.2)}
+  .search-clear{font-size:10px;color:#5a4a3a;cursor:pointer;padding:4px 6px;opacity:0;transition:opacity .3s;font-family:'Times New Roman',serif}
+  .search-clear:hover{color:#8a7a6a}
+  .search-count{font-size:10px;color:#4a3a2a;letter-spacing:2px;white-space:nowrap;font-family:'Times New Roman',serif;min-width:60px;text-align:right;border-left:1px solid rgba(197,168,128,0.08);padding-left:14px}
+
   /* ── Entry Grid ── */
+    /* ── Entry Grid ── */
   .entries-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:0 36px 24px}
 
   /* ── folder tab ── */
