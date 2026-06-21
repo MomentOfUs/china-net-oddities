@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-  <rect width="200" height="200" fill="#f5ebe0"/>
-  <circle cx="100" cy="72" r="38" fill="#e8d5c4"/>
-  <ellipse cx="100" cy="148" rx="50" ry="45" fill="#e8d5c4"/>
-  <circle cx="85" cy="65" r="4" fill="#3d2b1f"/>
-  <circle cx="115" cy="65" r="4" fill="#3d2b1f"/>
-  <path d="M88 78 Q100 86 112 78" stroke="#3d2b1f" stroke-width="1.5" fill="none"/>
-  <text x="100" y="188" text-anchor="middle" font-family="serif" font-size="10" fill="#8a7a6a" letter-spacing="2">晚 学 永 存</text>
-</svg>
