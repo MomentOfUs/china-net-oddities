@@ -10,4 +10,11 @@ export default defineConfig({
   build: {
     format: 'file',
   },
+  vite: {
+    server: {
+      watch: {
+        ignored: ['**/public/images/**'],
+      },
+    },
+  },
 });
