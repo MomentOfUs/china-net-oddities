@@ -679,55 +679,69 @@ const scores = data.scores || {
       inset 0 0 80px rgba(0,0,0,0.55);
   }
 
-  /* ── Corner Brass Guards (黄铜包角防磨与立体铆钉) ── */
+  /* ── Corner Leather Guards (真皮缝线包边护角) ── */
   .corner {
     position: absolute;
-    width: 32px;
-    height: 32px;
+    width: 42px;
+    height: 42px;
     z-index: 10;
-    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
     pointer-events: none;
   }
   .corner.tl {
     top: 0;
     left: 0;
     clip-path: polygon(0 0, 100% 0, 0 100%);
-    background: linear-gradient(135deg, #e5cda8 0%, #b39362 50%, #8c6a38 100%);
+    background: #36281c;
+    border-right: 1px solid rgba(0,0,0,0.35);
+    border-bottom: 1px solid rgba(0,0,0,0.35);
   }
   .corner.tr {
     top: 0;
     right: 0;
     clip-path: polygon(0 0, 100% 0, 100% 100%);
-    background: linear-gradient(225deg, #e5cda8 0%, #b39362 50%, #8c6a38 100%);
+    background: #36281c;
+    border-left: 1px solid rgba(0,0,0,0.35);
+    border-bottom: 1px solid rgba(0,0,0,0.35);
   }
   .corner.bl {
     bottom: 0;
     left: 0;
     clip-path: polygon(0 0, 0 100%, 100% 100%);
-    background: linear-gradient(45deg, #e5cda8 0%, #b39362 50%, #8c6a38 100%);
+    background: #36281c;
+    border-right: 1px solid rgba(0,0,0,0.35);
+    border-top: 1px solid rgba(0,0,0,0.35);
   }
   .corner.br {
     bottom: 0;
     right: 0;
     clip-path: polygon(100% 0, 0 100%, 100% 100%);
-    background: linear-gradient(315deg, #e5cda8 0%, #b39362 50%, #8c6a38 100%);
+    background: #36281c;
+    border-left: 1px solid rgba(0,0,0,0.35);
+    border-top: 1px solid rgba(0,0,0,0.35);
   }
-  /* 立体黄铜小铆钉 */
+  /* 内嵌手工手缝边线 */
   .corner::after {
     content: '';
     position: absolute;
-    width: 6px;
-    height: 6px;
-    background: radial-gradient(circle at 35% 35%, #fff 0%, #dfba8c 40%, #7d5f35 100%);
-    border-radius: 50%;
-    box-shadow: 
-      0.5px 1px 2px rgba(0, 0, 0, 0.5),
-      inset -0.5px -0.5px 1px rgba(0,0,0,0.6);
+    inset: 5px;
+    pointer-events: none;
   }
-  .corner.tl::after { top: 6px; left: 6px; }
-  .corner.tr::after { top: 6px; right: 6px; }
-  .corner.bl::after { bottom: 6px; left: 6px; }
-  .corner.br::after { bottom: 6px; right: 6px; }
+  .corner.tl::after {
+    border-left: 1px dashed rgba(197, 168, 128, 0.15);
+    border-top: 1px dashed rgba(197, 168, 128, 0.15);
+  }
+  .corner.tr::after {
+    border-right: 1px dashed rgba(197, 168, 128, 0.15);
+    border-top: 1px dashed rgba(197, 168, 128, 0.15);
+  }
+  .corner.bl::after {
+    border-left: 1px dashed rgba(197, 168, 128, 0.15);
+    border-bottom: 1px dashed rgba(197, 168, 128, 0.15);
+  }
+  .corner.br::after {
+    border-right: 1px dashed rgba(197, 168, 128, 0.15);
+    border-bottom: 1px dashed rgba(197, 168, 128, 0.15);
+  }
 
 
   /* ── Hero ── */
