@@ -314,7 +314,7 @@ const entries = rawEntries.map(item => {
   .sort-tabs {
     display: flex;
     gap: 8px;
-    margin: -8px 36px 16px;
+    margin: -8px 48px 16px;
     align-items: center;
   }
   .sort-label {
@@ -346,7 +346,7 @@ const entries = rawEntries.map(item => {
 
   /* ── Parchment Container ── */
   .wrap{
-    max-width:1100px;margin:48px auto;position:relative;z-index:2;
+    max-width:1320px;margin:48px auto;position:relative;z-index:2;
     background:
       radial-gradient(ellipse at 50% 20%, rgba(255, 255, 255, 0.02) 0%, transparent 80%),
       #1a130e;
@@ -446,7 +446,7 @@ const entries = rawEntries.map(item => {
   .entries{padding:36px 0}
   .entry-head{
     font-size:11px;color:#8a7a6a;letter-spacing:7px;text-transform:uppercase;font-weight:400;
-    margin:0 36px 28px;padding-bottom:12px;position:relative;font-family:'Times New Roman',Georgia,serif
+    margin:0 48px 28px;padding-bottom:12px;position:relative;font-family:'Times New Roman',Georgia,serif
   }
   .entry-head::after{
     content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
@@ -454,7 +454,7 @@ const entries = rawEntries.map(item => {
   }
 
   /* ── Search Bar ── */
-  .search-section{margin:0 36px 20px}
+  .search-section{margin:0 48px 20px}
   .search-bar{display:flex;align-items:center;gap:14px;padding:12px 18px;background:rgba(13,11,9,0.4);border:1px solid rgba(197,168,128,0.08)}
   .search-label{font-size:10px;color:#7a6a5a;letter-spacing:5px;text-transform:uppercase;white-space:nowrap;font-family:'Times New Roman',Georgia,serif;border-right:1px solid rgba(197,168,128,0.12);padding-right:14px}
   .search-inner{flex:1;display:flex;align-items:center;gap:8px}
@@ -465,7 +465,7 @@ const entries = rawEntries.map(item => {
   .search-clear:hover{color:#8a7a6a}
   .search-count{font-size:10px;color:#4a3a2a;letter-spacing:2px;white-space:nowrap;font-family:'Times New Roman',serif;min-width:60px;text-align:right;border-left:1px solid rgba(197,168,128,0.08);padding-left:14px}
 
-  .entries-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:0 36px 24px}
+  .entries-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:0 48px 24px}
 
   /* ── folder tab ── */
   .featured .folder-tab {
@@ -706,20 +706,20 @@ const entries = rawEntries.map(item => {
 
   /* ── Suggestion Wall ── */
   .suggest-section{padding:36px 0 0}
-  .suggest-form{margin:0 36px 24px;padding:24px 28px;background:rgba(13,11,9,0.5);border:1px solid rgba(197,168,128,0.15);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .suggest-form{margin:0 48px 24px;padding:24px 28px;background:rgba(13,11,9,0.5);border:1px solid rgba(197,168,128,0.15);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
   .suggest-form input{flex:1;min-width:180px;padding:10px 16px;background:rgba(8,7,6,0.8);border:1px solid rgba(197,168,128,0.2);color:#e6dfd3;font-family:inherit;font-size:14px;letter-spacing:2px;outline:none;transition:all .3s}
   .suggest-form input:focus{border-color:rgba(197,168,128,0.45);box-shadow:inset 0 1px 4px rgba(0,0,0,0.5)}
   .suggest-form input::placeholder{color:#6a5a4a;letter-spacing:4px;font-size:11px}
   .suggest-form button{padding:10px 24px;background:rgba(197,168,128,0.12);border:1px solid rgba(197,168,128,0.25);color:#c5a880;font-family:inherit;font-size:11px;letter-spacing:6px;cursor:pointer;transition:all .3s}
   .suggest-form button:hover{background:rgba(197,168,128,0.25);border-color:rgba(197,168,128,0.45);color:#e6dfd3}
   .suggest-form button:disabled{opacity:.3;cursor:not-allowed}
-  .suggest-msg{margin:0 36px;font-size:10px;letter-spacing:3px;min-height:20px}
+  .suggest-msg{margin:0 48px;font-size:10px;letter-spacing:3px;min-height:20px}
   .suggest-msg.ok{color:#7a9a6a}
   .suggest-msg.err{color:#b05030}
-  .suggest-list{margin:12px 36px 0;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .suggest-list{margin:12px 48px 0;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
   .suggest-item{padding:16px;background:rgba(13,11,9,0.5);border:1px solid rgba(197,168,128,0.15);font-size:14px;color:#bcae9e;letter-spacing:4px;text-align:center;cursor:default;transition:all .3s}
   .suggest-item:hover{background:rgba(22,18,15,0.8);border-color:rgba(197,168,128,0.35);color:#e6dfd3}
-  .suggest-empty{font-size:10px;color:#6a5a4a;letter-spacing:4px;margin:0 36px;grid-column:1/-1;text-align:center;padding:20px 0}
+  .suggest-empty{font-size:10px;color:#6a5a4a;letter-spacing:4px;margin:0 48px;grid-column:1/-1;text-align:center;padding:20px 0}
 
   /* ── Colophon ── */
   .footer{
@@ -777,7 +777,14 @@ const entries = rawEntries.map(item => {
 
   /* ── Responsive ── */
   @media(max-width:960px){
-    .entries-grid{grid-template-columns:repeat(3,1fr);gap:16px}
+    .entries-grid{grid-template-columns:repeat(3,1fr);gap:16px;margin:0 36px 24px}
+    .entry-head{margin:0 36px 28px}
+    .search-section{margin:0 36px 20px}
+    .sort-tabs{margin:-8px 36px 16px}
+    .suggest-form{margin:0 36px 24px}
+    .suggest-msg{margin:0 36px}
+    .suggest-list{margin:12px 36px 0}
+    .suggest-empty{margin:0 36px}
   }
   @media(max-width:640px){
     .wrap{margin:10px 6px}
