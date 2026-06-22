@@ -40,10 +40,6 @@ const entries = rawEntries.map(item => {
 ---
 <Layout title="中国互联网奇观 · 人物档案馆">
   <div class="wrap">
-    <div class="corner tl"></div>
-    <div class="corner tr"></div>
-    <div class="corner bl"></div>
-    <div class="corner br"></div>
     <div class="hero">
       <a href="/charte" class="charte-link">入选标准</a>
       <h1>中 国 互 联 网 奇 观</h1>
@@ -359,78 +355,7 @@ const entries = rawEntries.map(item => {
     overflow: hidden;
   }
 
-  /* ── Corner Brass Guards (立体古黄铜防磨护角) ── */
-  .corner {
-    position: absolute;
-    width: 44px;
-    height: 44px;
-    background: linear-gradient(135deg, #c5a880 0%, #90754a 45%, #523e20 100%);
-    z-index: 10;
-    pointer-events: none;
-    box-shadow: 
-      inset 1px 1px 1px rgba(255, 255, 255, 0.28),
-      inset -1px -1px 2px rgba(0, 0, 0, 0.7);
-  }
-  .corner.tl {
-    top: -22px;
-    left: -22px;
-    transform: rotate(45deg);
-    border-right: 1.5px solid #1a1005;
-    border-bottom: 1.5px solid #1a1005;
-    box-shadow: 
-      2px 2px 5px rgba(0,0,0,0.55),
-      inset 1px 1px 1px rgba(255, 255, 255, 0.28),
-      inset -1px -1px 2px rgba(0, 0, 0, 0.7);
-  }
-  .corner.tr {
-    top: -22px;
-    right: -22px;
-    transform: rotate(45deg);
-    border-left: 1.5px solid #1a1005;
-    border-bottom: 1.5px solid #1a1005;
-    box-shadow: 
-      -2px 2px 5px rgba(0,0,0,0.55),
-      inset 1px 1px 1px rgba(255, 255, 255, 0.28),
-      inset -1px -1px 2px rgba(0, 0, 0, 0.7);
-  }
-  .corner.bl {
-    bottom: -22px;
-    left: -22px;
-    transform: rotate(45deg);
-    border-right: 1.5px solid #1a1005;
-    border-top: 1.5px solid #1a1005;
-    box-shadow: 
-      2px -2px 5px rgba(0,0,0,0.55),
-      inset 1px 1px 1px rgba(255, 255, 255, 0.28),
-      inset -1px -1px 2px rgba(0, 0, 0, 0.7);
-  }
-  .corner.br {
-    bottom: -22px;
-    right: -22px;
-    transform: rotate(45deg);
-    border-left: 1.5px solid #1a1005;
-    border-top: 1.5px solid #1a1005;
-    box-shadow: 
-      -2px -2px 5px rgba(0,0,0,0.55),
-      inset 1px 1px 1px rgba(255, 255, 255, 0.28),
-      inset -1px -1px 2px rgba(0, 0, 0, 0.7);
-  }
-  /* 立体微凸的固定铜钉 */
-  .corner::after {
-    content: '';
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    background: radial-gradient(circle at 35% 35%, #fff 0%, #d8be96 45%, #6a4f28 100%);
-    border-radius: 50%;
-    box-shadow: 
-      0.5px 1px 2px rgba(0, 0, 0, 0.6),
-      inset -0.5px -0.5px 1px rgba(0,0,0,0.8);
-  }
-  .corner.tl::after { bottom: 7px; right: 7px; }
-  .corner.tr::after { bottom: 7px; left: 7px; }
-  .corner.bl::after { top: 7px; right: 7px; }
-  .corner.br::after { top: 7px; left: 7px; }
+
 
   /* ── Hero ── */
   .hero{
