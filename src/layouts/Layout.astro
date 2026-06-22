@@ -21,7 +21,12 @@ const { title } = Astro.props;
     *{margin:0;padding:0;box-sizing:border-box}
 
     body{
-      background:#0c0a09;
+      background:
+        radial-gradient(circle at 50% 30%, rgba(35, 25, 20, 0.15) 0%, #080504 100%),
+        repeating-linear-gradient(90deg, rgba(139, 115, 85, 0.012) 0px, rgba(139, 115, 85, 0.012) 2px, transparent 2px, transparent 30px),
+        repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.08) 0px, rgba(0, 0, 0, 0.08) 1px, transparent 1px, transparent 12px),
+        repeating-linear-gradient(0deg, rgba(139, 115, 85, 0.01) 0px, rgba(139, 115, 85, 0.01) 8px, transparent 8px, transparent 160px),
+        #0c0806;
       font-family:'Noto Serif SC','Source Han Serif SC','Noto Serif CJK SC','SimSun','STSong','Times New Roman',Georgia,serif;
       font-size:15px;
       color:#c8baaa;line-height:1.8;min-height:100vh;

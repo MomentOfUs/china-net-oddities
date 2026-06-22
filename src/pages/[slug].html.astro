@@ -34,6 +34,10 @@ const scores = data.scores || {
 <Layout title={`${data.title} · 互联网奇观 · 人物档案馆`}>
   <a class="back-link" href="/">← 返回档案目录</a>
   <div class="wrap">
+    <div class="corner tl"></div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div>
     <div class="hero">
       {hasHero && (
         isSvgPlaceholder ? (
@@ -656,25 +660,75 @@ const scores = data.scores || {
   .wrap{
     max-width:960px;margin:48px auto;position:relative;z-index:2;
     background: 
-      radial-gradient(ellipse at 50% 30%, rgba(197, 168, 128, 0.03) 0%, transparent 70%),
-      linear-gradient(175deg, rgba(18,14,11,0.92) 0%, rgba(10,8,6,0.96) 100%);
-    border: 3px double rgba(197, 168, 128, 0.25);
+      radial-gradient(ellipse at 50% 20%, rgba(255, 255, 255, 0.02) 0%, transparent 80%),
+      #1a130e;
+    border: 2px solid #2d241d;
     box-shadow:
-      0 0 0 1px rgba(80,65,50,0.12),
-      0 0 0 2px rgba(12,10,8,0.85),
+      0 0 0 1px rgba(100, 80, 60, 0.15),
       0 20px 100px rgba(0,0,0,0.85),
-      inset 0 0 100px rgba(0,0,0,0.45);
+      inset 0 0 80px rgba(0,0,0,0.5);
     padding:0 0 1px 0;
+    overflow: hidden;
     transition: border-color 0.4s ease, box-shadow 0.4s ease;
   }
   .wrap:hover {
-    border-color: rgba(197, 168, 128, 0.38);
+    border-color: #3d3229;
     box-shadow:
-      0 0 0 1px rgba(80,65,50,0.18),
-      0 0 0 2px rgba(12,10,8,0.9),
-      0 25px 120px rgba(0,0,0,0.92),
-      inset 0 0 100px rgba(0,0,0,0.5);
+      0 0 0 1px rgba(120, 100, 80, 0.2),
+      0 25px 120px rgba(0,0,0,0.9),
+      inset 0 0 80px rgba(0,0,0,0.55);
   }
+
+  /* ── Corner Brass Guards (黄铜包角防磨与立体铆钉) ── */
+  .corner {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    z-index: 10;
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+  }
+  .corner.tl {
+    top: 0;
+    left: 0;
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+    background: linear-gradient(135deg, #e5cda8 0%, #b39362 50%, #8c6a38 100%);
+  }
+  .corner.tr {
+    top: 0;
+    right: 0;
+    clip-path: polygon(0 0, 100% 0, 100% 100%);
+    background: linear-gradient(225deg, #e5cda8 0%, #b39362 50%, #8c6a38 100%);
+  }
+  .corner.bl {
+    bottom: 0;
+    left: 0;
+    clip-path: polygon(0 0, 0 100%, 100% 100%);
+    background: linear-gradient(45deg, #e5cda8 0%, #b39362 50%, #8c6a38 100%);
+  }
+  .corner.br {
+    bottom: 0;
+    right: 0;
+    clip-path: polygon(100% 0, 0 100%, 100% 100%);
+    background: linear-gradient(315deg, #e5cda8 0%, #b39362 50%, #8c6a38 100%);
+  }
+  /* 立体黄铜小铆钉 */
+  .corner::after {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: radial-gradient(circle at 35% 35%, #fff 0%, #dfba8c 40%, #7d5f35 100%);
+    border-radius: 50%;
+    box-shadow: 
+      0.5px 1px 2px rgba(0, 0, 0, 0.5),
+      inset -0.5px -0.5px 1px rgba(0,0,0,0.6);
+  }
+  .corner.tl::after { top: 6px; left: 6px; }
+  .corner.tr::after { top: 6px; right: 6px; }
+  .corner.bl::after { bottom: 6px; left: 6px; }
+  .corner.br::after { bottom: 6px; right: 6px; }
+
 
   /* ── Hero ── */
   .hero {
