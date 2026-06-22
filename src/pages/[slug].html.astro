@@ -679,69 +679,78 @@ const scores = data.scores || {
       inset 0 0 80px rgba(0,0,0,0.55);
   }
 
-  /* ── Corner Leather Guards (真皮缝线包边护角) ── */
+  /* ── Corner Brass Guards (立体古黄铜防磨护角) ── */
   .corner {
     position: absolute;
-    width: 42px;
-    height: 42px;
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, #c5a880 0%, #90754a 45%, #523e20 100%);
     z-index: 10;
     pointer-events: none;
+    box-shadow: 
+      inset 1px 1px 1px rgba(255, 255, 255, 0.28),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.7);
   }
   .corner.tl {
-    top: 0;
-    left: 0;
-    clip-path: polygon(0 0, 100% 0, 0 100%);
-    background: #36281c;
-    border-right: 1px solid rgba(0,0,0,0.35);
-    border-bottom: 1px solid rgba(0,0,0,0.35);
+    top: -22px;
+    left: -22px;
+    transform: rotate(45deg);
+    border-right: 1.5px solid #1a1005;
+    border-bottom: 1.5px solid #1a1005;
+    box-shadow: 
+      2px 2px 5px rgba(0,0,0,0.55),
+      inset 1px 1px 1px rgba(255, 255, 255, 0.28),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.7);
   }
   .corner.tr {
-    top: 0;
-    right: 0;
-    clip-path: polygon(0 0, 100% 0, 100% 100%);
-    background: #36281c;
-    border-left: 1px solid rgba(0,0,0,0.35);
-    border-bottom: 1px solid rgba(0,0,0,0.35);
+    top: -22px;
+    right: -22px;
+    transform: rotate(45deg);
+    border-left: 1.5px solid #1a1005;
+    border-bottom: 1.5px solid #1a1005;
+    box-shadow: 
+      -2px 2px 5px rgba(0,0,0,0.55),
+      inset 1px 1px 1px rgba(255, 255, 255, 0.28),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.7);
   }
   .corner.bl {
-    bottom: 0;
-    left: 0;
-    clip-path: polygon(0 0, 0 100%, 100% 100%);
-    background: #36281c;
-    border-right: 1px solid rgba(0,0,0,0.35);
-    border-top: 1px solid rgba(0,0,0,0.35);
+    bottom: -22px;
+    left: -22px;
+    transform: rotate(45deg);
+    border-right: 1.5px solid #1a1005;
+    border-top: 1.5px solid #1a1005;
+    box-shadow: 
+      2px -2px 5px rgba(0,0,0,0.55),
+      inset 1px 1px 1px rgba(255, 255, 255, 0.28),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.7);
   }
   .corner.br {
-    bottom: 0;
-    right: 0;
-    clip-path: polygon(100% 0, 0 100%, 100% 100%);
-    background: #36281c;
-    border-left: 1px solid rgba(0,0,0,0.35);
-    border-top: 1px solid rgba(0,0,0,0.35);
+    bottom: -22px;
+    right: -22px;
+    transform: rotate(45deg);
+    border-left: 1.5px solid #1a1005;
+    border-top: 1.5px solid #1a1005;
+    box-shadow: 
+      -2px -2px 5px rgba(0,0,0,0.55),
+      inset 1px 1px 1px rgba(255, 255, 255, 0.28),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.7);
   }
-  /* 内嵌手工手缝边线 */
+  /* 立体微凸的固定铜钉 */
   .corner::after {
     content: '';
     position: absolute;
-    inset: 5px;
-    pointer-events: none;
+    width: 6px;
+    height: 6px;
+    background: radial-gradient(circle at 35% 35%, #fff 0%, #d8be96 45%, #6a4f28 100%);
+    border-radius: 50%;
+    box-shadow: 
+      0.5px 1px 2px rgba(0, 0, 0, 0.6),
+      inset -0.5px -0.5px 1px rgba(0,0,0,0.8);
   }
-  .corner.tl::after {
-    border-left: 1px dashed rgba(197, 168, 128, 0.15);
-    border-top: 1px dashed rgba(197, 168, 128, 0.15);
-  }
-  .corner.tr::after {
-    border-right: 1px dashed rgba(197, 168, 128, 0.15);
-    border-top: 1px dashed rgba(197, 168, 128, 0.15);
-  }
-  .corner.bl::after {
-    border-left: 1px dashed rgba(197, 168, 128, 0.15);
-    border-bottom: 1px dashed rgba(197, 168, 128, 0.15);
-  }
-  .corner.br::after {
-    border-right: 1px dashed rgba(197, 168, 128, 0.15);
-    border-bottom: 1px dashed rgba(197, 168, 128, 0.15);
-  }
+  .corner.tl::after { bottom: 7px; right: 7px; }
+  .corner.tr::after { bottom: 7px; left: 7px; }
+  .corner.bl::after { top: 7px; right: 7px; }
+  .corner.br::after { top: 7px; left: 7px; }
 
 
   /* ── Hero ── */
