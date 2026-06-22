@@ -465,16 +465,14 @@ const entries = rawEntries.map(item => {
   .search-clear:hover{color:#8a7a6a}
   .search-count{font-size:10px;color:#4a3a2a;letter-spacing:2px;white-space:nowrap;font-family:'Times New Roman',serif;min-width:60px;text-align:right;border-left:1px solid rgba(197,168,128,0.08);padding-left:14px}
 
-  /* ── Entry Grid ── */
-    /* ── Entry Grid ── */
-  .entries-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:0 36px 24px}
+  .entries-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:0 36px 24px}
 
   /* ── folder tab ── */
   .featured .folder-tab {
     position: absolute;
     top: 0;
     left: 0;
-    background: linear-gradient(180deg, #8a7a67 0%, #766654 100%);
+    background: linear-gradient(180deg, #bcaea0 0%, #a89b8d 100%);
     border: 1px solid #2b1e13;
     border-top: none;
     border-left: none;
@@ -507,8 +505,8 @@ const entries = rawEntries.map(item => {
     color: #2b1e13;
     position: relative;
     background: 
-      radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.03) 0%, transparent 80%),
-      linear-gradient(180deg, #90816c 0%, #7d6f5a 100%);
+      radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 80%),
+      linear-gradient(180deg, #cdbeab 0%, #bbaea1 100%);
     border: 1px solid #2b1e13;
     box-shadow: 
       0 4px 15px rgba(0,0,0,0.6),
@@ -524,7 +522,7 @@ const entries = rawEntries.map(item => {
     z-index: 1;
   }
   .featured:hover {
-    background: linear-gradient(180deg, #a2937e 0%, #8e806b 100%);
+    background: linear-gradient(180deg, #d8ccba 0%, #c6b9ac 100%);
     border-color: #5c442e;
     box-shadow: 
       0 12px 35px rgba(197, 168, 128, 0.15), 
@@ -590,7 +588,7 @@ const entries = rawEntries.map(item => {
     filter: grayscale(0.2) contrast(1.05) brightness(0.85);
     border: 1px solid rgba(43, 30, 19, 0.35);
     padding: 3px;
-    background: #8a7b67;
+    background: #bcaea0;
     box-shadow: 
       0 4px 12px rgba(0,0,0,0.4),
       0 0 0 1px rgba(43, 30, 19, 0.15);
@@ -629,20 +627,20 @@ const entries = rawEntries.map(item => {
   .featured .fc-title {
     font-size: 19px;
     font-weight: 700;
-    color: #1a120a;
+    color: #110902;
     letter-spacing: 3px;
     margin-top: 4px;
     font-family: 'ZCOOL XiaoWei', 'Noto Serif SC', serif;
   }
   .featured .fc-meta {
     font-size: 10px;
-    color: #4a3a2a;
+    color: #2b1f14;
     margin-top: 6px;
     font-weight: 400;
     line-height: 1.6;
   }
   .featured .fc-meta .hl {
-    color: #b05030;
+    color: #b04020;
     font-weight: 700;
   }
   .featured .fc-stats {
@@ -653,12 +651,12 @@ const entries = rawEntries.map(item => {
   }
   .featured .fc-stats span {
     font-size: 9px;
-    color: #5a4a3a;
+    color: #3b2c1f;
     font-weight: 400;
     letter-spacing: .2px;
   }
   .featured .fc-stats b {
-    color: #9c7b50;
+    color: #8c6a38;
     font-size: 14px;
     font-family: 'Times New Roman', Georgia, serif;
     display: block;
@@ -672,7 +670,7 @@ const entries = rawEntries.map(item => {
     margin-top: auto;
     padding-top: 16px;
     font-size: 9px;
-    color: #6a5a4a;
+    color: #3d2f23;
     text-decoration: none;
     letter-spacing: 3px;
     transition: color .3s;
@@ -778,6 +776,9 @@ const entries = rawEntries.map(item => {
   }
 
   /* ── Responsive ── */
+  @media(max-width:960px){
+    .entries-grid{grid-template-columns:repeat(3,1fr);gap:16px}
+  }
   @media(max-width:640px){
     .wrap{margin:10px 6px}
     .hero{padding:54px 16px 40px}
