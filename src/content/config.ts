@@ -78,8 +78,16 @@ const phenomenon = defineCollection({
       absurdity: 5,
       slice: 5,
       narrative: 5,
-      native: 5,
     }),
+    clearance: z.enum(['A', 'B', 'C', 'D']).optional().default('D'),
+    relics: z.array(z.object({
+      name: z.string(),
+      desc: z.string(),
+    })).optional().default([]),
+    glossary: z.array(z.object({
+      key: z.string(),
+      val: z.string(),
+    })).optional().default([]),
   }),
 });
 

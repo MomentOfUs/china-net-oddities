@@ -34,7 +34,8 @@ const entries = rawEntries.map(item => {
     searchText: (data.title + ' ' + (metaInfo.meta || '') + ' ' + (data.tags || []).join(' ') + ' ' + (data.subtitle || '') + ' ' + (metaInfo.tag || '')).toLowerCase(),
     category: getCategory(metaInfo.tag),
     scores: scores,
-    score: Object.values(scores).reduce((a, b) => a + b, 0)
+    score: Object.values(scores).reduce((a, b) => a + b, 0),
+    clearance: data.clearance || 'D'
   };
 }).sort((a, b) => a.title.localeCompare(b.title, 'zh-cn'));
 ---
@@ -62,6 +63,8 @@ const entries = rawEntries.map(item => {
         <button class="sort-tab" data-sort="score">按评分</button>
       </div>
 
+      <div id="entriesData" data-urls={JSON.stringify(entries.map(e => e.filename))} style="display:none"></div>
+
       <div class="search-section">
         <div class="search-bar">
           <span class="search-label">▎档案检索</span>
@@ -70,6 +73,10 @@ const entries = rawEntries.map(item => {
             <span id="searchClear" class="search-clear" onclick="document.getElementById('searchInput').value='';applyFilters();this.style.opacity='0'">✕</span>
           </div>
           <span id="searchCount" class="search-count"></span>
+        </div>
+        <div class="oracle-book-corner" id="oracleTrigger" title="翻开下一页：随机命运调档">
+          <div class="book-corner-page"></div>
+          <div class="book-corner-text">命运调档 ➔</div>
         </div>
       </div>
 
@@ -88,6 +95,9 @@ const entries = rawEntries.map(item => {
                data-score={entry.score}>
             <a class="featured" href={entry.filename}>
               <div class="folder-tab">人物档案</div>
+              <div class={`clearance-stamp stamp-level-${entry.clearance}`}>
+                <span class="stamp-inner">{entry.clearance}级解密</span>
+              </div>
               <div class="fc-photo-wrap">
                 {entry.avatar && entry.avatar.endsWith('.svg') ? (
                   <img src={entry.avatar} alt={entry.title} class="fc-img" width={360} height={360} />
@@ -139,6 +149,106 @@ const entries = rawEntries.map(item => {
   </div>
 
   <script is:inline>
+    // 1. 翻书声音合成
+    function playBookFlipSound() {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      try {
+        const ctx = new AudioContext();
+        const bufferSize = ctx.sampleRate * 0.4;
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+        const noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+        
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(1000, ctx.currentTime);
+        filter.frequency.exponentialRampToValueAtTime(1500, ctx.currentTime + 0.3);
+        filter.Q.value = 1.0;
+        
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.01, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.38);
+        
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+        
+        noise.start();
+        noise.stop(ctx.currentTime + 0.4);
+      } catch(err) {
+        console.error("Audio error:", err);
+      }
+    }
+
+    // 2. 通用页面初始化函数，兼容浏览器 DOM 缓存
+    function initHomepage() {
+      // 2.1 绑定随机命运调档 (折角书签)
+      const oracleTrigger = document.getElementById('oracleTrigger');
+      if (oracleTrigger) {
+        if (!oracleTrigger.dataset.bound) {
+          oracleTrigger.dataset.bound = "true";
+          oracleTrigger.addEventListener('click', () => {
+            const wrap = document.querySelector('.wrap');
+            if (wrap && wrap.classList.contains('page-flipping')) return;
+            
+            playBookFlipSound();
+            
+            setTimeout(() => {
+              const dataEl = document.getElementById('entriesData');
+              if (dataEl) {
+                const urls = JSON.parse(dataEl.getAttribute('data-urls') || '[]');
+                if (urls.length > 0) {
+                  const randomUrl = urls[Math.floor(Math.random() * urls.length)];
+                  // 导航前移除类，防止 BFCache 恢复时残留动画状态
+                  if (wrap) wrap.classList.remove('page-flipping');
+                  window.location.href = randomUrl;
+                }
+              }
+            }, 400);
+          });
+        }
+      }
+
+      // 2.2 绑定卡片翻页
+      const cards = document.querySelectorAll('.phenomenon-card a');
+      cards.forEach(card => {
+        if (!card.dataset.bound) {
+          card.dataset.bound = "true";
+          card.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetUrl = card.getAttribute('href');
+            playBookFlipSound();
+            setTimeout(() => {
+              window.location.href = targetUrl;
+            }, 0);
+          });
+        }
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initHomepage);
+    } else {
+      initHomepage();
+    }
+
+    // 处理 BFCache：当用户点击浏览器返回时，移除残留的 page-flipping 动画状态
+    window.addEventListener('pageshow', (e) => {
+      if (e.persisted) {
+        const wrap = document.querySelector('.wrap');
+        if (wrap) {
+          wrap.classList.remove('page-flipping');
+        }
+      }
+    });
+
+
     (async function(){
       try{
         let r=await fetch('/api/count',{method:'POST'});
@@ -402,8 +512,44 @@ const entries = rawEntries.map(item => {
   }
 
   /* ── Search Bar ── */
-  .search-section{margin:0 48px 20px}
-  .search-bar{display:flex;align-items:center;gap:14px;padding:12px 18px;background:rgba(13,11,9,0.4);border:1px solid rgba(197,168,128,0.08)}
+  /* ── 3D翻书视口与动画 ── */
+  :global(body) {
+    perspective: 1200px;
+  }
+  .wrap.page-flipping {
+    transform-origin: left center;
+    animation: page-flip-anim 0.45s ease-in forwards;
+    pointer-events: none;
+  }
+  @keyframes page-flip-anim {
+    0% {
+      transform: rotateY(0deg) scale(1);
+      opacity: 1;
+      box-shadow: 0 15px 70px rgba(0,0,0,0.85);
+    }
+    100% {
+      transform: rotateY(-80deg) scale(0.95) skewY(-3deg);
+      opacity: 0.1;
+      box-shadow: 20px 30px 100px rgba(0,0,0,0.2);
+    }
+  }
+
+  /* ── Search Bar ── */
+  .search-section {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    margin: 0 48px 20px;
+  }
+  .search-bar {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 18px;
+    background: rgba(13,11,9,0.4);
+    border: 1px solid rgba(197,168,128,0.08);
+  }
   .search-label{font-size:10px;color:#7a6a5a;letter-spacing:5px;text-transform:uppercase;white-space:nowrap;font-family:'Times New Roman',Georgia,serif;border-right:1px solid rgba(197,168,128,0.12);padding-right:14px}
   .search-inner{flex:1;display:flex;align-items:center;gap:8px}
   .search-input{flex:1;padding:8px 10px;background:rgba(8,7,6,0.6);border:1px solid transparent;color:#c8baaa;font-family:'Noto Serif SC',serif;font-size:13px;letter-spacing:2px;outline:none;transition:all .3s}
@@ -412,6 +558,118 @@ const entries = rawEntries.map(item => {
   .search-clear{font-size:10px;color:#5a4a3a;cursor:pointer;padding:4px 6px;opacity:0;transition:opacity .3s;font-family:'Times New Roman',serif}
   .search-clear:hover{color:#8a7a6a}
   .search-count{font-size:10px;color:#4a3a2a;letter-spacing:2px;white-space:nowrap;font-family:'Times New Roman',serif;min-width:60px;text-align:right;border-left:1px solid rgba(197,168,128,0.08);padding-left:14px}
+
+  /* ── 命运折角书签 ── */
+  .oracle-book-corner {
+    position: relative;
+    width: 95px;
+    height: 42px;
+    background: linear-gradient(135deg, #f2ebd9 0%, #dcd3be 100%);
+    border: 1.5px solid #8a7a6a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+    box-shadow: 2px 3px 6px rgba(0,0,0,0.35);
+    border-radius: 2px;
+    transform: rotate(0.5deg);
+    overflow: hidden;
+    margin-top: -2px;
+    z-index: 100;
+  }
+  .oracle-book-corner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 14px 14px 0;
+    border-color: transparent transparent #a2917f transparent;
+    box-shadow: -1.5px 1.5px 3px rgba(0,0,0,0.25);
+    transition: all 0.25s ease;
+  }
+  .oracle-book-corner:hover {
+    transform: translateY(-2px) rotate(-1.5deg);
+    box-shadow: 4px 6px 12px rgba(0,0,0,0.45);
+    background: linear-gradient(135deg, #f8f3e8 0%, #e3d9c4 100%);
+  }
+  .oracle-book-corner:hover::before {
+    border-width: 0 20px 20px 0;
+    border-color: transparent transparent #8a7a6a transparent;
+  }
+  .book-corner-text {
+    font-size: 9px;
+    color: #4a3a2a;
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding-right: 6px;
+  }
+
+  /* ── 档案解密等级戳章 ── */
+  .clearance-stamp {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 10;
+    font-family: 'ZCOOL XiaoWei', 'Noto Serif SC', serif;
+    font-weight: 900;
+    font-size: 11px;
+    letter-spacing: 2px;
+    padding: 6px 12px;
+    text-transform: uppercase;
+    transform: rotate(-14.5deg);
+    border-radius: 4px 6px 3px 5px / 5px 3px 6px 4px; /* 不规则边缘，模拟手剪牛皮标签纸 */
+    mix-blend-mode: normal;
+    pointer-events: none;
+    opacity: 0.96;
+    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    /* 引入全局拟物油墨噪点与晕染滤镜 */
+    filter: url(#stamp-filter);
+  }
+  .stamp-level-A {
+    border: 2px solid #b71c1c;
+    color: #b71c1c;
+    /* 带噪点与不规则厚度的拟物牛皮纸贴底色 */
+    background: #fbf8ee url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.25' numOctaves='3'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' fill='%23000'/%3E%3C/svg%3E");
+    box-shadow: 
+      0 2px 5px rgba(0,0,0,0.35),
+      inset 0 0 6px rgba(183, 28, 28, 0.08);
+  }
+  .stamp-level-B {
+    border: 2px solid #d84315;
+    color: #d84315;
+    background: #fbf8ee url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.25' numOctaves='3'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' fill='%23000'/%3E%3C/svg%3E");
+    box-shadow: 
+      0 2px 5px rgba(0,0,0,0.35),
+      inset 0 0 6px rgba(216, 67, 21, 0.08);
+  }
+  .stamp-level-C {
+    border: 2px dashed #e65100;
+    color: #e65100;
+    background: #fbf8ee url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.25' numOctaves='3'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' fill='%23000'/%3E%3C/svg%3E");
+    box-shadow: 
+      0 2px 5px rgba(0,0,0,0.35),
+      inset 0 0 6px rgba(230, 81, 0, 0.08);
+  }
+  .stamp-level-D {
+    border: 3px double #0d47a1;
+    color: #0d47a1;
+    background: #fbf8ee url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.25' numOctaves='3'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' fill='%23000'/%3E%3C/svg%3E");
+    box-shadow: 
+      0 2px 5px rgba(0,0,0,0.35),
+      inset 0 0 6px rgba(13, 71, 161, 0.08);
+  }
+  .featured:hover .clearance-stamp {
+    transform: rotate(-10deg) scale(1.04);
+    box-shadow: 
+      0 4px 10px rgba(0,0,0,0.45),
+      inset 0 0 8px rgba(0,0,0,0.05);
+    opacity: 1;
+  }
 
   .entries-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:0 48px 24px}
 
@@ -489,24 +747,7 @@ const entries = rawEntries.map(item => {
     align-items: center;
     z-index: 2;
   }
-  /* 绝密印章 */
-  .fc-photo-wrap::before {
-    content: 'TOP SECRET';
-    position: absolute;
-    bottom: 4px;
-    right: 22px;
-    font-size: 8px;
-    color: rgba(220, 80, 70, 0.6);
-    border: 1.5px double rgba(220, 80, 70, 0.6);
-    padding: 2px 6px;
-    transform: rotate(-12deg);
-    font-family: 'Times New Roman', Georgia, serif;
-    font-weight: 900;
-    letter-spacing: 1px;
-    z-index: 3;
-    pointer-events: none;
-    text-transform: uppercase;
-  }
+
   /* 金属回形针 */
   .fc-photo-wrap::after {
     content: '';
