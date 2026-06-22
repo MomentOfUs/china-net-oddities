@@ -1073,10 +1073,13 @@ const scores = data.scores || {
     .main-stat>div:first-child::after{display:none}
     .main-stat>div{padding:24px 20px}
     .main-stat .mn{font-size:52px}
-    .data-grid{grid-template-columns:1fr}
-    .data-grid>div:nth-child(3n){border-right:1px solid rgba(197,168,128,0.15)}.data-grid>div:last-child{border-right:none}
+    .data-grid{grid-template-columns:repeat(2,1fr)}
+    .data-grid>div{border-right:none;border-bottom:1px solid rgba(197,168,128,0.15)}
+    .data-grid>div:nth-child(odd){border-right:1px solid rgba(197,168,128,0.15)}
+    .data-grid>div:last-child{border-right:none}
     .body-grid{grid-template-columns:1fr}.body-grid>div:nth-child(even){border-right:none}
-    .tl-grid{grid-template-columns:1fr}.tl-item:nth-child(even){border-right:none}
+    .tl-grid{grid-template-columns:1fr}
+    .tl-item{border-right:none !important}
     .end-section{grid-template-columns:1fr}
     .end-section>div{border-right:none;border-bottom:1px solid rgba(197,168,128,0.15)}.end-section>div:last-child{border-bottom:none}
     .pull-quote{padding:30px 20px 26px}
@@ -1088,5 +1091,6 @@ const scores = data.scores || {
     .ribbon>div:nth-child(odd){border-right:1px solid rgba(197, 168, 128, 0.15)}
     .ribbon>div:nth-child(3),.ribbon>div:nth-child(4){border-bottom:none}
     .eval-grid{grid-template-columns:1fr;gap:20px}
+    .radar-container{display:flex;justify-content:center;align-items:center;width:100%}
   }
 </style>
