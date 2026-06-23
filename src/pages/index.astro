@@ -112,6 +112,8 @@ const entries = rawEntries.map(item => {
                   height={360} 
                   format="webp" 
                   inferSize={true}
+                  loading="lazy"
+                  decoding="async"
                   class="fc-img" 
                 />
                 )}
@@ -415,6 +417,19 @@ const entries = rawEntries.map(item => {
         this.blur();
       }
     });
+
+    /* ── 图片懒加载渐入 ── */
+    function initImgFadeIn() {
+      document.querySelectorAll('.fc-img').forEach(img => {
+        if (img.complete && img.naturalWidth > 0) {
+          img.classList.add('img-loaded');
+        } else {
+          img.addEventListener('load', () => img.classList.add('img-loaded'), { once: true });
+          img.addEventListener('error', () => img.classList.add('img-loaded'), { once: true });
+        }
+      });
+    }
+    initImgFadeIn();
   </script>
 </Layout>
 
@@ -798,7 +813,7 @@ const entries = rawEntries.map(item => {
     opacity: 1;
   }
 
-  .entries-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin:0 48px 24px}
+  .entries-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin:0 48px 24px}
 
   /* ── folder tab ── */
   .featured .folder-tab {
@@ -858,10 +873,11 @@ const entries = rawEntries.map(item => {
     background: linear-gradient(180deg, #3c2e22 0%, #281d14 100%);
     border-color: #523f2b;
     box-shadow: 
-      0 12px 35px rgba(0,0,0,0.9), 
-      0 0 15px rgba(197, 168, 128, 0.15),
+      0 6px 18px rgba(0,0,0,0.7),
+      0 16px 40px rgba(0,0,0,0.55),
+      0 0 20px rgba(197, 168, 128, 0.12),
       inset 0 0 20px rgba(0,0,0,0.5);
-    transform: translateY(-4px);
+    transform: translateY(-3px) scale(1.015);
   }
   .featured:hover .fc-link { color: #e6dfd3; }
 
@@ -908,8 +924,12 @@ const entries = rawEntries.map(item => {
     box-shadow: 
       0 4px 12px rgba(0,0,0,0.4),
       0 0 0 1px rgba(197, 168, 128, 0.15);
-    transition: all 0.4s ease;
+    transition: all 0.4s ease, opacity 0.5s ease;
     z-index: 2;
+    opacity: 0;
+  }
+  .featured .fc-img.img-loaded {
+    opacity: 1;
   }
   .featured:hover .fc-img {
     filter: grayscale(0.05) contrast(1.05) brightness(0.95);
@@ -951,7 +971,7 @@ const entries = rawEntries.map(item => {
   }
   .featured .fc-meta {
     font-size: 9px;
-    color: #a89a87;
+    color: #bdb0a0;
     margin-top: 3px;
     font-weight: 400;
     line-height: 1.5;
