@@ -199,6 +199,60 @@ const { title } = Astro.props;
       to   { background-position: 0 8px; }
     }
 
+    /* ── 背景音乐播放器 ── */
+    .bgm-player {
+      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .bgm-toggle {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(26, 19, 14, 0.85);
+      border: 1px solid rgba(197, 168, 128, 0.25);
+      color: var(--c-gold-dim); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(4px);
+    }
+    .bgm-toggle:hover {
+      color: var(--c-gold); border-color: rgba(197, 168, 128, 0.5);
+      background: rgba(26, 19, 14, 0.95);
+    }
+    .bgm-toggle.playing {
+      color: var(--c-gold-bright);
+      border-color: rgba(197, 168, 128, 0.4);
+      box-shadow: 0 0 8px rgba(197, 168, 128, 0.15);
+    }
+    .bgm-volume-wrap {
+      width: 0; overflow: hidden;
+      transition: width 0.25s ease;
+    }
+    .bgm-player:hover .bgm-volume-wrap {
+      width: 80px;
+    }
+    .bgm-volume {
+      -webkit-appearance: none; appearance: none;
+      width: 80px; height: 4px;
+      background: rgba(197, 168, 128, 0.15);
+      border-radius: 2px; outline: none;
+      cursor: pointer;
+    }
+    .bgm-volume::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--c-gold-dim);
+      border: 1px solid rgba(197, 168, 128, 0.3);
+      cursor: pointer; transition: background 0.15s;
+    }
+    .bgm-volume::-webkit-slider-thumb:hover {
+      background: var(--c-gold);
+    }
+    .bgm-volume::-moz-range-thumb {
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--c-gold-dim);
+      border: 1px solid rgba(197, 168, 128, 0.3);
+      cursor: pointer;
+    }
+
     @media print {
       body {
         background: #fff !important;
@@ -257,6 +311,86 @@ const { title } = Astro.props;
       });
     })();
   </script>
+  <!-- 背景音乐播放器 -->
+  <div id="bgm-player" class="bgm-player" title="背景音乐">
+    <button id="bgm-toggle" class="bgm-toggle" aria-label="播放/暂停背景音乐">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 18V5l12-2v13" />
+        <circle cx="6" cy="18" r="3" />
+        <circle cx="18" cy="16" r="3" />
+      </svg>
+    </button>
+    <div id="bgm-volume-wrap" class="bgm-volume-wrap">
+      <input type="range" id="bgm-volume" class="bgm-volume" min="0" max="1" step="0.05" value="0.3" aria-label="音量">
+    </div>
+  </div>
+  <script is:inline>
+    (function(){
+      var audio = new Audio('/audio/bgm.mp3');
+      audio.loop = true;
+      audio.volume = 0.3;
+      var toggle = document.getElementById('bgm-toggle');
+      var volInput = document.getElementById('bgm-volume');
+      var isPlaying = false;
+
+      // 读取之前的播放状态
+      try {
+        var savedTime = localStorage.getItem('archive-bgm-time');
+        var savedVol = localStorage.getItem('archive-bgm-vol');
+        var wasPlaying = localStorage.getItem('archive-bgm-playing') === '1';
+        if (savedVol !== null) {
+          audio.volume = parseFloat(savedVol);
+          volInput.value = audio.volume;
+        }
+        if (savedTime !== null && !isNaN(parseFloat(savedTime))) {
+          audio.currentTime = parseFloat(savedTime);
+        }
+        if (wasPlaying) {
+          audio.play().then(function(){ isPlaying = true; toggle.classList.add('playing'); }).catch(function(){});
+        }
+      } catch(e){}
+
+      toggle.addEventListener('click', function(){
+        if (isPlaying) {
+          audio.pause();
+          isPlaying = false;
+          toggle.classList.remove('playing');
+        } else {
+          audio.play().then(function(){
+            isPlaying = true;
+            toggle.classList.add('playing');
+          }).catch(function(){});
+        }
+      });
+
+      volInput.addEventListener('input', function(){
+        audio.volume = parseFloat(volInput.value);
+        try { localStorage.setItem('archive-bgm-vol', audio.volume); } catch(e){}
+      });
+
+      // 定时保存播放进度
+      setInterval(function(){
+        if (isPlaying) {
+          try {
+            localStorage.setItem('archive-bgm-time', audio.currentTime);
+            localStorage.setItem('archive-bgm-playing', '1');
+          } catch(e){}
+        }
+      }, 5000);
+
+      window.addEventListener('beforeunload', function(){
+        if (isPlaying) {
+          try {
+            localStorage.setItem('archive-bgm-time', audio.currentTime);
+            localStorage.setItem('archive-bgm-playing', '1');
+          } catch(e){}
+        } else {
+          try { localStorage.setItem('archive-bgm-playing', '0'); } catch(e){}
+        }
+      });
+    })();
+  </script>
+
   <!-- 全局拟物印章滤镜：微弱边缘起伏以确保文字清晰，混合斑驳颗粒模拟半透明油墨 -->
   <svg style="position: absolute; width: 0; height: 0;" width="0" height="0" aria-hidden="true">
     <filter id="stamp-filter" x="-5%" y="-5%" width="110%" height="110%">
@@ -274,5 +408,8 @@ const { title } = Astro.props;
       </feMerge>
     </filter>
   </svg>
+
+
+
 </body>
 </html>
