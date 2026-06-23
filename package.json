@@ -17,6 +17,7 @@
     "sharp": "^0.35.2"
   },
   "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.10"
+    "@types/jsonwebtoken": "^9.0.10",
+    "yargs-parser": "^22.0.0"
   }
 }

@@ -18,7 +18,7 @@ const sortedEntries = rawEntries.map(item => {
 }).sort((a, b) => b.total - a.total);
 ---
 <Layout title="入选标准 · 互联网奇观 · 人物档案馆">
-  <div class="wrap">
+  <div class="wrap" id="main-content">
     <div class="hero">
       <div class="top-back"><a href="/">← 返 回 档 案 馆</a></div>
       <h1>入 选 标 准</h1>
@@ -30,7 +30,7 @@ const sortedEntries = rawEntries.map(item => {
       <!-- 总纲 -->
       <div class="section">
         <div class="s-h"><span class="num">△</span>总纲</div>
-        <p class="no-indent" style="font-size:12px;color:#8a7a6a;letter-spacing:3px;line-height:2.4">
+        <p class="no-indent" style="font-size:12px;color:var(--c-text-muted);letter-spacing:3px;line-height:2.4">
           这里没有网红，只有在围观与挣扎中，被时代重力碾成的命运标本。
         </p>
         <div class="quote-block">
@@ -136,24 +136,24 @@ const sortedEntries = rawEntries.map(item => {
         <div class="s-h"><span class="num">肆</span>收录流程</div>
         <div style="display:flex;gap:4px;margin:16px 0;flex-wrap:wrap">
           <div style="flex:1;min-width:120px;background:rgba(18,15,13,0.3);border:1px solid rgba(60,45,35,0.25);padding:14px 12px;text-align:center">
-            <div style="font-size:20px;color:#5a4a3a;font-family:Georgia,serif">①</div>
-            <div style="font-size:10px;color:#7a6a5a;letter-spacing:3px">提名</div>
-            <div style="font-size:8px;color:#5a4a3a;letter-spacing:2px;margin-top:4px">请愿墙 / 发现</div>
+            <div style="font-size:20px;color:var(--c-text-faintest);font-family:Georgia,serif">①</div>
+            <div style="font-size:10px;color:var(--c-text-faint-light);letter-spacing:3px">提名</div>
+            <div style="font-size:8px;color:var(--c-text-faintest);letter-spacing:2px;margin-top:4px">请愿墙 / 发现</div>
           </div>
           <div style="flex:1;min-width:120px;background:rgba(18,15,13,0.3);border:1px solid rgba(60,45,35,0.25);padding:14px 12px;text-align:center">
-            <div style="font-size:20px;color:#5a4a3a;font-family:Georgia,serif">②</div>
-            <div style="font-size:10px;color:#7a6a5a;letter-spacing:3px">初审</div>
-            <div style="font-size:8px;color:#5a4a3a;letter-spacing:2px;margin-top:4px">六维评分 ≥36</div>
+            <div style="font-size:20px;color:var(--c-text-faintest);font-family:Georgia,serif">②</div>
+            <div style="font-size:10px;color:var(--c-text-faint-light);letter-spacing:3px">初审</div>
+            <div style="font-size:8px;color:var(--c-text-faintest);letter-spacing:2px;margin-top:4px">六维评分 ≥36</div>
           </div>
           <div style="flex:1;min-width:120px;background:rgba(18,15,13,0.3);border:1px solid rgba(60,45,35,0.25);padding:14px 12px;text-align:center">
-            <div style="font-size:20px;color:#5a4a3a;font-family:Georgia,serif">③</div>
-            <div style="font-size:10px;color:#7a6a5a;letter-spacing:3px">归档</div>
-            <div style="font-size:8px;color:#5a4a3a;letter-spacing:2px;margin-top:4px">事实核查 + 写作</div>
+            <div style="font-size:20px;color:var(--c-text-faintest);font-family:Georgia,serif">③</div>
+            <div style="font-size:10px;color:var(--c-text-faint-light);letter-spacing:3px">归档</div>
+            <div style="font-size:8px;color:var(--c-text-faintest);letter-spacing:2px;margin-top:4px">事实核查 + 写作</div>
           </div>
           <div style="flex:1;min-width:120px;background:rgba(18,15,13,0.3);border:1px solid rgba(60,45,35,0.25);padding:14px 12px;text-align:center">
-            <div style="font-size:20px;color:#5a4a3a;font-family:Georgia,serif">④</div>
-            <div style="font-size:10px;color:#7a6a5a;letter-spacing:3px">入库</div>
-            <div style="font-size:8px;color:#5a4a3a;letter-spacing:2px;margin-top:4px">上线档案馆</div>
+            <div style="font-size:20px;color:var(--c-text-faintest);font-family:Georgia,serif">④</div>
+            <div style="font-size:10px;color:var(--c-text-faint-light);letter-spacing:3px">入库</div>
+            <div style="font-size:8px;color:var(--c-text-faintest);letter-spacing:2px;margin-top:4px">上线档案馆</div>
           </div>
         </div>
       </div>
@@ -182,7 +182,7 @@ const sortedEntries = rawEntries.map(item => {
           </tbody>
         </table>
         </div>
-        <p style="font-size:10px;color:#5a4a3a;letter-spacing:2px;margin-top:8px">吴京 37 分，战狼文化符号加持下的国民度达到了准入标准。</p>
+        <p style="font-size:10px;color:var(--c-text-faintest);letter-spacing:2px;margin-top:8px">吴京 37 分，战狼文化符号加持下的国民度达到了准入标准。</p>
       </div>
 
       <!-- 陆 -->
@@ -194,9 +194,9 @@ const sortedEntries = rawEntries.map(item => {
             如果这个人不存在，<br />
             互联网的这段历史是不是就少了点什么？
           </p>
-          <div style="margin-top:12px;font-size:10px;color:#5a4a3a;letter-spacing:4px;line-height:2">
-            <span style="color:#7a6a5a">合格</span> 少了点精彩。<br />
-            <span style="color:#7a6a5a">优秀</span> 少了块拼图。<br />
+          <div style="margin-top:12px;font-size:10px;color:var(--c-text-faintest);letter-spacing:4px;line-height:2">
+            <span style="color:var(--c-text-faint-light)">合格</span> 少了点精彩。<br />
+            <span style="color:var(--c-text-faint-light)">优秀</span> 少了块拼图。<br />
             <span class="dim">不入</span> 少了谁都一样。
           </div>
         </div>
@@ -406,13 +406,13 @@ const sortedEntries = rawEntries.map(item => {
   }
   .lab-label {
     font-size: 11px;
-    color: #8a7a6a;
+    color: var(--c-text-muted);
     letter-spacing: 1px;
     display: flex;
     justify-content: space-between;
   }
   .lab-label b {
-    color: #c5a880;
+    color: var(--c-gold);
     font-family: 'Times New Roman', Georgia, serif;
     font-size: 13px;
   }
@@ -431,7 +431,7 @@ const sortedEntries = rawEntries.map(item => {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: #c5a880;
+    background: var(--c-gold);
     cursor: pointer;
     box-shadow: 0 0 6px rgba(197, 168, 128, 0.4);
     transition: transform 0.2s;
@@ -466,13 +466,13 @@ const sortedEntries = rawEntries.map(item => {
     stroke-dasharray: 2 2;
   }
   .lab-radar-box :global(polygon.lab-poly) {
-    stroke: #c5a880;
+    stroke: var(--c-gold);
     stroke-width: 1.5;
     fill: rgba(197, 168, 128, 0.16);
   }
   .lab-radar-box :global(circle.lab-dot) {
     fill: #0c0a09;
-    stroke: #c5a880;
+    stroke: var(--c-gold);
     stroke-width: 1.2;
   }
   
@@ -487,7 +487,7 @@ const sortedEntries = rawEntries.map(item => {
   .lab-score-num {
     font-size: 38px;
     font-weight: bold;
-    color: #e6dfd3;
+    color: var(--c-text);
     font-family: 'Times New Roman', Georgia, serif;
     line-height: 1;
     margin: 4px 0 8px;
@@ -533,80 +533,80 @@ const sortedEntries = rawEntries.map(item => {
   }
   .top-back a {
     font-size: 10px;
-    color: #7a6a5a;
+    color: var(--c-text-faint-light);
     text-decoration: none;
     letter-spacing: 4px;
     font-weight: 300;
     transition: color 0.3s;
   }
   .top-back a:hover {
-    color: #c5a880;
+    color: var(--c-gold);
   }
   .hero::after{
     content:'';position:absolute;bottom:-1px;left:32px;right:32px;height:1px;
     background:linear-gradient(90deg,transparent,rgba(197,168,128,0.2) 10%,rgba(197,168,128,0.1) 50%,rgba(197,168,128,0.2) 90%,transparent)
   }
   .hero h1{
-    font-size:40px;font-weight:400;color:#e6dfd3;letter-spacing:16px;line-height:1.3;
+    font-size:40px;font-weight:400;color:var(--c-text);letter-spacing:16px;line-height:1.3;
     text-shadow:0 3px 12px rgba(0,0,0,0.5),0 0 60px rgba(197,168,128,0.06);
     font-family:'ZCOOL XiaoWei','Noto Serif SC',serif;font-weight:900
   }
-  .hero .sub{font-size:10px;color:#8a7a6a;margin-top:12px;letter-spacing:8px;font-weight:300}
-  .hero .sub::before,.hero .sub::after{content:'◆';font-size:4px;color:#c5a880;margin:0 12px;vertical-align:middle;opacity:.4}
-  .hero .desc{font-size:12px;color:#9a8a7a;max-width:520px;margin:20px auto 0;line-height:2.2;font-weight:300}
+  .hero .sub{font-size:10px;color:var(--c-text-muted);margin-top:12px;letter-spacing:8px;font-weight:300}
+  .hero .sub::before,.hero .sub::after{content:'◆';font-size:4px;color:var(--c-gold);margin:0 12px;vertical-align:middle;opacity:.4}
+  .hero .desc{font-size:12px;color:var(--c-text-dim);max-width:520px;margin:20px auto 0;line-height:2.2;font-weight:300}
   .content{padding:40px 36px 48px}
   .content .section{margin-bottom:36px;position:relative}
-  .content .s-h{font-size:18px;font-weight:600;color:#c5a880;letter-spacing:8px;margin-bottom:16px}
-  .content .s-h .num{color:#7a6a5a;font-size:11px;letter-spacing:4px;margin-right:8px}
+  .content .s-h{font-size:18px;font-weight:600;color:var(--c-gold);letter-spacing:8px;margin-bottom:16px}
+  .content .s-h .num{color:var(--c-text-faint-light);font-size:11px;letter-spacing:4px;margin-right:8px}
   .content .s-h::after{content:'';display:block;width:40px;height:1px;background:rgba(197,168,128,0.35);margin-top:8px}
   .content p{font-size:14px;color:#bcae9e;margin-bottom:12px;text-indent:2em;letter-spacing:.5px;line-height:2.0}
   .content p.no-indent{text-indent:0}
   .quote-block{
     margin:20px 0 24px;padding:20px 24px;
     background:rgba(13,11,9,0.5);border-left:2px solid rgba(197,168,128,0.3);
-    font-size:12px;color:#9a8a7a;letter-spacing:2px;line-height:2.2
+    font-size:12px;color:var(--c-text-dim);letter-spacing:2px;line-height:2.2
   }
-  .quote-block em{font-style:normal;color:#c5a880;font-size:16px;letter-spacing:4px;display:block;margin-bottom:8px}
+  .quote-block em{font-style:normal;color:var(--c-gold);font-size:16px;letter-spacing:4px;display:block;margin-bottom:8px}
   .criteria-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0 20px}
   .criteria-item{background:rgba(13,11,9,0.35);border:1px solid rgba(197,168,128,0.15);padding:16px 18px}
-  .criteria-item .ci-name{font-size:13px;color:#c5a880;letter-spacing:6px;margin-bottom:4px}
-  .criteria-item .ci-desc{font-size:11px;color:#8a7a6a;letter-spacing:2px;line-height:1.8;font-weight:300}
+  .criteria-item .ci-name{font-size:13px;color:var(--c-gold);letter-spacing:6px;margin-bottom:4px}
+  .criteria-item .ci-desc{font-size:11px;color:var(--c-text-muted);letter-spacing:2px;line-height:1.8;font-weight:300}
   .score-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:11px}
-  .score-table th{background:rgba(13,11,9,0.6);color:#8a7a6a;font-weight:400;letter-spacing:3px;padding:8px 6px;border:1px solid rgba(197,168,128,0.2);text-align:center}
+  .score-table th{background:rgba(13,11,9,0.6);color:var(--c-text-muted);font-weight:400;letter-spacing:3px;padding:8px 6px;border:1px solid rgba(197,168,128,0.2);text-align:center}
   .score-table td{padding:7px 6px;border:1px solid rgba(197,168,128,0.15);text-align:center;color:#a89a8a;letter-spacing:1px}
-  .score-table td:first-child{color:#c5a880;letter-spacing:3px;text-align:left;padding-left:12px}
-  .score-table td:last-child{color:#e6dfd3;font-weight:bold;font-size:13px;font-family:'Times New Roman',Georgia,serif}
+  .score-table td:first-child{color:var(--c-gold);letter-spacing:3px;text-align:left;padding-left:12px}
+  .score-table td:last-child{color:var(--c-text);font-weight:bold;font-size:13px;font-family:'Times New Roman',Georgia,serif}
   
   .criteria-box {
     margin:20px 0;padding:16px 20px;background:rgba(13,11,9,0.3);border:1px solid rgba(197,168,128,0.15)
   }
   .criteria-header {
-    font-size:14px;color:#c5a880;letter-spacing:4px;margin-bottom:8px
+    font-size:14px;color:var(--c-gold);letter-spacing:4px;margin-bottom:8px
   }
   .criteria-intro {
-    font-size:11px;color:#9a8a7a;text-indent:0;margin-bottom:8px
+    font-size:11px;color:var(--c-text-dim);text-indent:0;margin-bottom:8px
   }
   .score-notes {
     font-size:10px;color:#6a5a4a;letter-spacing:2px;margin-top:6px
   }
   .score-row{display:flex;align-items:center;margin:8px 0;font-size:11px;gap:10px}
-  .score-row .sr-label{width:60px;color:#8a7a6a;letter-spacing:3px;flex-shrink:0}
+  .score-row .sr-label{width:60px;color:var(--c-text-muted);letter-spacing:3px;flex-shrink:0}
   .score-row .sr-bar{flex:1;height:6px;background:rgba(13,11,9,0.6);position:relative}
   .score-row .sr-fill{height:100%;background:rgba(197,168,128,0.15);transition:width .5s}
   .score-row .sr-fill.high{background:rgba(197,168,128,0.35)}
   .dim{color:#6a5a4a}
-  .dim-light{color:#7a6a5a;font-size:9px;letter-spacing:2px}
+  .dim-light{color:var(--c-text-faint-light);font-size:9px;letter-spacing:2px}
   
   .back-link{
-    display:inline-block;margin-top:24px;font-size:10px;color:#8a7a6a;
+    display:inline-block;margin-top:24px;font-size:10px;color:var(--c-text-muted);
     text-decoration:none;letter-spacing:4px;transition:color .3s;font-weight:400;
     border:1px solid rgba(197,168,128,0.2);padding:6px 14px;background:rgba(13,11,9,0.5)
   }
-  .back-link:hover{color:#c5a880;border-color:rgba(197,168,128,0.4)}
+  .back-link:hover{color:var(--c-gold);border-color:rgba(197,168,128,0.4)}
   .back-link::before{content:'← '}
   
   .footer{
-    padding:40px 30px 44px;text-align:center;font-size:8px;color:#5a4a3a;
+    padding:40px 30px 44px;text-align:center;font-size:8px;color:var(--c-text-faintest);
     letter-spacing:3px;line-height:2.4;font-weight:300;
     border-top:1px solid rgba(197,168,128,0.15);position:relative
   }

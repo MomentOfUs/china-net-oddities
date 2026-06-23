@@ -1,0 +1,17 @@
+---
+// 档案解密等级印章组件
+// Props: level (A|B|C|D), label (文本), compact (bool, 紧凑模式)
+const { level = 'D', label = '', compact = false } = Astro.props;
+const tag = compact ? 'span' : 'div';
+---
+<Fragment>
+  {label ? (
+    <{tag} class={`clearance-stamp stamp-level-${level}${compact ? ' stamp-compact' : ''}`}>
+      <span class="stamp-inner">{label}</span>
+    </{tag}>
+  ) : (
+    <{tag} class={`clearance-stamp stamp-level-${level}${compact ? ' stamp-compact' : ''}`}>
+      <span class="stamp-inner">{level}级解密</span>
+    </{tag}>
+  )}
+</Fragment>

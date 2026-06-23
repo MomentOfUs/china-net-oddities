@@ -2,6 +2,8 @@
 export const prerender = true;
 
 import Layout from '../layouts/Layout.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import Stamp from '../components/Stamp.astro';
 import { getCollection } from 'astro:content';
 import { getAvatar } from '../utils/imageResolver';
 import { Image } from 'astro:assets';
@@ -19,6 +21,42 @@ const getCategory = (tag) => {
   return '时代草根';
 };
 
+// 从 english_name 派生全拼、逐字首字母、英文别名、分词拼音
+// e.g. "Ma Baoguo" → "mabaoguo mbg ma baoguo ma bao guo"
+// e.g. "Sun Xiaochuan (DD Master)" → "sunxiaochuan sxc dd master sun xiaochuan sun xiao chuan"
+function getPinyinTokens(englishName) {
+  if (!englishName) return '';
+  const pinyinPart = englishName.split(/[\(\（]/)[0].trim();
+
+  // 全拼（去空格 + 去连字符）："sunxiaochuan"
+  const fullPinyin = pinyinPart.replace(/[\s-]+/g, '').toLowerCase();
+
+  // 拼音音节拆分（Baoguo → bao, guo）—— 用正则切出合法的拼音声母+韵母组合
+  const syllableRe = /(zh|ch|sh|[bpmfdtnlgkhjqxzcsryw])?(iang|iong|uang|uai|ian|iao|ang|eng|ing|ong|ueng|[aeiouv]{1,2}(?:ng|n)?)/gi;
+  const allSyllables = pinyinPart.split(/\s+/).flatMap(w => {
+    const syllables = w.toLowerCase().match(syllableRe);
+    return syllables && syllables.length > 0 ? syllables : [w.toLowerCase()];
+  });
+
+  // 逐字首字母：Baoguo → b + g = bg
+  const initials = allSyllables.map(s => (s[0] || '').toLowerCase()).join('');
+
+  // 英文别名（括号内内容）："tai chi master"
+  const aliasMatch = englishName.match(/[\(\（](.+?)[\)\）]/);
+  const englishAlias = aliasMatch ? aliasMatch[1].toLowerCase() : '';
+
+  // 返回多种 token 形式，空格分隔
+  return [
+    fullPinyin,
+    initials,
+    englishAlias,
+    pinyinPart.toLowerCase(),
+    allSyllables.join(' ').toLowerCase(),
+    // 额外加入去连字符版本（应对 "A-Giao" 这种写法）
+    pinyinPart.replace(/[\s-]+/g, ' ').toLowerCase(),
+  ].filter(Boolean).join(' ');
+}
+
 // 按照 home_metadata 进行列表整理
 const entries = rawEntries.map(item => {
   const data = item.data;
@@ -31,7 +69,7 @@ const entries = rawEntries.map(item => {
     tag: metaInfo.tag,
     meta: metaInfo.meta,
     stats: metaInfo.stats || [],
-    searchText: (data.title + ' ' + (metaInfo.meta || '') + ' ' + (data.tags || []).join(' ') + ' ' + (data.subtitle || '') + ' ' + (metaInfo.tag || '')).toLowerCase(),
+    searchText: (data.title + ' ' + (metaInfo.meta || '') + ' ' + (data.tags || []).join(' ') + ' ' + (data.subtitle || '') + ' ' + (metaInfo.tag || '') + ' ' + getPinyinTokens(data.english_name)).toLowerCase(),
     category: getCategory(metaInfo.tag),
     scores: scores,
     score: Object.values(scores).reduce((a, b) => a + b, 0),
@@ -49,7 +87,7 @@ const entries = rawEntries.map(item => {
       </filter>
     </defs>
   </svg>
-  <div class="wrap">
+  <div class="wrap" id="main-content">
     <div class="hero">
       <a href="/charte" class="charte-link">入选标准</a>
       <h1>中 国 互 联 网 奇 观</h1>
@@ -63,7 +101,7 @@ const entries = rawEntries.map(item => {
     </div>
 
     <div class="entries">
-      <div class="entry-head" style="margin-bottom:12px">馆 藏 目 录<span class="entry-count">共 {entries.length} 件</span></div>
+      <SectionHeading title="馆 藏 目 录" count={entries.length + ' 件'} />
       
       <!-- 排序切换 -->
       <div class="sort-tabs">
@@ -94,10 +132,11 @@ const entries = rawEntries.map(item => {
 
       <div class="entries-grid">
         {entries.map(entry => (
-          <div class="fc-wrapper phenomenon-card" 
+          <div class="fc-wrapper phenomenon-card"
                style="position:relative; transition: opacity 0.4s ease, transform 0.4s ease"
                data-search={entry.searchText}
                data-category={entry.category}
+               data-clearance={entry.clearance}
                data-popularity={entry.scores.popularity}
                data-dispute={entry.scores.dispute}
                data-absurdity={entry.scores.absurdity}
@@ -157,48 +196,13 @@ const entries = rawEntries.map(item => {
     </div>
 
     <div class="footer">
-      <span id="vcounter" style="cursor:help;color:#6a5a4a;letter-spacing:5px" title="同IP每小时只计1次">◈ 访客 − ◈</span>
+      <span id="vcounter" style="cursor:help;color:var(--c-text-faint);letter-spacing:5px" title="同IP每小时只计1次">◈ 访客 − ◈</span>
       <br /><span style="opacity:.4">🦞 麻辣小龙虾 · 持续更新</span>
     </div>
   </div>
 
   <script is:inline>
-    // 1. 翻书声音合成
-    function playBookFlipSound() {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContext) return;
-      try {
-        const ctx = new AudioContext();
-        const bufferSize = ctx.sampleRate * 0.4;
-        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-          data[i] = Math.random() * 2 - 1;
-        }
-        const noise = ctx.createBufferSource();
-        noise.buffer = buffer;
-        
-        const filter = ctx.createBiquadFilter();
-        filter.type = 'bandpass';
-        filter.frequency.setValueAtTime(1000, ctx.currentTime);
-        filter.frequency.exponentialRampToValueAtTime(1500, ctx.currentTime + 0.3);
-        filter.Q.value = 1.0;
-        
-        const gain = ctx.createGain();
-        gain.gain.setValueAtTime(0.01, ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.08);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.38);
-        
-        noise.connect(filter);
-        filter.connect(gain);
-        gain.connect(ctx.destination);
-        
-        noise.start();
-        noise.stop(ctx.currentTime + 0.4);
-      } catch(err) {
-        console.error("Audio error:", err);
-      }
-    }
+    // 翻书声音由 /audio.js 全局模块提供
 
     // 2. 通用页面初始化函数，兼容浏览器 DOM 缓存
     function initHomepage() {
@@ -210,21 +214,36 @@ const entries = rawEntries.map(item => {
           oracleTrigger.addEventListener('click', () => {
             const wrap = document.querySelector('.wrap');
             if (wrap && wrap.classList.contains('page-flipping')) return;
-            
-            playBookFlipSound();
-            
+
+            window.__archiveAudio.playBookFlipSound();
+            if (wrap) wrap.classList.add('page-flipping');
+
+            // 编号闪烁：No.?? 快速跳动
+            const numEl = document.querySelector('.book-corner-numbers');
+            if (numEl) {
+              const total = 43; // 馆藏总数
+              let flashCount = 0;
+              const flashInterval = setInterval(() => {
+                numEl.textContent = 'No.' + String(Math.floor(Math.random() * total) + 1).padStart(2, '0');
+                flashCount++;
+                if (flashCount >= 12) {
+                  clearInterval(flashInterval);
+                  numEl.textContent = 'No. ??';
+                }
+              }, 50);
+            }
+
             setTimeout(() => {
               const dataEl = document.getElementById('entriesData');
               if (dataEl) {
                 const urls = JSON.parse(dataEl.getAttribute('data-urls') || '[]');
                 if (urls.length > 0) {
                   const randomUrl = urls[Math.floor(Math.random() * urls.length)];
-                  // 导航前移除类，防止 BFCache 恢复时残留动画状态
                   if (wrap) wrap.classList.remove('page-flipping');
                   window.location.href = randomUrl;
                 }
               }
-            }, 400);
+            }, 420);
           });
         }
       }
@@ -237,7 +256,7 @@ const entries = rawEntries.map(item => {
           card.addEventListener('click', (e) => {
             e.preventDefault();
             const targetUrl = card.getAttribute('href');
-            playBookFlipSound();
+            window.__archiveAudio.playBookFlipSound();
             setTimeout(() => {
               window.location.href = targetUrl;
             }, 0);
@@ -386,21 +405,10 @@ const entries = rawEntries.map(item => {
         }
 
         if (searchMatch) {
-          card.style.display = 'block';
+          card.classList.remove('filtered-out');
           visibleCount++;
-          // 延迟应用透明度以显示淡入动画
-          setTimeout(() => {
-            card.style.opacity = '1';
-            card.style.transform = 'scale(1)';
-          }, 20);
         } else {
-          card.style.opacity = '0';
-          card.style.transform = 'scale(0.95)';
-          setTimeout(() => {
-            if (card.style.opacity === '0') {
-              card.style.display = 'none';
-            }
-          }, 400);
+          card.classList.add('filtered-out');
         }
       });
 
@@ -427,6 +435,74 @@ const entries = rawEntries.map(item => {
       }
     });
 
+    /* ── 卡片入场交错动画 ── */
+    function initCardEntrance() {
+      const cards = document.querySelectorAll('.phenomenon-card');
+      if (!cards.length || !('IntersectionObserver' in window)) {
+        cards.forEach(c => c.classList.add('card-visible'));
+        return;
+      }
+      const cardsArray = Array.from(cards);
+
+      // 兜底：3 秒后尚未显示的卡片全部亮出
+      let fallbackTimer = setTimeout(() => {
+        cardsArray.forEach(c => {
+          if (!c.classList.contains('card-visible')) {
+            c.style.animationDelay = '0ms';
+            c.classList.add('card-visible');
+          }
+        });
+      }, 3000);
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const card = entry.target;
+            const index = cardsArray.indexOf(card);
+            // 每行 3 张，同行微错开 40ms，换行加 25ms —— 快速但有层次
+            const row = Math.floor(index / 3);
+            const col = index % 3;
+            card.style.animationDelay = (col * 40 + row * 25) + 'ms';
+            card.classList.add('card-visible');
+            observer.unobserve(card);
+            // 全部显示则清除兜底
+            if (cardsArray.every(c => c.classList.contains('card-visible'))) {
+              clearTimeout(fallbackTimer);
+            }
+          }
+        });
+      }, { threshold: 0.05, rootMargin: '0px 0px 120px 0px' });
+      // threshold 0.05 → 露一点就触发
+      // rootMargin 120px → 提前 120px 预热，快滑不空白
+
+      cardsArray.forEach(c => observer.observe(c));
+    }
+
+    /* ── 卡片照片 3D 倾斜 ── */
+    function initPhotoTilt() {
+      document.querySelectorAll('.featured').forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = (e.clientX - rect.left) / rect.width - 0.5;
+          const y = (e.clientY - rect.top) / rect.height - 0.5;
+          const img = card.querySelector('.fc-img');
+          if (img) {
+            img.style.transform = `perspective(400px) rotateY(${x * 14}deg) rotateX(${-y * 10}deg) scale(1.04)`;
+            img.style.transition = 'transform 0.1s ease-out';
+            img.style.filter = 'grayscale(0.15) sepia(0.06) contrast(1.06) brightness(0.88) saturate(0.85)';
+          }
+        });
+        card.addEventListener('mouseleave', () => {
+          const img = card.querySelector('.fc-img');
+          if (img) {
+            img.style.transform = '';
+            img.style.filter = '';
+            img.style.transition = '';
+          }
+        });
+      });
+    }
+
     /* ── 图片懒加载渐入 ── */
     function initImgFadeIn() {
       document.querySelectorAll('.fc-img').forEach(img => {
@@ -439,6 +515,8 @@ const entries = rawEntries.map(item => {
       });
     }
     initImgFadeIn();
+    initCardEntrance();
+    initPhotoTilt();
   </script>
 </Layout>
 
@@ -463,7 +541,7 @@ const entries = rawEntries.map(item => {
   }
   .sort-label {
     font-size: 9px;
-    color: #6a5a4a;
+    color: var(--c-text-faint);
     letter-spacing: 2px;
     font-family: 'Times New Roman', Georgia, serif;
     padding-right: 16px;
@@ -479,7 +557,7 @@ const entries = rawEntries.map(item => {
   .sort-tab {
     background: transparent;
     border: none;
-    color: #7a6a5a;
+    color: var(--c-text-faint-light);
     padding: 6px 16px 6px 14px;
     font-size: 10px;
     letter-spacing: 1px;
@@ -498,7 +576,7 @@ const entries = rawEntries.map(item => {
   .sort-tab-icon {
     font-size: 8px;
     font-family: 'Times New Roman', Georgia, serif;
-    color: #5a4a3a;
+    color: var(--c-text-faintest);
     letter-spacing: 0;
     transition: all 0.25s ease;
   }
@@ -507,7 +585,7 @@ const entries = rawEntries.map(item => {
     color: #b8a088;
   }
   .sort-tab:hover .sort-tab-icon {
-    color: #8a7a6a;
+    color: var(--c-text-muted);
   }
   .sort-tab.active {
     color: #d4c8b8;
@@ -523,7 +601,7 @@ const entries = rawEntries.map(item => {
     left: 20%;
     right: 20%;
     height: 2px;
-    background: linear-gradient(90deg, transparent 0%, #c5a880 50%, transparent 100%);
+    background: linear-gradient(90deg, transparent 0%, var(--c-gold) 50%, transparent 100%);
     border-radius: 2px;
   }
 
@@ -532,7 +610,7 @@ const entries = rawEntries.map(item => {
     max-width:1320px;margin:48px auto;position:relative;z-index:2;
     background:
       radial-gradient(ellipse at 50% 20%, rgba(255, 255, 255, 0.02) 0%, transparent 80%),
-      #1a130e;
+      var(--c-bg-surface);
     border: 2px solid #2d241d;
     box-shadow:
       0 0 0 1px rgba(100, 80, 60, 0.15),
@@ -556,14 +634,8 @@ const entries = rawEntries.map(item => {
   .hero::before{
     content:'';position:absolute;top:0;left:0;right:0;bottom:0;
     background:
-      radial-gradient(ellipse 60% 30% at 50% 40%,rgba(197,168,128,0.035) 0%,transparent 70%),
-      repeating-linear-gradient(
-        180deg,
-        transparent,
-        transparent 3px,
-        rgba(197,168,128,0.012) 3px,
-        rgba(197,168,128,0.012) 4px
-      );
+      radial-gradient(ellipse 60% 30% at 50% 40%,rgba(197,168,128,0.012) 0%,transparent 70%),
+      repeating-linear-gradient(180deg,transparent,transparent 3px,rgba(197,168,128,0.012) 3px,rgba(197,168,128,0.012) 4px);
     pointer-events:none;
     z-index:0;
   }
@@ -574,7 +646,7 @@ const entries = rawEntries.map(item => {
     to   { opacity: 1; transform: translateY(0); }
   }
   .hero h1 {
-    font-size:54px;font-weight:900;color:#e6dfd3;letter-spacing:22px;line-height:1.2;
+    font-size:54px;font-weight:900;color:var(--c-text);letter-spacing:22px;line-height:1.2;
     text-shadow:0 3px 12px rgba(0,0,0,0.5),0 0 60px rgba(197,168,128,0.06);
     font-family:'ZCOOL XiaoWei','Noto Serif SC',serif;
     position: relative; z-index: 1;
@@ -588,10 +660,10 @@ const entries = rawEntries.map(item => {
     animation-delay: 0.22s;
   }
   .hero .sub::before,.hero .sub::after{
-    content:'◆';font-size:5px;color:#8a7a6a;margin:0 14px;vertical-align:middle;opacity:.4
+    content:'◆';font-size:5px;color:var(--c-text-muted);margin:0 14px;vertical-align:middle;opacity:.4
   }
   .hero .desc {
-    font-size:12px;color:#9a8a7a;max-width:520px;margin:20px auto 0;line-height:2.1;font-weight:300;
+    font-size:12px;color:var(--c-text-dim);max-width:520px;margin:20px auto 0;line-height:2.1;font-weight:300;
     letter-spacing:1px;position:relative;z-index:1;
     animation: hero-rise 0.9s cubic-bezier(0.22,1,0.36,1) both;
     animation-delay: 0.38s;
@@ -603,7 +675,7 @@ const entries = rawEntries.map(item => {
   /* ── Entry List ── */
   .entries{padding:24px 0}
   .entry-head{
-    font-size:11px;color:#8a7a6a;letter-spacing:7px;text-transform:uppercase;font-weight:400;
+    font-size:11px;color:var(--c-text-muted);letter-spacing:7px;text-transform:uppercase;font-weight:400;
     margin:0 48px 28px;padding-bottom:12px;position:relative;font-family:'Times New Roman',Georgia,serif;
     display: flex;
     align-items: baseline;
@@ -611,7 +683,7 @@ const entries = rawEntries.map(item => {
   }
   .entry-count {
     font-size: 9px;
-    color: #5a4a3a;
+    color: var(--c-text-faintest);
     letter-spacing: 2px;
     font-weight: 300;
     padding: 2px 10px;
@@ -627,7 +699,7 @@ const entries = rawEntries.map(item => {
 
   /* ── Search Bar ── */
   /* ── 3D翻书视口与动画 ── */
-  :global(body) {
+  .wrap {
     perspective: 1200px;
   }
   .wrap.page-flipping {
@@ -664,13 +736,13 @@ const entries = rawEntries.map(item => {
     background: rgba(13,11,9,0.4);
     border: 1px solid rgba(197,168,128,0.08);
   }
-  .search-label{font-size:10px;color:#7a6a5a;letter-spacing:5px;text-transform:uppercase;white-space:nowrap;font-family:'Times New Roman',Georgia,serif;border-right:1px solid rgba(197,168,128,0.12);padding-right:14px}
+  .search-label{font-size:10px;color:var(--c-text-faint-light);letter-spacing:5px;text-transform:uppercase;white-space:nowrap;font-family:'Times New Roman',Georgia,serif;border-right:1px solid rgba(197,168,128,0.12);padding-right:14px}
   .search-inner{flex:1;display:flex;align-items:center;gap:8px}
-  .search-input{flex:1;padding:8px 10px;background:rgba(8,7,6,0.6);border:1px solid transparent;color:#c8baaa;font-family:'Noto Serif SC',serif;font-size:13px;letter-spacing:2px;outline:none;transition:all .3s}
-  .search-input::placeholder{color:#5a4a3a;letter-spacing:3px;font-weight:300;font-size:11px}
+  .search-input{flex:1;padding:8px 10px;background:rgba(8,7,6,0.6);border:1px solid transparent;color:var(--c-text-body);font-family:'Noto Serif SC',serif;font-size:13px;letter-spacing:2px;outline:none;transition:all .3s}
+  .search-input::placeholder{color:var(--c-text-faintest);letter-spacing:3px;font-weight:300;font-size:11px}
   .search-input:focus{background:rgba(8,7,6,0.8);border-color:rgba(197,168,128,0.2)}
-  .search-clear{font-size:10px;color:#5a4a3a;cursor:pointer;padding:4px 6px;opacity:0;transition:opacity .3s;font-family:'Times New Roman',serif}
-  .search-clear:hover{color:#8a7a6a}
+  .search-clear{font-size:10px;color:var(--c-text-faintest);cursor:pointer;padding:4px 6px;opacity:0;transition:opacity .3s;font-family:'Times New Roman',serif}
+  .search-clear:hover{color:var(--c-text-muted)}
   .search-count{font-size:10px;color:#4a3a2a;letter-spacing:2px;white-space:nowrap;font-family:'Times New Roman',serif;min-width:60px;text-align:right;border-left:1px solid rgba(197,168,128,0.08);padding-left:14px}
 
   /* ── 命运调档（铁皮档案盒标签） ── */
@@ -678,7 +750,7 @@ const entries = rawEntries.map(item => {
     position: relative;
     min-width: 108px;
     height: 40px;
-    background: linear-gradient(180deg, #a09080 0%, #8a7a6a 100%);
+    background: linear-gradient(180deg, #a09080 0%, var(--c-text-muted) 100%);
     border: none;
     display: flex;
     align-items: center;
@@ -737,7 +809,7 @@ const entries = rawEntries.map(item => {
     position: absolute;
     width: 6px;
     height: 6px;
-    background: radial-gradient(circle at 40% 35%, #c8b8a8, #6a5a4a 70%);
+    background: radial-gradient(circle at 40% 35%, #c8b8a8, var(--c-text-faint) 70%);
     border-radius: 50%;
     box-shadow: inset 0 1px 1px rgba(255,255,255,0.3), 0 1px 2px rgba(0,0,0,0.3);
     pointer-events: none;
@@ -805,34 +877,34 @@ const entries = rawEntries.map(item => {
     filter: url(#stamp-filter);
   }
   .stamp-level-A {
-    border: 2px solid #b71c1c;
-    color: #b71c1c;
+    border: 2px solid var(--c-red-stamp);
+    color: var(--c-red-stamp);
     /* 带噪点与不规则厚度的拟物牛皮纸贴底色 */
-    background: #fbf8ee url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.25' numOctaves='3'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' fill='%23000'/%3E%3C/svg%3E");
+    background: #fbf8ee var(--texture-stamp-ink);
     box-shadow: 
       0 2px 5px rgba(0,0,0,0.35),
       inset 0 0 6px rgba(183, 28, 28, 0.08);
   }
   .stamp-level-B {
-    border: 2px solid #d84315;
-    color: #d84315;
-    background: #fbf8ee url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.25' numOctaves='3'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' fill='%23000'/%3E%3C/svg%3E");
+    border: 2px solid var(--c-orange);
+    color: var(--c-orange);
+    background: #fbf8ee var(--texture-stamp-ink);
     box-shadow: 
       0 2px 5px rgba(0,0,0,0.35),
       inset 0 0 6px rgba(216, 67, 21, 0.08);
   }
   .stamp-level-C {
-    border: 2px dashed #e65100;
-    color: #e65100;
-    background: #fbf8ee url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.25' numOctaves='3'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' fill='%23000'/%3E%3C/svg%3E");
+    border: 2px dashed var(--c-amber);
+    color: var(--c-amber);
+    background: #fbf8ee var(--texture-stamp-ink);
     box-shadow: 
       0 2px 5px rgba(0,0,0,0.35),
       inset 0 0 6px rgba(230, 81, 0, 0.08);
   }
   .stamp-level-D {
-    border: 3px double #0d47a1;
-    color: #0d47a1;
-    background: #fbf8ee url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.25' numOctaves='3'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' fill='%23000'/%3E%3C/svg%3E");
+    border: 3px double var(--c-blue);
+    color: var(--c-blue);
+    background: #fbf8ee var(--texture-stamp-ink);
     box-shadow: 
       0 2px 5px rgba(0,0,0,0.35),
       inset 0 0 6px rgba(13, 71, 161, 0.08);
@@ -857,7 +929,7 @@ const entries = rawEntries.map(item => {
     border-top: none;
     border-left: none;
     font-size: 8px;
-    color: #c5a880;
+    color: var(--c-gold);
     padding: 3px 12px;
     letter-spacing: 2px;
     font-family: 'Noto Serif SC', serif;
@@ -869,10 +941,29 @@ const entries = rawEntries.map(item => {
   }
 
   /* ── Featured Cards ── */
+  /* ── 卡片入场交错动画 ── */
+  @keyframes card-enter {
+    from { opacity: 0; transform: translateY(24px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .phenomenon-card {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+  .phenomenon-card.card-visible {
+    animation: card-enter 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
   .fc-wrapper {
     display: flex;
     flex-direction: column;
     height: 100%;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+  .fc-wrapper.filtered-out {
+    opacity: 0;
+    transform: scale(0.95);
+    pointer-events: none;
   }
   .featured {
     display: flex;
@@ -882,11 +973,11 @@ const entries = rawEntries.map(item => {
     margin: 0;
     transition: all .4s cubic-bezier(0.165, 0.84, 0.44, 1);
     text-decoration: none;
-    color: #e6dfd3;
+    color: var(--c-text);
     position: relative;
     background: 
       radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.02) 0%, transparent 80%),
-      linear-gradient(180deg, #32251a 0%, #221810 100%);
+      linear-gradient(180deg, #32251a 0%, var(--c-bg-card) 100%);
     border: 1px solid #1a120a;
     box-shadow: 
       0 4px 20px rgba(0,0,0,0.85),
@@ -904,14 +995,31 @@ const entries = rawEntries.map(item => {
   .featured:hover {
     background: linear-gradient(180deg, #3c2e22 0%, #281d14 100%);
     border-color: #523f2b;
-    box-shadow: 
+    box-shadow:
       0 6px 18px rgba(0,0,0,0.7),
       0 16px 40px rgba(0,0,0,0.55),
       0 0 20px rgba(197, 168, 128, 0.12),
       inset 0 0 20px rgba(0,0,0,0.5);
     transform: translateY(-3px) scale(1.015);
   }
-  .featured:hover .fc-link { color: #e6dfd3; }
+  /* ── 保密级别差异化辉光 ── */
+  .phenomenon-card[data-clearance="A"] .featured:hover {
+    border-color: rgba(183, 28, 28, 0.55);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.7), 0 16px 40px rgba(0,0,0,0.55), 0 0 28px rgba(183,28,28,0.25), 0 0 60px rgba(183,28,28,0.08), inset 0 0 20px rgba(0,0,0,0.5);
+  }
+  .phenomenon-card[data-clearance="B"] .featured:hover {
+    border-color: rgba(216, 67, 21, 0.5);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.7), 0 16px 40px rgba(0,0,0,0.55), 0 0 28px rgba(216,67,21,0.22), 0 0 60px rgba(216,67,21,0.06), inset 0 0 20px rgba(0,0,0,0.5);
+  }
+  .phenomenon-card[data-clearance="C"] .featured:hover {
+    border-color: rgba(230, 81, 0, 0.45);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.7), 0 16px 40px rgba(0,0,0,0.55), 0 0 24px rgba(230,81,0,0.2), 0 0 50px rgba(230,81,0,0.05), inset 0 0 20px rgba(0,0,0,0.5);
+  }
+  .phenomenon-card[data-clearance="D"] .featured:hover {
+    border-color: rgba(13, 71, 161, 0.5);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.7), 0 16px 40px rgba(0,0,0,0.55), 0 0 28px rgba(13,71,161,0.22), 0 0 60px rgba(13,71,161,0.06), inset 0 0 20px rgba(0,0,0,0.5);
+  }
+  .featured:hover .fc-link { color: var(--c-text); }
 
   /* ── Photo Frame & Paperclip ── */
   .fc-photo-wrap {
@@ -952,7 +1060,7 @@ const entries = rawEntries.map(item => {
     pointer-events: none;
     /* 颗粒噪点 + 泛黄晕染 */
     background:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E"),
+      var(--texture-paper-grain),
       radial-gradient(ellipse at 50% 0%, rgba(255,230,180,0.06) 0%, transparent 65%),
       radial-gradient(ellipse at 0% 100%, rgba(0,0,0,0.18) 0%, transparent 55%),
       radial-gradient(ellipse at 100% 100%, rgba(0,0,0,0.15) 0%, transparent 50%);
@@ -1021,7 +1129,7 @@ const entries = rawEntries.map(item => {
   .featured .fc-title {
     font-size: 17px;
     font-weight: 700;
-    color: #e6dfd3;
+    color: var(--c-text);
     letter-spacing: 2px;
     margin-top: 2px;
     font-family: 'ZCOOL XiaoWei', 'Noto Serif SC', serif;
@@ -1051,7 +1159,7 @@ const entries = rawEntries.map(item => {
     letter-spacing: .2px;
   }
   .featured .fc-stats b {
-    color: #c5a880;
+    color: var(--c-gold);
     font-size: 14px;
     font-family: 'Times New Roman', Georgia, serif;
     display: block;
@@ -1095,30 +1203,30 @@ const entries = rawEntries.map(item => {
     display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:160px
   }
   .card-grid>a:hover{background:rgba(22,18,15,0.6);border-color:rgba(197,168,128,0.35)}
-  .card-grid .ci{font-size:24px;margin-bottom:10px;opacity:.15;color:#c5a880}
-  .card-grid .cn{font-size:13px;color:#7a6a5a;letter-spacing:6px;font-weight:300}
-  .card-grid .cd{font-size:9px;color:#5a4a3a;margin-top:6px;letter-spacing:2px;font-weight:300}
+  .card-grid .ci{font-size:24px;margin-bottom:10px;opacity:.15;color:var(--c-gold)}
+  .card-grid .cn{font-size:13px;color:var(--c-text-faint-light);letter-spacing:6px;font-weight:300}
+  .card-grid .cd{font-size:9px;color:var(--c-text-faintest);margin-top:6px;letter-spacing:2px;font-weight:300}
 
   /* ── Suggestion Wall ── */
   .suggest-section{padding:36px 0 0}
   .suggest-form{margin:0 48px 24px;padding:24px 28px;background:rgba(13,11,9,0.5);border:1px solid rgba(197,168,128,0.15);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-  .suggest-form input{flex:1;min-width:180px;padding:10px 16px;background:rgba(8,7,6,0.8);border:1px solid rgba(197,168,128,0.2);color:#e6dfd3;font-family:inherit;font-size:14px;letter-spacing:2px;outline:none;transition:all .3s}
+  .suggest-form input{flex:1;min-width:180px;padding:10px 16px;background:rgba(8,7,6,0.8);border:1px solid rgba(197,168,128,0.2);color:var(--c-text);font-family:inherit;font-size:14px;letter-spacing:2px;outline:none;transition:all .3s}
   .suggest-form input:focus{border-color:rgba(197,168,128,0.45);box-shadow:inset 0 1px 4px rgba(0,0,0,0.5)}
-  .suggest-form input::placeholder{color:#6a5a4a;letter-spacing:4px;font-size:11px}
-  .suggest-form button{padding:10px 24px;background:rgba(197,168,128,0.12);border:1px solid rgba(197,168,128,0.25);color:#c5a880;font-family:inherit;font-size:11px;letter-spacing:6px;cursor:pointer;transition:all .3s}
-  .suggest-form button:hover{background:rgba(197,168,128,0.25);border-color:rgba(197,168,128,0.45);color:#e6dfd3}
+  .suggest-form input::placeholder{color:var(--c-text-faint);letter-spacing:4px;font-size:11px}
+  .suggest-form button{padding:10px 24px;background:rgba(197,168,128,0.12);border:1px solid rgba(197,168,128,0.25);color:var(--c-gold);font-family:inherit;font-size:11px;letter-spacing:6px;cursor:pointer;transition:all .3s}
+  .suggest-form button:hover{background:rgba(197,168,128,0.25);border-color:rgba(197,168,128,0.45);color:var(--c-text)}
   .suggest-form button:disabled{opacity:.3;cursor:not-allowed}
   .suggest-msg{margin:0 48px;font-size:10px;letter-spacing:3px;min-height:20px}
   .suggest-msg.ok{color:#7a9a6a}
-  .suggest-msg.err{color:#b05030}
+  .suggest-msg.err{color:var(--c-red)}
   .suggest-list{margin:12px 48px 0;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
   .suggest-item{padding:16px;background:rgba(13,11,9,0.5);border:1px solid rgba(197,168,128,0.15);font-size:14px;color:#bcae9e;letter-spacing:4px;text-align:center;cursor:default;transition:all .3s}
-  .suggest-item:hover{background:rgba(22,18,15,0.8);border-color:rgba(197,168,128,0.35);color:#e6dfd3}
-  .suggest-empty{font-size:10px;color:#6a5a4a;letter-spacing:4px;margin:0 48px;grid-column:1/-1;text-align:center;padding:20px 0}
+  .suggest-item:hover{background:rgba(22,18,15,0.8);border-color:rgba(197,168,128,0.35);color:var(--c-text)}
+  .suggest-empty{font-size:10px;color:var(--c-text-faint);letter-spacing:4px;margin:0 48px;grid-column:1/-1;text-align:center;padding:20px 0}
 
   /* ── Colophon ── */
   .footer{
-    padding:40px 30px 44px;text-align:center;font-size:8px;color:#5a4a3a;
+    padding:40px 30px 44px;text-align:center;font-size:8px;color:var(--c-text-faintest);
     letter-spacing:3px;line-height:2.4;font-weight:300;
     border-top:1px solid rgba(197,168,128,0.15);position:relative
   }
@@ -1133,14 +1241,14 @@ const entries = rawEntries.map(item => {
     top: 18px;
     right: 22px;
     font-size: 9px;
-    color: #b05030;
+    color: var(--c-red);
     border: 1.5px solid rgba(176,80,48,0.5);
     padding: 4px 12px;
     letter-spacing: 5px;
     font-family: 'Noto Serif SC', serif;
     font-weight: 700;
     transform: rotate(-6deg);
-    background: #fbf8ee url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.3' numOctaves='3'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)'/%3E%3C/svg%3E");
+    background: #fbf8ee var(--texture-stamp-classification);
     box-shadow:
       0 2px 6px rgba(0,0,0,0.4),
       inset 0 0 6px rgba(176,80,48,0.07);
@@ -1157,7 +1265,7 @@ const entries = rawEntries.map(item => {
     top: 20px;
     left: 24px;
     font-size: 9px;
-    color: #c5a880;
+    color: var(--c-gold);
     border: 1px solid rgba(197, 168, 128, 0.3);
     padding: 3px 10px;
     letter-spacing: 4px;
@@ -1171,7 +1279,7 @@ const entries = rawEntries.map(item => {
   .charte-link:hover {
     background: rgba(197, 168, 128, 0.08);
     border-color: rgba(197, 168, 128, 0.65);
-    color: #e6dfd3;
+    color: var(--c-text);
     text-shadow: 0 0 4px rgba(197, 168, 128, 0.2);
   }
 
@@ -1190,7 +1298,7 @@ const entries = rawEntries.map(item => {
   }
   .evidence-tag {
     font-size: 9px;
-    color: #7a6a5a;
+    color: var(--c-text-faint-light);
     letter-spacing: 3px;
     padding-right: 14px;
     border-right: 1px solid rgba(197,168,128,0.18);
@@ -1200,14 +1308,14 @@ const entries = rawEntries.map(item => {
   .filing-num {
     font-size: 9px;
     font-family: monospace;
-    color: #8a7a6a;
+    color: var(--c-text-muted);
     letter-spacing: 2px;
   }
   /* 等级色点 */
-  .filing-num .lvl-a { color: #b71c1c; }
-  .filing-num .lvl-b { color: #d84315; }
-  .filing-num .lvl-c { color: #e65100; }
-  .filing-num .lvl-d { color: #5c7a9e; }
+  .filing-num .lvl-a { color: var(--c-red-stamp); }
+  .filing-num .lvl-b { color: var(--c-orange); }
+  .filing-num .lvl-c { color: var(--c-amber); }
+  .filing-num .lvl-d { color: var(--c-blue-dim); }
 
   /* ── Responsive ── */
   @media(max-width:960px){

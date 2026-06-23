@@ -1,0 +1,19 @@
+/* ═══════════════════════════════════════════════════════════
+   共享纹理库 — SVG 噪点/纸纤维纹理 Data URI
+   通过 CSS 变量统一引用，避免在多个文件中重复内联
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  /* 印章油墨噪点纹理 (baseFrequency=0.25, numOctaves=3) */
+  /* 用于: stamp-level-A/B/C/D, impact-stamp */
+  --texture-stamp-ink: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.25' numOctaves='3'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' fill='%23000'/%3E%3C/svg%3E");
+
+  /* 分类印章纹理 (baseFrequency=0.3, numOctaves=3) — 更细密 */
+  --texture-stamp-classification: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.3' numOctaves='3'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)'/%3E%3C/svg%3E");
+
+  /* 文档纸颗粒纹理 — 卡片照片纸 (baseFrequency=0.75) */
+  --texture-paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
+
+  /* 档案照片纸纹理 — 详情页照片框 (baseFrequency=0.8) */
+  --texture-photo-paper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E");
+}

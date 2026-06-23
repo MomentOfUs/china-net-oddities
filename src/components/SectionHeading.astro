@@ -1,0 +1,48 @@
+---
+// 档案分区标题组件
+// Props: title (文本), count (可选)
+const { title = '', count } = Astro.props;
+---
+<div class="entry-head">
+  {title}
+  {count != null && (
+    <span class="entry-count">{count}</span>
+  )}
+</div>
+
+<style>
+  .entry-head {
+    font-size: 11px;
+    color: var(--c-text-muted);
+    letter-spacing: 7px;
+    text-transform: uppercase;
+    font-weight: 400;
+    margin: 0 var(--space-gutter) 28px;
+    padding-bottom: 12px;
+    position: relative;
+    font-family: var(--font-ui);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  .entry-head::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(197,168,128,0.25) 15%, rgba(197,168,128,0.05) 50%, transparent);
+  }
+  .entry-count {
+    font-size: 9px;
+    color: var(--c-text-faintest);
+    letter-spacing: 2px;
+    font-weight: 300;
+    padding: 2px 10px;
+    border: 1px solid rgba(100, 60, 30, 0.12);
+    border-radius: 1px;
+    background: rgba(13,11,9,0.3);
+    font-family: 'Courier New', monospace;
+  }
+</style>

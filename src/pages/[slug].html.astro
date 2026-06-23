@@ -60,7 +60,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
 ---
 <Layout title={`${data.title} · 互联网奇观 · 人物档案馆`}>
   <a class="back-link" href="/">← 返回</a>
-  <div class="wrap">
+  <div class="wrap" id="main-content">
     <!-- 盖章降临组件 -->
     <div class={`impact-stamp stamp-level-${data.clearance || 'D'}`} id="impactStamp">
       <span class="stamp-title">DECLASSIFIED</span>
@@ -239,15 +239,35 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
 
     {data.body_grid && data.body_grid.length > 0 && (
       <div class="body-grid">
-        {data.body_grid.map(bg => (
-          <div>
-            <div class="bl">{bg.label}</div>
-            <div class="bv">
-              <Fragment set:html={bg.value} />
-              {bg.sub && <span class="bs">{bg.sub}</span>}
+        {data.body_grid.map(bg => {
+          // 档案馆化隐式替换映射表
+          let displayLabel = bg.label;
+          const labelMap = {
+            '本名': '自然人本名',
+            '真名': '自然人本名',
+            '现状': '社会学状态',
+            '结局': '社会学结局',
+            '起点': '初始轨迹坐标',
+            '成名作': '标志性事件',
+            '知名ID': '核心网络标识',
+            '游戏ID': '核心网络标识',
+            '英文ID': '核心网络标识',
+            '转型': '轨迹偏转'
+          };
+          const cleanLabel = String(bg.label || '').trim();
+          if (labelMap[cleanLabel]) {
+            displayLabel = labelMap[cleanLabel];
+          }
+          return (
+            <div>
+              <div class="bl">{displayLabel}</div>
+              <div class="bv">
+                <Fragment set:html={bg.value} />
+                {bg.sub && <span class="bs">{bg.sub}</span>}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     )}
 
@@ -423,107 +443,104 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
   </div>
   <div class="imprint"><span>◈</span> 档 案 馆 藏 <span>◈</span></div>
   <script is:inline define:vars={{ scores }}>
-    function playStampSound() {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContext) return;
-      try {
-        const ctx = new AudioContext();
-        
-        const osc = ctx.createOscillator();
-        const gainOsc = ctx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(120, ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 0.15);
-        gainOsc.gain.setValueAtTime(0.7, ctx.currentTime);
-        gainOsc.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
-        osc.connect(gainOsc);
-        gainOsc.connect(ctx.destination);
-        
-        const click = ctx.createOscillator();
-        const gainClick = ctx.createGain();
-        click.type = 'sine';
-        click.frequency.setValueAtTime(1000, ctx.currentTime);
-        click.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.04);
-        gainClick.gain.setValueAtTime(0.5, ctx.currentTime);
-        gainClick.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.04);
-        click.connect(gainClick);
-        gainClick.connect(ctx.destination);
+    // 翻书/盖章声音由 /audio.js 全局模块提供
 
-        const bufferSize = ctx.sampleRate * 0.06;
-        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-          data[i] = Math.random() * 2 - 1;
+    /* ── 数字递增动画 ── */
+    function animateNumbers() {
+      const targets = document.querySelectorAll('.ribbon .nu, .data-grid .gv, .end-section .en, .main-stat .mn');
+      targets.forEach(el => {
+        const text = el.textContent.trim();
+        const match = text.match(/^([\d,.]+)(.*)$/);
+        if (!match) return;
+        const targetNum = parseFloat(match[1].replace(/,/g, ''));
+        const suffix = match[2] || '';
+        if (isNaN(targetNum) || targetNum === 0) return;
+        const original = el.textContent;
+        const duration = 900;
+        let startTime = null;
+        function step(ts) {
+          if (!startTime) startTime = ts;
+          const p = Math.min((ts - startTime) / duration, 1);
+          const eased = 1 - Math.pow(1 - p, 3);
+          const current = targetNum < 1 ? (targetNum * eased).toFixed(1) : Math.round(targetNum * eased);
+          el.textContent = current + suffix;
+          if (p < 1) { requestAnimationFrame(step); }
+          else { el.textContent = original; }
         }
-        const noise = ctx.createBufferSource();
-        noise.buffer = buffer;
-        
-        const filter = ctx.createBiquadFilter();
-        filter.type = 'bandpass';
-        filter.frequency.value = 350;
-        filter.Q.value = 2.0;
-        
-        const gainNoise = ctx.createGain();
-        gainNoise.gain.setValueAtTime(0.3, ctx.currentTime);
-        gainNoise.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.06);
-        noise.connect(filter);
-        filter.connect(gainNoise);
-        gainNoise.connect(ctx.destination);
-        
-        osc.start();
-        osc.stop(ctx.currentTime + 0.18);
-        click.start();
-        click.stop(ctx.currentTime + 0.06);
-        noise.start();
-        noise.stop(ctx.currentTime + 0.06);
-      } catch(err) {
-        console.error("Stamp audio error:", err);
-      }
+        requestAnimationFrame(step);
+      });
     }
 
-    function playBookFlipSound() {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContext) return;
-      try {
-        const ctx = new AudioContext();
-        const bufferSize = ctx.sampleRate * 0.4;
-        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-          data[i] = Math.random() * 2 - 1;
-        }
-        const noise = ctx.createBufferSource();
-        noise.buffer = buffer;
-        
-        const filter = ctx.createBiquadFilter();
-        filter.type = 'bandpass';
-        filter.frequency.setValueAtTime(1000, ctx.currentTime);
-        filter.frequency.exponentialRampToValueAtTime(1500, ctx.currentTime + 0.3);
-        filter.Q.value = 1.0;
-        
-        const gain = ctx.createGain();
-        gain.gain.setValueAtTime(0.01, ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.08);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.38);
-        
-        noise.connect(filter);
-        filter.connect(gain);
-        gain.connect(ctx.destination);
-        
-        noise.start();
-        noise.stop(ctx.currentTime + 0.4);
-      } catch(err) {
-        console.error("Book flip audio error:", err);
+    /* ── 老档案馆漂浮尘粒 ── */
+    function initDustParticles() {
+      const hero = document.querySelector('.hero');
+      if (!hero) return;
+      const canvas = document.createElement('canvas');
+      canvas.className = 'dust-canvas';
+      canvas.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:4;opacity:0.7';
+      hero.appendChild(canvas);
+      const ctx = canvas.getContext('2d');
+
+      const particles = [];
+      const COUNT = 28;
+
+      function resize() {
+        const r = hero.getBoundingClientRect();
+        canvas.width = r.width;
+        canvas.height = r.height;
       }
+      resize();
+      window.addEventListener('resize', resize);
+
+      // 初始化粒子：集中在 hero 中上部（光柱区域）
+      for (let i = 0; i < COUNT; i++) {
+        particles.push({
+          x: canvas.width * (0.2 + Math.random() * 0.6),
+          y: canvas.height * (0.1 + Math.random() * 0.5),
+          r: 0.6 + Math.random() * 2.5,
+          vx: (Math.random() - 0.5) * 0.25,
+          vy: -0.15 - Math.random() * 0.35,
+          opacity: 0.02 + Math.random() * 0.08,
+        });
+      }
+
+      function frame() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          // 移动
+          p.x += p.vx + (Math.random() - 0.5) * 0.1;
+          p.y += p.vy + (Math.random() - 0.5) * 0.08;
+
+          // 越界重生
+          if (p.y < -10 || p.y > canvas.height + 10 || p.x < -10 || p.x > canvas.width + 10) {
+            p.x = canvas.width * (0.2 + Math.random() * 0.6);
+            p.y = canvas.height * (0.5 + Math.random() * 0.4);
+            p.opacity = 0.02 + Math.random() * 0.08;
+          }
+
+          // 微闪烁
+          const flicker = 0.7 + 0.3 * Math.sin(Date.now() * 0.002 + p.x);
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(220, 200, 160, ${p.opacity * flicker})`;
+          ctx.fill();
+        });
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
     }
 
     function initDetailPage() {
       const wrap = document.querySelector('.wrap');
-      
-      // 0. 播放翻书声音
+
+      // 0. 老档案馆尘粒
+      try { initDustParticles(); } catch(e) { console.error("Dust particles error:", e); }
+
+      // 0.5 播放翻书声音
       if (wrap) {
         try {
-          playBookFlipSound();
+          window.__archiveAudio.playBookFlipSound();
         } catch(e) {
           console.error(e);
         }
@@ -539,7 +556,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
           if (wrap && wrap.classList.contains('page-closing')) return;
           
           try {
-            playBookFlipSound();
+            window.__archiveAudio.playBookFlipSound();
           } catch(err) {
             console.error("Flip sound error:", err);
           }
@@ -554,18 +571,6 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
         });
       }
 
-      // 强制修复固定定位（兜底方案）
-      const fixBackLink = () => {
-        const bl = document.querySelector('.back-link');
-        if (bl) {
-          bl.style.position = 'fixed';
-          bl.style.top = '16px';
-          bl.style.left = '16px';
-        }
-      };
-      fixBackLink();
-      window.addEventListener('scroll', fixBackLink, { once: true });
-
       // 2. 盖章降临动效
       const stamp = document.getElementById('impactStamp');
       if (stamp) {
@@ -573,7 +578,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
           stamp.classList.add('landed');
           
           try {
-            playStampSound();
+            window.__archiveAudio.playStampSound();
           } catch(e) {
             console.error(e);
           }
@@ -605,6 +610,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
             if (iterations >= originalText.length) {
               clearInterval(interval);
               el.textContent = originalText;
+              el.classList.add('decrypt-done');
             }
             iterations += 1/3;
           }, 30);
@@ -779,6 +785,50 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
       } catch(err) {
         console.error("Radar chart error:", err);
       }
+
+      // 5. 统计数据数字递增
+      try { animateNumbers(); } catch(err) { console.error("Number animation error:", err); }
+
+      // 6. 印章墨迹渐干效果
+      try {
+        const stamp = document.getElementById('impactStamp');
+        if (stamp) {
+          // 找到主印章 SVG filter 的两个 feTurbulence
+          const filterEl = document.querySelector('#stamp-filter');
+          if (filterEl) {
+            const turbulences = filterEl.querySelectorAll('feTurbulence');
+            const grainTurb = turbulences[turbulences.length - 1]; // 第二个，颗粒噪点
+            const edgeTurb = turbulences[0]; // 第一个，边缘变形
+            if (grainTurb && edgeTurb) {
+              const targetGrain = 0.18;
+              const targetEdge = 0.04;
+              // 湿墨：高频率 + 大位移
+              const wetGrain = 0.55;
+              const wetEdge = 0.10;
+              const duration = 2500;
+              let startTime = null;
+              function dryInk(ts) {
+                if (!startTime) startTime = ts;
+                const p = Math.min((ts - startTime) / duration, 1);
+                const eased = 1 - Math.pow(1 - p, 4);
+                grainTurb.setAttribute('baseFrequency', (wetGrain + (targetGrain - wetGrain) * eased).toFixed(4));
+                edgeTurb.setAttribute('baseFrequency', (wetEdge + (targetEdge - wetEdge) * eased).toFixed(4));
+                // 同时缩小位移量
+                const dispMap = filterEl.querySelector('feDisplacementMap');
+                if (dispMap) {
+                  dispMap.setAttribute('scale', (3.0 + (1.2 - 3.0) * eased).toFixed(1));
+                }
+                if (p < 1) requestAnimationFrame(dryInk);
+              }
+              grainTurb.setAttribute('baseFrequency', wetGrain.toFixed(4));
+              edgeTurb.setAttribute('baseFrequency', wetEdge.toFixed(4));
+              const dispMap = filterEl.querySelector('feDisplacementMap');
+              if (dispMap) dispMap.setAttribute('scale', '3.0');
+              setTimeout(() => requestAnimationFrame(dryInk), 600);
+            }
+          }
+        }
+      } catch(err) { console.error("Ink drying error:", err); }
     }
 
     if (document.readyState === 'loading') {
@@ -829,7 +879,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     align-items: center;
     gap: 12px;
     font-size: 11px;
-    color: #8a7a6a;
+    color: var(--c-text-muted);
     transition: all 0.3s;
     cursor: default;
     padding: 4px 8px;
@@ -839,7 +889,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
   .score-item:hover, .score-item.active {
     background: rgba(197, 168, 128, 0.05);
     border-color: rgba(197, 168, 128, 0.15);
-    color: #e6dfd3;
+    color: var(--c-text);
   }
   .score-item .sn {
     width: 90px;
@@ -868,7 +918,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     font-size: 14px;
     font-family: 'Times New Roman', Georgia, serif;
     font-weight: bold;
-    color: #c5a880;
+    color: var(--c-gold);
     width: 16px;
     text-align: right;
   }
@@ -884,7 +934,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     stroke-dasharray: 2 2;
   }
   .radar-container :global(text.radar-label) {
-    fill: #7a6a5a;
+    fill: var(--c-text-faint-light);
     font-size: 9px;
     letter-spacing: 1px;
     font-family: 'Noto Serif SC', serif;
@@ -893,56 +943,44 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     cursor: default;
   }
   .radar-container :global(text.radar-label.active) {
-    fill: #c5a880;
+    fill: var(--c-gold);
     font-weight: bold;
   }
+  /* 雷达图呼吸脉冲 —— 动画完成后缓慢波动 */
+  @keyframes radar-breathe {
+    0%, 100% { fill-opacity: 0.12; }
+    50%      { fill-opacity: 0.22; }
+  }
   .radar-container :global(polygon.radar-poly) {
-    stroke: #c5a880;
+    stroke: var(--c-gold);
     stroke-width: 1.5;
     fill: rgba(197, 168, 128, 0.15);
     transition: fill 0.3s, stroke 0.3s;
+    animation: radar-breathe 3.5s ease-in-out 1s infinite;
   }
   .radar-container :global(polygon.radar-poly:hover) {
     fill: rgba(197, 168, 128, 0.28);
-    stroke: #e6dfd3;
+    stroke: var(--c-text);
   }
   .radar-container :global(circle.radar-dot) {
     fill: #0c0a09;
-    stroke: #c5a880;
+    stroke: var(--c-gold);
     stroke-width: 1.5;
     transition: all 0.3s;
     cursor: pointer;
   }
   .radar-container :global(circle.radar-dot:hover),
   .radar-container :global(circle.radar-dot.active) {
-    fill: #c5a880;
+    fill: var(--c-gold);
     r: 5px;
     filter: drop-shadow(0 0 4px rgba(197,168,128,0.5));
   }
-  /* ── Custom Scrollbar (全局自定义暗金滚动条) ── */
-  :global(::-webkit-scrollbar) {
-    width: 8px;
-    height: 8px;
-  }
-  :global(::-webkit-scrollbar-track) {
-    background: #0a0806;
-  }
-  :global(::-webkit-scrollbar-thumb) {
-    background: rgba(197, 168, 128, 0.25);
-    border-radius: 4px;
-    border: 2px solid #0a0806;
-    transition: background 0.3s;
-  }
-  :global(::-webkit-scrollbar-thumb:hover) {
-    background: rgba(197, 168, 128, 0.45);
-  }
-
   /* ── Parchment Container (羊皮纸容器质感优化) ── */
   .wrap{
     max-width:960px;margin:48px auto;position:relative;z-index:2;
     background: 
       radial-gradient(ellipse at 50% 20%, rgba(255, 255, 255, 0.02) 0%, transparent 80%),
-      #1a130e;
+      var(--c-bg-surface);
     border: 2px solid #2d241d;
     box-shadow:
       0 0 0 1px rgba(100, 80, 60, 0.15),
@@ -1020,7 +1058,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     z-index: 10;
     pointer-events: none;
     background:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E"),
+      var(--texture-photo-paper),
       radial-gradient(ellipse at 50% 50%, transparent 45%, rgba(0,0,0,0.45) 100%),
       linear-gradient(180deg, rgba(255,220,150,0.04) 0%, transparent 40%, rgba(0,0,0,0.1) 100%);
     background-size: 160px 160px, 100% 100%, 100% 100%;
@@ -1060,26 +1098,35 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     box-sizing: border-box;
   }
   .hero-text .tag{
-    font-size:9px;letter-spacing:8px;color:#8a7a6a;text-transform:uppercase;margin-bottom:14px;
+    font-size:9px;letter-spacing:8px;color:var(--c-text-muted);text-transform:uppercase;margin-bottom:14px;
     font-family:'Times New Roman',Georgia,serif;font-weight:400;display:inline-block;
     padding:0 10px;position:relative
   }
   .hero-text .tag::before,.hero-text .tag::after{
-    content:'◆';font-size:6px;color:#c5a880;margin:0 14px;vertical-align:middle;opacity:.4
+    content:'◆';font-size:6px;color:var(--c-gold);margin:0 14px;vertical-align:middle;opacity:.4
   }
   .hero-text .type{
-    font-size:9px;color:#b05030;letter-spacing:6px;margin-bottom:10px;font-weight:400;
+    font-size:9px;color:var(--c-red);letter-spacing:6px;margin-bottom:10px;font-weight:400;
     font-family:'Times New Roman',Georgia,serif
   }
   .hero-text h1{
-    font-size:76px;font-weight:400;color:#e6dfd3;letter-spacing:22px;line-height:1.05;
+    font-size:76px;font-weight:400;color:var(--c-text);letter-spacing:22px;line-height:1.05;
     text-shadow:0 3px 12px rgba(0,0,0,0.6), 0 0 60px rgba(197,168,128,0.1);
     font-family:'ZCOOL XiaoWei','Noto Serif SC','Times New Roman',serif;font-weight:900
   }
-  .hero-text .sub{
-    font-size:11px;color:#9a8a7a;margin-top:10px;letter-spacing:6px;font-weight:300
+  /* 解密完成辉光脉冲 */
+  @keyframes decrypt-glow {
+    0%   { text-shadow: 0 3px 12px rgba(0,0,0,0.6), 0 0 60px rgba(197,168,128,0.1); }
+    40%  { text-shadow: 0 3px 12px rgba(0,0,0,0.6), 0 0 80px rgba(197,168,128,0.45), 0 0 160px rgba(197,168,128,0.15); }
+    100% { text-shadow: 0 3px 12px rgba(0,0,0,0.6), 0 0 60px rgba(197,168,128,0.1); }
   }
-  .hero-text .sub em{font-style:normal;color:#c5a880}
+  .hero-text h1.decrypt-done {
+    animation: decrypt-glow 0.7s ease-out;
+  }
+  .hero-text .sub{
+    font-size:11px;color:var(--c-text-dim);margin-top:10px;letter-spacing:6px;font-weight:300
+  }
+  .hero-text .sub em{font-style:normal;color:var(--c-gold)}
   .hero-pattern{position:absolute;inset:0;z-index:1}
   .hero-pattern-sm{position:absolute;inset:0;z-index:1;
     background:radial-gradient(ellipse 100% 50% at 50% 30%,rgba(197,168,128,0.02) 0%,transparent 60%),
@@ -1104,7 +1151,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
   }
   .ribbon .nu{
-    display:block;font-size:24px;font-weight:400;color:#e6dfd3;
+    display:block;font-size:24px;font-weight:400;color:var(--c-text);
     font-family:'Times New Roman',Georgia,serif;line-height:1;letter-spacing:2px;
     transition: color 0.3s ease;
   }
@@ -1112,9 +1159,9 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     color: #f3e7c4;
     text-shadow: 0 0 10px rgba(197, 168, 128, 0.2);
   }
-  .ribbon .sm{font-size:10px;color:#8a7a6a;display:block;margin-top:2px;font-family:'Noto Serif SC',serif;letter-spacing:1px}
-  .ribbon .lb{font-size:7px;color:#8a7a6a;letter-spacing:3px;margin-top:4px;text-transform:uppercase;font-weight:300}
-  .ribbon .gold{color:#c5a880}.ribbon .red{color:#b05030}
+  .ribbon .sm{font-size:10px;color:var(--c-text-muted);display:block;margin-top:2px;font-family:'Noto Serif SC',serif;letter-spacing:1px}
+  .ribbon .lb{font-size:7px;color:var(--c-text-muted);letter-spacing:3px;margin-top:4px;text-transform:uppercase;font-weight:300}
+  .ribbon .gold{color:var(--c-gold)}.ribbon .red{color:var(--c-red)}
 
   /* ── Main Stat ── */
   .main-stat{display:grid;grid-template-columns:1fr 1.25fr;border-bottom:1px solid rgba(197,168,128,0.18)}
@@ -1126,19 +1173,19 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
   }
   .main-stat .mn{
     font-size:68px;font-weight:400;
-    background: linear-gradient(135deg, #f5ecd5 0%, #c5a880 60%, #a88a62 100%);
+    background: linear-gradient(135deg, #f5ecd5 0%, var(--c-gold) 60%, #a88a62 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-family:'Times New Roman',Georgia,serif;line-height:0.95;letter-spacing:4px;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
   }
-  .main-stat .mu{font-size:11px;color:#8a7a6a;letter-spacing:10px;margin-top:4px;font-weight:300}
-  .main-stat .md{font-size:11px;color:#9a8a7a;margin-top:10px;line-height:2.4}
-  .main-stat .md :global(b){color:#e6dfd3;font-weight:700}
-  .main-stat .md :global(.hl){color:#c5a880;font-weight:600}.main-stat .md :global(.hr){color:#b05030;font-weight:600}
-  .main-stat .desc-sm{color:#8a7a6a;font-size:9px;letter-spacing:3px;margin-top:5px;font-weight:300}
+  .main-stat .mu{font-size:11px;color:var(--c-text-muted);letter-spacing:10px;margin-top:4px;font-weight:300}
+  .main-stat .md{font-size:11px;color:var(--c-text-dim);margin-top:10px;line-height:2.4}
+  .main-stat .md :global(b){color:var(--c-text);font-weight:700}
+  .main-stat .md :global(.hl){color:var(--c-gold);font-weight:600}.main-stat .md :global(.hr){color:var(--c-red);font-weight:600}
+  .main-stat .desc-sm{color:var(--c-text-muted);font-size:9px;letter-spacing:3px;margin-top:5px;font-weight:300}
   .main-stat .subl{
-    color:#7a6a5a;font-size:9px;margin-top:20px;font-weight:300;font-style:italic;
+    color:var(--c-text-faint-light);font-size:9px;margin-top:20px;font-weight:300;font-style:italic;
     border-top:1px solid rgba(197,168,128,0.15);padding-top:14px;letter-spacing:2px
   }
 
@@ -1154,17 +1201,17 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     background:rgba(197,168,128,0.03);
     box-shadow: inset 0 0 15px rgba(197,168,128,0.02);
   }
-  .data-grid .gl{font-size:9px;color:#8a7a6a;letter-spacing:2px;text-transform:uppercase;font-weight:400;margin-bottom:3px}
+  .data-grid .gl{font-size:9px;color:var(--c-text-muted);letter-spacing:2px;text-transform:uppercase;font-weight:400;margin-bottom:3px}
   .data-grid .gv{
-    font-size:20px;font-weight:400;color:#e6dfd3;
+    font-size:20px;font-weight:400;color:var(--c-text);
     font-family:'Times New Roman',Georgia,serif;margin-top:3px;letter-spacing:1px;
     transition: color 0.3s ease;
   }
   .data-grid>div:hover .gv {
     color: #f3e7c4;
   }
-  .data-grid .gv .sm{font-size:10px;color:#8a7a6a;font-family:'Noto Serif SC',serif}
-  .data-grid .gv.dg{color:#b05030}.data-grid .gv.gd{color:#c5a880}
+  .data-grid .gv .sm{font-size:10px;color:var(--c-text-muted);font-family:'Noto Serif SC',serif}
+  .data-grid .gv.dg{color:var(--c-red)}.data-grid .gv.gd{color:var(--c-gold)}
   .data-grid>div:has(.gd){border-left:1px solid rgba(197,168,128,0.1)}
 
   /* ── Body Grid (文字标签优化为 9px) ── */
@@ -1178,15 +1225,15 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
   .body-grid>div:hover{
     background:rgba(197,168,128,0.03);
   }
-  .body-grid .bl{font-size:9px;color:#8a7a6a;letter-spacing:2px;font-weight:400;margin-bottom:3px}
-  .body-grid .bv{font-size:13px;color:#e6dfd3;margin-top:2px;line-height:1.6;transition: color 0.3s ease;}
+  .body-grid .bl{font-size:9px;color:var(--c-text-muted);letter-spacing:2px;font-weight:400;margin-bottom:3px}
+  .body-grid .bv{font-size:13px;color:var(--c-text);margin-top:2px;line-height:1.6;transition: color 0.3s ease;}
   .body-grid>div:hover .bv { color: #f3e7c4; }
-  .body-grid .bv :global(.hr){color:#b05030}.body-grid .bs{font-size:10px;color:#8a7a6a;display:block;margin-top:2px;font-weight:300}
+  .body-grid .bv :global(.hr){color:var(--c-red)}.body-grid .bs{font-size:10px;color:var(--c-text-muted);display:block;margin-top:2px;font-weight:300}
 
   /* ── Section ── */
   .section{padding:30px 36px 24px;border-bottom:1px solid rgba(197,168,128,0.18)}
   .section .st{
-    font-size:11px;color:#8a7a6a;letter-spacing:6px;text-transform:uppercase;font-weight:400;
+    font-size:11px;color:var(--c-text-muted);letter-spacing:6px;text-transform:uppercase;font-weight:400;
     margin-bottom:14px;padding-bottom:10px;position:relative;font-family:'Times New Roman',Georgia,serif
   }
   .section .st::after{
@@ -1195,20 +1242,49 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
   }
 
   /* ── Timeline ── */
-  .tl-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+  /* ── 时间轴：单列 + 左侧一条连续红线 ── */
+  .tl-grid {display:grid;grid-template-columns:1fr;gap:0;
+    position: relative;
+    padding-left: 22px;
+  }
+  .tl-grid::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 12px;
+    bottom: 12px;
+    width: 2px;
+    background: linear-gradient(180deg, transparent 0%, #7a5040 5%, #8b5a4a 50%, #7a5040 95%, transparent 100%);
+    opacity: 0.5;
+    pointer-events: none;
+  }
   .tl-item{
-    padding:16px 20px;border-right:1px solid rgba(197,168,128,0.15);
+    padding:16px 20px;
     border-bottom:1px solid rgba(197,168,128,0.15);
     transition:all .3s cubic-bezier(0.25, 0.8, 0.25, 1);position:relative;
   }
-  .tl-item:nth-child(even){border-right:none}
+  /* 红线上的大头针 */
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -18px;
+    top: 20px;
+    width: 10px;
+    height: 10px;
+    background: radial-gradient(circle at 40% 35%, #b89078, #7a5040);
+    border-radius: 50%;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.6), 0 0 8px rgba(160,100,70,0.2);
+    z-index: 1;
+    transition: box-shadow 0.3s;
+  }
   .tl-item:hover{
     background:rgba(197,168,128,0.04);
     transform: translateY(-2px);
     box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
   }
+  .tl-item:hover::before { box-shadow: 0 1px 6px rgba(0,0,0,0.7), 0 0 12px rgba(160,100,70,0.35); }
   .tl-item .yr{
-    font-size:14px;font-weight:400;color:#c5a880;
+    font-size:14px;font-weight:400;color:var(--c-gold);
     font-family:'Times New Roman',Georgia,serif;display:block;line-height:1;letter-spacing:3px;
     transition: text-shadow 0.3s ease;
   }
@@ -1216,7 +1292,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     text-shadow: 0 0 10px rgba(197, 168, 128, 0.3);
   }
   .tl-item .yr::before{
-    content:'◆ ';font-size:8px;color:#c5a880;vertical-align:middle;margin-right:6px;opacity:.8;
+    content:'◆ ';font-size:8px;color:var(--c-gold);vertical-align:middle;margin-right:6px;opacity:.8;
     transition: transform 0.3s ease;
     display: inline-block;
   }
@@ -1224,7 +1300,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     transform: rotate(45deg) scale(1.2);
   }
   .tl-item .td{font-size:11px;color:#a09080;margin-top:6px;line-height:1.9;font-weight:300;letter-spacing:.3px}
-  .tl-item .td :global(b){color:#e6dfd3;font-weight:700}.tl-item .td :global(.hr){color:#b05030;font-weight:600}
+  .tl-item .td :global(b){color:var(--c-text);font-weight:700}.tl-item .td :global(.hr){color:var(--c-red);font-weight:600}
 
   /* ── Pull Quote ── */
   .pull-quote{
@@ -1241,12 +1317,12 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     font-family:Georgia,'Times New Roman',serif;line-height:1;font-weight:400
   }
   .pull-quote .pq{
-    font-size:24px;font-weight:400;color:#c5a880;
+    font-size:24px;font-weight:400;color:var(--c-gold);
     letter-spacing:12px;position:relative;z-index:1;line-height:1.8;
     font-family:'ZCOOL XiaoWei','Noto Serif SC',serif;
     text-shadow: 0 2px 10px rgba(0,0,0,0.5);
   }
-  .pull-quote .ps{font-size:10px;color:#7a6a5a;margin-top:12px;letter-spacing:5px;font-weight:300;font-style:italic}
+  .pull-quote .ps{font-size:10px;color:var(--c-text-faint-light);margin-top:12px;letter-spacing:5px;font-weight:300;font-style:italic}
 
   /* ── Num Strip ── */
   .num-strip{
@@ -1266,15 +1342,15 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     transform: scale(1.02);
   }
   .num-strip .nu{
-    font-size:22px;font-weight:400;color:#e6dfd3;
+    font-size:22px;font-weight:400;color:var(--c-text);
     font-family:'Times New Roman',Georgia,serif;line-height:1;letter-spacing:1px
   }
-  .num-strip .nl{font-size:7px;color:#8a7a6a;margin-top:4px;letter-spacing:2px;font-weight:300}
+  .num-strip .nl{font-size:7px;color:var(--c-text-muted);margin-top:4px;letter-spacing:2px;font-weight:300}
 
   /* ── Quote List ── */
   .qlist{padding:20px 34px;border-bottom:1px solid rgba(197,168,128,0.18)}
   .qlist .qs{font-size:14px;color:#b8a898;line-height:2.0;font-weight:400;letter-spacing:.4px}
-  .qlist .qs :global(.hl){color:#c5a880;font-weight:600}
+  .qlist .qs :global(.hl){color:var(--c-gold);font-weight:600}
 
   /* ── Video ── */
   .video-wrap{position:relative;padding:0 0 56.25%}
@@ -1284,12 +1360,12 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
   /* ── Comment ── */
   .cmt{padding:20px 34px;border-top:1px solid rgba(197,168,128,0.18);border-bottom:1px solid rgba(197,168,128,0.18)}
   .cmt .ct{font-size:14px;color:#b8a898;line-height:2.0;font-weight:400;letter-spacing:.4px}
-  .cmt .ct :global(b){color:#e6dfd3;font-weight:700}.cmt .ct :global(.hlg){color:#c5a880;font-weight:600}.cmt .ct :global(.hlr){color:#b05030;font-weight:600}
+  .cmt .ct :global(b){color:var(--c-text);font-weight:700}.cmt .ct :global(.hlg){color:var(--c-gold);font-weight:600}.cmt .ct :global(.hlr){color:var(--c-red);font-weight:600}
 
   /* ── Essay ── */
   .essay{padding:20px 36px 26px;border-bottom:1px solid rgba(197,168,128,0.18)}
   .essay .et{
-    font-size:12px;color:#8a7a6a;letter-spacing:6px;text-transform:uppercase;font-weight:500;
+    font-size:12px;color:var(--c-text-muted);letter-spacing:6px;text-transform:uppercase;font-weight:500;
     margin-bottom:14px;padding-bottom:10px;position:relative;font-family:'Times New Roman',Georgia,serif
   }
   .essay .et::after{
@@ -1300,7 +1376,20 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     font-size:15px;color:#b8a898;line-height:2.0;text-align:justify;margin-bottom:16px;
     text-indent:2em;font-weight:400;letter-spacing:.5px
   }
-  .essay :global(p:first-child){text-indent:0}
+  /* 首字下沉 —— 老报纸排版 */
+  .essay :global(p:first-of-type) {
+    text-indent: 0;
+  }
+  .essay :global(p:first-of-type::first-letter) {
+    float: left;
+    font-family: 'ZCOOL XiaoWei', 'Noto Serif SC', serif;
+    font-size: 3.8em;
+    font-weight: 900;
+    line-height: 0.75;
+    color: var(--c-gold);
+    padding: 5px 10px 0 0;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5), 0 0 20px rgba(197,168,128,0.2);
+  }
   .essay :global(p:last-child){margin-bottom:0}
 
   /* ── Tags ── */
@@ -1309,7 +1398,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     border-bottom:1px solid rgba(197,168,128,0.18)
   }
   .tag-strip span{
-    font-size:8px;color:#8a7a6a;padding:3px 12px;border:1px solid rgba(197,168,128,0.2);
+    font-size:8px;color:var(--c-text-muted);padding:3px 12px;border:1px solid rgba(197,168,128,0.2);
     letter-spacing:2px;font-weight:300;transition:all .2s
   }
   .tag-strip span:hover{color:#bcae9e;border-color:rgba(197,168,128,0.4);background:rgba(197,168,128,0.04)}
@@ -1328,17 +1417,17 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     background: rgba(197, 168, 128, 0.02);
   }
   .end-section .en{
-    font-size:36px;font-weight:400;color:#c5a880;
+    font-size:36px;font-weight:400;color:var(--c-gold);
     font-family:'Times New Roman',Georgia,serif;line-height:1;letter-spacing:2px;
     text-shadow:0 1px 2px rgba(0,0,0,0.15)
   }
-  .end-section .eu{font-size:10px;color:#8a7a6a;margin-top:2px;font-weight:300;letter-spacing:3px}
-  .end-section .ed{font-size:9px;color:#6a5a4a;margin-top:6px;letter-spacing:2px;font-weight:300}
-  .end-section .ed :global(.lt){color:#9a8a7a}
+  .end-section .eu{font-size:10px;color:var(--c-text-muted);margin-top:2px;font-weight:300;letter-spacing:3px}
+  .end-section .ed{font-size:9px;color:var(--c-text-faint);margin-top:6px;letter-spacing:2px;font-weight:300}
+  .end-section .ed :global(.lt){color:var(--c-text-dim)}
 
   /* ── Colophon ── */
   .footer{
-    padding:24px 36px 30px;text-align:center;font-size:8px;color:#5a4a3a;
+    padding:24px 36px 30px;text-align:center;font-size:8px;color:var(--c-text-faintest);
     letter-spacing:3px;line-height:2.2;font-weight:300
   }
   .footer::before{
@@ -1369,44 +1458,44 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
   }
   .media-index {
     font-size: 9px;
-    color: #7a6a5a;
+    color: var(--c-text-faint-light);
     font-family: 'Courier New', monospace;
     min-width: 24px;
   }
   .media-label {
     flex: 1;
     font-size: 11px;
-    color: #c5a880;
+    color: var(--c-gold);
     letter-spacing: 2px;
     font-weight: 300;
   }
   .media-source {
     font-size: 8px;
-    color: #5a4a3a;
+    color: var(--c-text-faintest);
     letter-spacing: 1px;
     padding: 1px 8px;
     border: 1px solid rgba(197,168,128,0.08);
   }
   .media-arrow {
     font-size: 10px;
-    color: #7a6a5a;
+    color: var(--c-text-faint-light);
     transition: transform 0.2s ease;
   }
   .media-item:hover .media-arrow {
     transform: translateX(3px);
-    color: #c5a880;
+    color: var(--c-gold);
   }
 
   /* ── Back Link (毛玻璃微平移特效) ── */
   .back-link{
-    position:fixed;top:16px;left:16px;z-index:9999;font-size:8px;color:#7a6a5a;
+    position:fixed;top:16px;left:16px;z-index:9999;font-size:8px;color:var(--c-text-faint-light);
     letter-spacing:2px;text-decoration:none;padding:3px 8px;
     border:1px solid rgba(197,168,128,0.2);background:rgba(13,11,9,0.8);
     transition:all .3s cubic-bezier(0.25, 0.8, 0.25, 1);font-weight:400;font-family:'Times New Roman',Georgia,serif;
     box-shadow:0 2px 4px rgba(0,0,0,0.3);
   }
   .back-link:hover{
-    color:#c5a880;border-color:rgba(197,168,128,0.45);
+    color:var(--c-gold);border-color:rgba(197,168,128,0.45);
     box-shadow:0 4px 12px rgba(197,168,128,0.12),0 2px 8px rgba(0,0,0,0.4);
     background:rgba(22,18,15,0.92);
     transform: translateX(-4px);
@@ -1441,8 +1530,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     .data-grid>div:nth-child(odd){border-right:1px solid rgba(197,168,128,0.15)}
     .data-grid>div:last-child{border-right:none}
     .body-grid{grid-template-columns:1fr}.body-grid>div:nth-child(even){border-right:none}
-    .tl-grid{grid-template-columns:1fr}
-    .tl-item{border-right:none !important}
+    .tl-item{border-right:none}
     .end-section{grid-template-columns:1fr}
     .end-section>div{border-right:none;border-bottom:1px solid rgba(197,168,128,0.15)}.end-section>div:last-child{border-bottom:none}
     .pull-quote{padding:30px 20px 26px}
@@ -1543,7 +1631,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     padding: 8px 18px;
     /* 盖章降临时的牛皮底纸：手撕边缘不规则裁切 */
     border-radius: 4px 6px 3px 5px / 5px 3px 6px 4px;
-    background: #fbf8ee url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.25' numOctaves='3'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' fill='%23000'/%3E%3C/svg%3E");
+    background: #fbf8ee var(--texture-stamp-ink);
     box-shadow: 
       0 10px 30px rgba(0,0,0,0.35),
       inset 0 0 8px rgba(0,0,0,0.05);
@@ -1575,8 +1663,8 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
   }
  
   .stamp-level-A {
-    border: 2px solid #b71c1c;
-    color: #b71c1c;
+    border: 2px solid var(--c-red-stamp);
+    color: var(--c-red-stamp);
   }
   .stamp-level-A .stamp-title {
     border-bottom-color: rgba(183, 28, 28, 0.4);
@@ -1596,8 +1684,8 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     border-bottom-color: rgba(230, 81, 0, 0.4);
   }
   .stamp-level-D {
-    border: 3px double #0d47a1;
-    color: #0d47a1;
+    border: 3px double var(--c-blue);
+    color: var(--c-blue);
   }
   .stamp-level-D .stamp-title {
     border-bottom-color: rgba(13, 71, 161, 0.4);
@@ -1615,19 +1703,19 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
   /* ── 时代黑话便利贴 ── */
   .ct :global(.glossary-term), .essay :global(.glossary-term) {
     position: relative;
-    color: #c5a880;
+    color: var(--c-gold);
     border-bottom: 1.5px dashed rgba(197, 168, 128, 0.6);
     cursor: help;
     transition: all 0.2s ease;
     display: inline;
   }
   .ct :global(.glossary-term:hover), .essay :global(.glossary-term:hover) {
-    color: #e6dfd3;
-    border-bottom-color: #e6dfd3;
+    color: var(--c-text);
+    border-bottom-color: var(--c-text);
     background: rgba(197, 168, 128, 0.08);
   }
   .ct :global(.glossary-term::after), .essay :global(.glossary-term::after) {
-    content: none; /* 默认无内容，彻底消除不 hover 时的幽灵空白字符盒 */
+    content: attr(data-tip); /* 始终渲染内容，靠 visibility 控制显隐 */
     display: block;
     position: absolute;
     bottom: 125%;
@@ -1645,18 +1733,18 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     letter-spacing: 1px;
     text-align: left;
     border-radius: 2px;
-    box-shadow: 
-      0 10px 25px rgba(0,0,0,0.5), 
+    box-shadow:
+      0 10px 25px rgba(0,0,0,0.5),
       inset 0 1px 0 rgba(255,255,255,0.4);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
     z-index: 2500;
-    transition: transform 0.22s cubic-bezier(0.18, 0.89, 0.32, 1.25), opacity 0.15s;
+    transition: transform 0.22s cubic-bezier(0.18, 0.89, 0.32, 1.25), opacity 0.18s, visibility 0.18s;
     white-space: normal;
   }
   .ct :global(.glossary-term::before), .essay :global(.glossary-term::before) {
-    content: none; /* 默认无内容，彻底消除不 hover 时的幽灵空白字符盒 */
+    content: '';
     display: block;
     position: absolute;
     bottom: calc(125% + 12px);
@@ -1673,18 +1761,15 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     visibility: hidden;
     pointer-events: none;
     z-index: 2499;
-    transition: opacity 0.15s;
+    transition: opacity 0.18s, visibility 0.18s;
   }
-  
-  /* Hover 状态下才动态赋予 content，由浏览器渲染出伪元素内容 */
+
   .ct :global(.glossary-term:hover::after), .essay :global(.glossary-term:hover::after) {
-    content: attr(data-tip); /* 悬浮时意图赋予内容 */
     opacity: 1;
     visibility: visible;
     transform: rotate(-3.5deg) scale(1);
   }
   .ct :global(.glossary-term:hover::before), .essay :global(.glossary-term:hover::before) {
-    content: ''; /* 悬浮时意图物色胶带 */
     opacity: 0.75;
     visibility: visible;
   }
@@ -1721,10 +1806,22 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
   .relic-glass {
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 45%, rgba(255,255,255,0.02) 100%);
+    background:
+      linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.03) 100%),
+      linear-gradient(45deg, transparent 35%, rgba(255,255,255,0.07) 38%, rgba(255,255,255,0.07) 42%, transparent 45%);
+    background-size: 100% 100%, 200% 200%;
+    background-position: 0 0, -50% -50%;
     z-index: 5;
     pointer-events: none;
     transition: transform 0.4s ease, opacity 0.4s;
+    animation: glass-shimmer 5s ease-in-out infinite;
+  }
+  @keyframes glass-shimmer {
+    0%, 100% { background-position: 0 0, -50% -50%; }
+    50%      { background-position: 0 0, 120% 120%; }
+  }
+  .relic-cell:hover .relic-glass {
+    animation: none;
   }
   .relic-cell:hover .relic-glass {
     transform: translate(25px, 25px);
@@ -1751,7 +1848,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     justify-content: center;
   }
   .relic-cell:hover .relic-shadow-art {
-    color: #c5a880;
+    color: var(--c-gold);
     opacity: 0.95;
     filter: drop-shadow(0 0 6px rgba(197,168,128,0.25));
   }
@@ -1810,7 +1907,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
   }
   .relic-info-title {
     font-size: 13px;
-    color: #e6dfd3;
+    color: var(--c-text);
     font-weight: bold;
     margin-bottom: 6px;
     border-bottom: 1px solid rgba(197,168,128,0.25);
@@ -1828,12 +1925,13 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     border-top: 1px solid rgba(197, 168, 128, 0.1);
   }
   .file-nav-inner {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    gap: 0;
+    display: flex;
+    flex-direction: row;
     align-items: stretch;
   }
   .file-nav-card {
+    flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     gap: 5px;
@@ -1843,6 +1941,10 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     border-top: 1px solid rgba(197, 168, 128, 0.08);
     transition: background 0.3s ease, border-color 0.3s ease;
     position: relative;
+  }
+  .file-nav-home {
+    flex: 0 0 auto;
+    min-width: 120px;
   }
   .file-nav-card:hover {
     background: rgba(40, 28, 18, 0.8);
@@ -1857,6 +1959,8 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     border-left: 1px solid rgba(197, 168, 128, 0.08);
   }
   .file-nav-empty {
+    flex: 1;
+    min-width: 40px;
     background: transparent;
     cursor: default;
     border-top: 1px solid rgba(197, 168, 128, 0.04);
@@ -1870,14 +1974,14 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
   }
   .file-nav-title {
     font-size: 15px;
-    color: #c5a880;
+    color: var(--c-gold);
     font-family: 'ZCOOL XiaoWei', 'Noto Serif SC', serif;
     letter-spacing: 2px;
     font-weight: 700;
     transition: color 0.3s;
   }
   .file-nav-card:hover .file-nav-title {
-    color: #e6dfd3;
+    color: var(--c-text);
   }
   .file-nav-arrow {
     font-size: 13px;
@@ -1887,11 +1991,11 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
   }
   .file-nav-prev:hover .file-nav-arrow {
     transform: translateX(-4px);
-    color: #c5a880;
+    color: var(--c-gold);
   }
   .file-nav-next:hover .file-nav-arrow {
     transform: translateX(4px);
-    color: #c5a880;
+    color: var(--c-gold);
   }
   .file-nav-home {
     display: flex;
@@ -1918,7 +2022,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     line-height: 1;
   }
   .file-nav-home:hover .file-nav-home-icon {
-    color: #c5a880;
+    color: var(--c-gold);
   }
   .file-nav-home-text {
     font-size: 9px;
@@ -1931,20 +2035,62 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     color: #a89a87;
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 720px) {
     .file-nav-inner {
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: auto auto;
+      flex-direction: column;
     }
     .file-nav-home {
-      grid-column: 1 / -1;
-      grid-row: 2;
-      border-top: none;
-      border-left: none;
-      border-right: none;
+      flex: 0 0 auto;
+      min-width: 0;
+      border: none;
       border-bottom: 1px solid rgba(197, 168, 128, 0.08);
     }
-    .file-nav-prev { grid-row: 1; grid-column: 1; }
-    .file-nav-next { grid-row: 1; grid-column: 2; }
+    .file-nav-prev, .file-nav-next {
+      flex: 0 0 auto;
+      border: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .wrap { margin: 8px 2px; }
+    .hero { height: 340px; padding: 20px 12px; box-sizing: border-box; }
+    .hero-text h1 { font-size: 28px; letter-spacing: 6px; }
+    .hero-text .sub { font-size: 9px; letter-spacing: 3px; }
+    .hero-text .tag { font-size: 7px; letter-spacing: 4px; }
+    .hero-text .tag::before, .hero-text .tag::after { margin: 0 4px; }
+    .hero-portrait { width: 90px; height: 120px; margin-bottom: 12px; }
+    .hero-portrait:hover { transform: translateY(-2px) scale(1.01); }
+    .impact-stamp { top: 8px; right: 6px; padding: 5px 12px; }
+    .impact-stamp .stamp-title { font-size: 6px; }
+    .impact-stamp .stamp-level { font-size: 10px; }
+    .impact-stamp.landed { transform: scale(0.85) rotate(-12deg); }
+    .ribbon { grid-template-columns: 1fr 1fr; }
+    .ribbon > div { padding: 12px 4px 10px; }
+    .ribbon .nu { font-size: 18px; }
+    .ribbon .lb { font-size: 6px; }
+    .main-stat { grid-template-columns: 1fr; }
+    .main-stat > div { padding: 20px 16px; }
+    .main-stat .mn { font-size: 42px; }
+    .data-grid { grid-template-columns: 1fr; }
+    .data-grid > div { border-right: none; padding: 14px 16px; }
+    .data-grid .gv { font-size: 16px; }
+    .body-grid { grid-template-columns: 1fr; }
+    .body-grid > div { border-right: none; }
+    .eval-grid { grid-template-columns: 1fr; gap: 16px; }
+    .relics-cabinet { grid-template-columns: 1fr; padding: 12px; gap: 10px; }
+    .relic-cell { height: 160px; }
+    .relic-info-panel { padding: 12px; font-size: 10px; }
+    .end-section { grid-template-columns: 1fr; }
+    .end-section > div { border-right: none; border-bottom: 1px solid rgba(197,168,128,0.15); }
+    .end-section > div:last-child { border-bottom: none; }
+    .file-nav-inner { grid-template-columns: 1fr; grid-template-rows: auto auto auto; }
+    .file-nav-home { grid-column: 1; grid-row: 2; border: none; border-bottom: 1px solid rgba(197,168,128,0.08); }
+    .file-nav-prev { grid-column: 1; grid-row: 1; }
+    .file-nav-next { grid-column: 1; grid-row: 3; }
+    .pull-quote .pq { font-size: 15px; letter-spacing: 4px; }
+    .pull-quote { padding: 24px 16px 20px; }
+    .section, .essay, .cmt, .qlist { padding-left: 16px !important; padding-right: 16px !important; }
+    .ct :global(.glossary-term::after), .essay :global(.glossary-term::after) { width: 140px; left: -20px; }
+    .ct :global(.glossary-term::before), .essay :global(.glossary-term::before) { left: 5px; }
   }
 </style>

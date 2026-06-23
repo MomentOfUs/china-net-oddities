@@ -1,4 +1,6 @@
 ---
+import '../styles/textures.css';
+
 interface Props {
   title: string;
 }
@@ -14,70 +16,247 @@ const { title } = Astro.props;
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
-  <script is:inline>
-    // 防止 body 上 perspective 导致 fixed/sticky 失效
-    document.addEventListener('DOMContentLoaded', function() {
-      document.body.style.perspective = '';
-    });
-  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&display=swap&subset=chinese-simplified" rel="stylesheet" />
+  <script src="/audio.js" is:inline></script>
   <style is:global>
     /* ═══════════════════════════════════════════════════════
        互联网奇观 · 人物档案馆 — 通用布局与背景层
        ═══════════════════════════════════════════════════════ */
+
+    /* ── Design Tokens ── */
+    :root {
+      /* 品牌色 */
+      --c-gold: #c5a880;
+      --c-gold-bright: #e6dfd3;
+      --c-gold-dim: #8a7a6a;
+      --c-gold-faint: rgba(197, 168, 128, 0.18);
+      --c-gold-hover: rgba(197, 168, 128, 0.08);
+      --c-gold-glow: rgba(197, 168, 128, 0.12);
+
+      /* 文本色 */
+      --c-text: #e6dfd3;
+      --c-text-body: #c8baaa;
+      --c-text-dim: #9a8a7a;
+      --c-text-muted: #9a8a78;
+      --c-text-faint-light: #8a7a68;
+      --c-text-faint: #7a6a58;
+      --c-text-faintest: #6a5a4a;
+
+      /* 背景色 */
+      --c-bg-surface: #1a130e;
+      --c-bg-deep: #0d0a08;
+      --c-bg-card: #221810;
+      --c-bg-input: rgba(8, 7, 6, 0.6);
+
+      /* 强调色 */
+      --c-red: #b05030;
+      --c-red-stamp: #b71c1c;
+      --c-orange: #d84315;
+      --c-amber: #e65100;
+      --c-blue: #0d47a1;
+      --c-blue-dim: #5c7a9e;
+
+      /* 边框 */
+      --border-gold: 1px solid rgba(197, 168, 128, 0.18);
+      --border-gold-light: 1px solid rgba(197, 168, 128, 0.08);
+      --border-gold-subtle: 1px solid rgba(197, 168, 128, 0.15);
+
+      /* 间距 */
+      --space-section: 24px;
+      --space-gutter: 48px;
+
+      /* 字体 */
+      --font-display: 'ZCOOL XiaoWei', 'Noto Serif SC', serif;
+      --font-body: 'Noto Serif SC', 'Source Han Serif SC', 'Noto Serif CJK SC', 'SimSun', 'STSong', 'Times New Roman', Georgia, serif;
+      --font-mono: 'Times New Roman', Georgia, serif;
+      --font-ui: 'Times New Roman', Georgia, serif;
+    }
+
     *{margin:0;padding:0;box-sizing:border-box}
+
+    /* ── 档案荧光笔选中色 ── */
+    ::selection {
+      background: rgba(197, 168, 128, 0.25);
+      color: var(--c-gold-bright);
+      text-shadow: 0 0 2px rgba(197, 168, 128, 0.2);
+    }
 
     body{
       background:
-        radial-gradient(circle at 50% 30%, rgba(70, 48, 36, 0.22) 0%, #0d0a08 100%),
+        radial-gradient(circle at 50% 30%, rgba(70, 48, 36, 0.22) 0%, var(--c-bg-deep) 100%),
         repeating-linear-gradient(90deg, rgba(139, 115, 85, 0.02) 0px, rgba(139, 115, 85, 0.02) 2px, transparent 2px, transparent 30px),
         repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.12) 0px, rgba(0, 0, 0, 0.12) 1px, transparent 1px, transparent 12px),
         repeating-linear-gradient(0deg, rgba(139, 115, 85, 0.015) 0px, rgba(139, 115, 85, 0.015) 8px, transparent 8px, transparent 160px),
         #15100d;
-      font-family:'Noto Serif SC','Source Han Serif SC','Noto Serif CJK SC','SimSun','STSong','Times New Roman',Georgia,serif;
+      font-family:var(--font-body);
       font-size:15px;
-      color:#c8baaa;line-height:1.8;min-height:100vh;
+      color:var(--c-text-body);line-height:1.8;min-height:100vh;
       -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale
     }
  
-    body::before{
-      content:'';position:fixed;inset:0;pointer-events:none;z-index:9995;
-      background:
-        repeating-linear-gradient(87deg,transparent,transparent 40px,rgba(40,30,20,0.006) 40px,rgba(40,30,20,0.006) 41px),
-        repeating-linear-gradient(3deg,transparent,transparent 50px,rgba(35,28,22,0.004) 50px,rgba(35,28,22,0.004) 51px);
-      background-size:100% 100%
-    }
+    /* 全局暗室环境：扫描线 → 聚光渐变 → 胶片颗粒 合为一层 */
     body::after{
       content:'';position:fixed;inset:0;pointer-events:none;z-index:9996;
-      background:radial-gradient(ellipse 70% 60% at 50% 30%,rgba(197,168,128,0.05) 0%,transparent 60%),
+      background:
+        /* 层1: 交叉扫描线 */
+        repeating-linear-gradient(87deg,transparent,transparent 40px,rgba(40,30,20,0.006) 40px,rgba(40,30,20,0.006) 41px),
+        repeating-linear-gradient(3deg,transparent,transparent 50px,rgba(35,28,22,0.004) 50px,rgba(35,28,22,0.004) 51px),
+        /* 层2: 顶部高光 + 底部均光 */
+        radial-gradient(ellipse 70% 60% at 50% 30%,var(--c-gold-glow) 0%,transparent 60%),
         radial-gradient(ellipse 120% 100% at 50% 100%,rgba(0,0,0,0.55) 0%,transparent 60%);
-    }
-    body z{content:'';position:fixed;inset:0;pointer-events:none;z-index:9997;
-      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.038'/%3E%3C/svg%3E");
-      background-size:500px 500px;
+      background-size:100% 100%,100% 100%,100% 100%,100% 100%;
     }
 
     /* ── 全局滚动条美化 ── */
     ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 8px;
+      height: 8px;
     }
     ::-webkit-scrollbar-track {
-      background: #0c0a09;
+      background: #0a0806;
     }
     ::-webkit-scrollbar-thumb {
-      background: rgba(197, 168, 128, 0.18);
-      border-radius: 3px;
+      background: rgba(197, 168, 128, 0.25);
+      border-radius: 4px;
+      border: 2px solid #0a0806;
       transition: background 0.3s;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: rgba(197, 168, 128, 0.4);
+      background: rgba(197, 168, 128, 0.45);
+    }
+
+    /* ── 键盘焦点可见指示 ── */
+    :focus-visible {
+      outline: 2px solid var(--c-gold);
+      outline-offset: 2px;
+    }
+
+    /* ── 跳过导航链接 ── */
+    .skip-link {
+      position: fixed;
+      top: -100%;
+      left: 16px;
+      z-index: 99999;
+      padding: 8px 16px;
+      background: var(--c-bg-deep);
+      color: var(--c-gold);
+      border: 1px solid var(--c-gold);
+      font-size: 12px;
+      text-decoration: none;
+      font-family: var(--font-body);
+      letter-spacing: 1px;
+      transition: top 0.2s ease;
+    }
+    .skip-link:focus {
+      top: 16px;
+    }
+
+    /* ── 打印样式 ── */
+    /* ── Konami 彩蛋全屏覆盖层 ── */
+    .konami-overlay {
+      position: fixed; inset: 0; z-index: 99999;
+      background: radial-gradient(circle, rgba(197,168,128,0.15) 0%, rgba(10,8,6,0.97) 80%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      pointer-events: none; opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .konami-overlay.active {
+      pointer-events: all; opacity: 1;
+      animation: konami-flash 0.15s ease-out;
+    }
+    @keyframes konami-flash {
+      0% { background: rgba(197,168,128,0.6); }
+      100% { background: radial-gradient(circle, rgba(197,168,128,0.15) 0%, rgba(10,8,6,0.97) 80%); }
+    }
+    .konami-text {
+      font-family: 'ZCOOL XiaoWei', 'Noto Serif SC', serif;
+      font-size: 48px; font-weight: 900; color: var(--c-gold);
+      letter-spacing: 12px; text-align: center;
+      text-shadow: 0 0 40px rgba(197,168,128,0.5), 0 0 80px rgba(197,168,128,0.2);
+      animation: konami-text-in 0.5s cubic-bezier(0.18,0.89,0.32,1.25) both;
+      animation-delay: 0.15s;
+    }
+    .konami-text span {
+      display: block; font-size: 22px; letter-spacing: 16px;
+      color: var(--c-gold-bright); margin-top: 4px;
+    }
+    @keyframes konami-text-in {
+      from { transform: scale(2); opacity: 0; filter: blur(4px); }
+      to   { transform: scale(1); opacity: 1; filter: blur(0); }
+    }
+    .konami-sub {
+      margin-top: 24px; font-size: 11px; color: var(--c-text-faint-light);
+      letter-spacing: 4px; animation: konami-text-in 0.5s ease both;
+      animation-delay: 0.35s;
+    }
+    .konami-scanline {
+      position: absolute; inset: 0; pointer-events: none;
+      background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(197,168,128,0.02) 3px, rgba(197,168,128,0.02) 4px);
+      animation: konami-scan 2s linear infinite;
+    }
+    @keyframes konami-scan {
+      from { background-position: 0 0; }
+      to   { background-position: 0 8px; }
+    }
+
+    @media print {
+      body {
+        background: #fff !important;
+        color: #000 !important;
+        font-size: 12px;
+        line-height: 1.6;
+      }
+      body::after, .skip-link, .back-link, .impact-stamp, .imprint,
+      .oracle-book-corner, .search-section, .sort-tabs, #archive-mute-btn {
+        display: none !important;
+      }
+      .wrap {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+        background: #fff !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+      }
+      a { color: #000 !important; text-decoration: underline; }
+      .clearance-stamp { filter: none !important; opacity: 1 !important; }
+      .fc-img { filter: none !important; }
+      .hero-portrait :global(img) { filter: none !important; }
     }
   </style>
 </head>
 <body>
-  <z></z>
+  <a href="#main-content" class="skip-link">跳转到主要内容</a>
+  <div id="konami-overlay" class="konami-overlay" aria-hidden="true">
+    <div class="konami-text">TOP SECRET<br/><span>ACCESS GRANTED</span></div>
+    <div class="konami-sub">🦞 麻辣小龙虾总部确认身份</div>
+    <div class="konami-scanline"></div>
+  </div>
   <slot />
+  <script is:inline>
+    // Konami Code: ↑ ↑ ↓ ↓ ← → ← →
+    (function(){
+      const KONAMI = [38,38,40,40,37,39,37,39];
+      let pos = 0;
+      let timer = null;
+      document.addEventListener('keydown', function(e) {
+        if (e.keyCode === KONAMI[pos]) {
+          pos++;
+          clearTimeout(timer);
+          timer = setTimeout(function(){ pos = 0; }, 2000);
+          if (pos === KONAMI.length) {
+            pos = 0;
+            var overlay = document.getElementById('konami-overlay');
+            if (overlay) {
+              overlay.classList.add('active');
+              setTimeout(function(){ overlay.classList.remove('active'); }, 3500);
+            }
+          }
+        } else {
+          pos = 0;
+        }
+      });
+    })();
+  </script>
   <!-- 全局拟物印章滤镜：微弱边缘起伏以确保文字清晰，混合斑驳颗粒模拟半透明油墨 -->
   <svg style="position: absolute; width: 0; height: 0;" width="0" height="0" aria-hidden="true">
     <filter id="stamp-filter" x="-5%" y="-5%" width="110%" height="110%">

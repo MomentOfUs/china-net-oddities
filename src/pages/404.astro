@@ -1,0 +1,138 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="档案遗失 · 互联网奇观 · 人物档案馆">
+  <div class="wrap-404" id="main-content">
+    <div class="lost-notice">
+      <div class="lost-stamp">FILE<br/>MISSING</div>
+      <h1>该卷宗已被移出档案馆</h1>
+      <div class="sub">DOSSIER NOT FOUND · 档案编号不存在</div>
+      <p class="desc">
+        你所查找的卷宗可能已被销毁、移库，或从未被收录。<br/>
+        每个互联网奇观都有它的保质期——有些被遗忘，有些正等待被书写。
+      </p>
+      <div class="scattered-folders" aria-hidden="true">
+        <span class="folder f1">📁</span>
+        <span class="folder f2">📂</span>
+        <span class="folder f3">🗂</span>
+        <span class="folder f4">📁</span>
+        <span class="folder f5">📂</span>
+      </div>
+      <a href="/" class="back-btn">← 返回档案目录</a>
+      <div class="footer-404">
+        <span>🦞 档案管理员已收到遗失报告</span>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .wrap-404 {
+    max-width: 720px;
+    margin: 80px auto;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    background: var(--c-bg-surface);
+    border: 2px solid #2d241d;
+    box-shadow: 0 0 0 1px rgba(100,80,60,0.15), 0 20px 80px rgba(0,0,0,0.7);
+    padding: 60px 40px 40px;
+  }
+  .lost-notice {
+    position: relative;
+    z-index: 1;
+  }
+  .lost-stamp {
+    display: inline-block;
+    font-family: 'ZCOOL XiaoWei', 'Noto Serif SC', serif;
+    font-weight: 900;
+    font-size: 18px;
+    line-height: 1.15;
+    color: #8a2a18;
+    border: 3px double #8a2a18;
+    padding: 8px 18px;
+    transform: rotate(-8deg);
+    margin-bottom: 28px;
+    background: #fbf8ee var(--texture-stamp-classification);
+    border-radius: 2px 4px 2px 4px / 4px 2px 4px 2px;
+    filter: url(#stamp-filter);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    opacity: 0.92;
+  }
+  h1 {
+    font-family: 'ZCOOL XiaoWei', 'Noto Serif SC', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--c-text);
+    letter-spacing: 6px;
+    margin-bottom: 10px;
+  }
+  .sub {
+    font-size: 10px;
+    color: var(--c-text-faint-light);
+    letter-spacing: 4px;
+    font-family: 'Times New Roman', Georgia, serif;
+    margin-bottom: 20px;
+  }
+  .desc {
+    font-size: 13px;
+    color: var(--c-text-dim);
+    line-height: 2.2;
+    letter-spacing: 1px;
+    max-width: 440px;
+    margin: 0 auto 30px;
+    font-weight: 300;
+  }
+  .scattered-folders {
+    margin: 10px 0 30px;
+  }
+  .scattered-folders .folder {
+    display: inline-block;
+    font-size: 36px;
+    opacity: 0.3;
+    margin: 0 6px;
+    filter: grayscale(0.8);
+    animation: folder-float 3s ease-in-out infinite;
+  }
+  .f1 { animation-delay: 0s; }
+  .f2 { animation-delay: 0.5s; }
+  .f3 { animation-delay: 1.1s; }
+  .f4 { animation-delay: 0.3s; }
+  .f5 { animation-delay: 0.8s; }
+  @keyframes folder-float {
+    0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.25; }
+    50%      { transform: translateY(-6px) rotate(3deg); opacity: 0.4; }
+  }
+  .back-btn {
+    display: inline-block;
+    padding: 10px 28px;
+    border: 1px solid rgba(197,168,128,0.2);
+    color: var(--c-gold);
+    font-family: 'Noto Serif SC', serif;
+    font-size: 12px;
+    letter-spacing: 4px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin-top: 8px;
+  }
+  .back-btn:hover {
+    background: rgba(197,168,128,0.08);
+    border-color: rgba(197,168,128,0.5);
+    color: var(--c-text);
+    text-shadow: 0 0 8px rgba(197,168,128,0.2);
+  }
+  .footer-404 {
+    margin-top: 30px;
+    font-size: 9px;
+    color: var(--c-text-faint);
+    letter-spacing: 2px;
+    opacity: 0.5;
+  }
+
+  @media (max-width: 600px) {
+    .wrap-404 { margin: 30px 10px; padding: 40px 20px 30px; }
+    h1 { font-size: 20px; letter-spacing: 3px; }
+    .lost-stamp { font-size: 14px; padding: 6px 14px; }
+    .scattered-folders .folder { font-size: 26px; }
+  }
+</style>
