@@ -1,0 +1,27 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{secrets.SSH_PRIVATE_KEY}}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{secrets.HOST}} >> ~/.ssh/known_hosts
+      - name: Deploy via SSH
+        run: |
+          ssh ${{secrets.USER}}@${{secrets.HOST}} << 'EOF'
+            set -e
+            cd /var/www/china-net-oddities
+            git pull origin master
+            pnpm install
+            pnpm run build
+            sudo systemctl restart astro-oddity
+          EOF
