@@ -88,6 +88,11 @@ const phenomenon = defineCollection({
       key: z.string(),
       val: z.string(),
     })).optional().default([]),
+    media: z.array(z.object({
+      url: z.string(),
+      label: z.string(),
+      source: z.string(),
+    })).optional().default([]),
   }),
 });
 

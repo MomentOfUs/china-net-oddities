@@ -139,9 +139,24 @@ home_metadata:
   - val: 撕裂
     label: 舆论等级
 scores:
-  popularity: 6
-  dispute: 9
+  popularity: 4
+  dispute: 8
   absurdity: 10
-  slice: 8
+  slice: 6
   narrative: 7
   native: 10
+clearance: D
+relics:
+- name: 过期中国护照
+  desc: 牢A持有的中国护照。一本过期证件映射了中国留学生在海外敏感内容赛道上的全部挣扎——他在美国说着中国的事，成了两国都不想要的人。
+- name: B站封禁后台截图
+  desc: 牢A多次被B站封禁的后台通知合集。他被封的次数比他更新的视频还多——"封号斗士"不是外号，是简历。
+- name: 斯奎奇大王头像
+  desc: 牢A的B站头像。一个卡通角色成为了敏感内容账号的保护色——当账号被封时，头像还在，人已经不知道去哪里了。
+glossary:
+- key: 牢A
+  val: Alex的自嘲式外号。"牢"字代表着"被限制"的状态——他确实一直在被封号、解封、再被封的循环中度过。
+- key: 封号斗士
+  val: 牢A粉丝给他的封号。他在B站的更新史就是一部封禁史。
+- key: 时代代言人
+  val: 牢A给自己的定位。他说的内容映射了一部分中国青年在全球化退潮时代的身份焦虑。

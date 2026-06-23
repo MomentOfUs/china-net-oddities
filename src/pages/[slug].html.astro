@@ -51,7 +51,7 @@ const scores = data.scores || {
 };
 ---
 <Layout title={`${data.title} · 互联网奇观 · 人物档案馆`}>
-  <a class="back-link" href="/">← 返回档案目录</a>
+  <a class="back-link" href="/">← 返回</a>
   <div class="wrap">
     <!-- 盖章降临组件 -->
     <div class={`impact-stamp stamp-level-${data.clearance || 'D'}`} id="impactStamp">
@@ -371,6 +371,22 @@ const scores = data.scores || {
       </div>
     )}
 
+    {data.media && data.media.length > 0 && (
+      <div class="section" style="padding:20px 34px">
+        <div class="st">▎影 像 资 料</div>
+        <div class="media-list">
+          {data.media.map((item, index) => (
+            <a href={item.url} target="_blank" rel="noopener noreferrer" class="media-item">
+              <span class="media-index">#{index + 1}</span>
+              <span class="media-label">{item.label}</span>
+              <span class="media-source">{item.source}</span>
+              <span class="media-arrow">→</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+
     <div class="footer" set:html={data.footer} />
   </div>
   <div class="imprint"><span>◈</span> 档 案 馆 藏 <span>◈</span></div>
@@ -505,6 +521,18 @@ const scores = data.scores || {
           }, 0);
         });
       }
+
+      // 强制修复固定定位（兜底方案）
+      const fixBackLink = () => {
+        const bl = document.querySelector('.back-link');
+        if (bl) {
+          bl.style.position = 'fixed';
+          bl.style.top = '16px';
+          bl.style.left = '16px';
+        }
+      };
+      fixBackLink();
+      window.addEventListener('scroll', fixBackLink, { once: true });
 
       // 2. 盖章降临动效
       const stamp = document.getElementById('impactStamp');
@@ -937,8 +965,8 @@ const scores = data.scores || {
   .hero-portrait {
     position: relative;
     z-index: 3;
-    width: 180px;
-    height: 180px;
+    width: 150px;
+    height: 200px;
     border-radius: 4px;
     overflow: hidden;
     border: 3px double rgba(197,168,128,0.4);
@@ -1260,14 +1288,65 @@ const scores = data.scores || {
     content:'❧';display:block;font-size:11px;color:rgba(197,168,128,0.25);margin-bottom:12px;letter-spacing:0
   }
 
+  /* ── 影像资料列表 ── */
+  .media-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 14px;
+  }
+  .media-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 14px;
+    background: rgba(13,11,9,0.35);
+    border: 1px solid rgba(197,168,128,0.08);
+    text-decoration: none;
+    transition: all 0.25s ease;
+    cursor: pointer;
+  }
+  .media-item:hover {
+    background: rgba(13,11,9,0.6);
+    border-color: rgba(197,168,128,0.25);
+  }
+  .media-index {
+    font-size: 9px;
+    color: #7a6a5a;
+    font-family: 'Courier New', monospace;
+    min-width: 24px;
+  }
+  .media-label {
+    flex: 1;
+    font-size: 11px;
+    color: #c5a880;
+    letter-spacing: 2px;
+    font-weight: 300;
+  }
+  .media-source {
+    font-size: 8px;
+    color: #5a4a3a;
+    letter-spacing: 1px;
+    padding: 1px 8px;
+    border: 1px solid rgba(197,168,128,0.08);
+  }
+  .media-arrow {
+    font-size: 10px;
+    color: #7a6a5a;
+    transition: transform 0.2s ease;
+  }
+  .media-item:hover .media-arrow {
+    transform: translateX(3px);
+    color: #c5a880;
+  }
+
   /* ── Back Link (毛玻璃微平移特效) ── */
   .back-link{
-    position:fixed;top:16px;left:16px;z-index:9999;font-size:9px;color:#7a6a5a;
-    letter-spacing:3px;text-decoration:none;padding:6px 14px;
+    position:fixed;top:16px;left:16px;z-index:9999;font-size:8px;color:#7a6a5a;
+    letter-spacing:2px;text-decoration:none;padding:3px 8px;
     border:1px solid rgba(197,168,128,0.2);background:rgba(13,11,9,0.8);
     transition:all .3s cubic-bezier(0.25, 0.8, 0.25, 1);font-weight:400;font-family:'Times New Roman',Georgia,serif;
-    box-shadow:0 2px 8px rgba(0,0,0,0.3);
-    backdrop-filter: blur(6px);
+    box-shadow:0 2px 4px rgba(0,0,0,0.3);
   }
   .back-link:hover{
     color:#c5a880;border-color:rgba(197,168,128,0.45);
@@ -1287,9 +1366,9 @@ const scores = data.scores || {
   /* ── Responsive ── */
   @media(max-width:720px){
     .wrap{margin:20px 8px}
-    .back-link{top:10px;left:10px;font-size:8px;padding:4px 10px}
+    .back-link{top:10px;left:10px;font-size:7px;padding:2px 6px}
     .hero{height:420px;padding:30px 16px 20px;box-sizing:border-box}
-    .hero-portrait{width:130px;height:130px;position:relative;top:auto;left:auto;transform:none;margin-bottom:16px}
+    .hero-portrait{width:110px;height:147px;position:relative;top:auto;left:auto;transform:none;margin-bottom:16px}
     .hero-portrait:hover{transform:translateY(-3px) scale(1.02)}
     .hero-text{position:relative;bottom:auto;left:auto;right:auto;padding:0 10px}
     .hero-text .tag::before,.hero-text .tag::after{display:none}
@@ -1350,7 +1429,7 @@ const scores = data.scores || {
   }
  
   /* ── 3D翻书页与合书页动画 ── */
-  :global(body) {
+  .wrap {
     perspective: 1200px;
   }
   .wrap.page-enter-active {

@@ -20,7 +20,7 @@ body_grid:
   value: <span class="hl">给照片打分</span> · "负分滚粗"
 - label: 经典金句
   sub: 毒舌
-  value: "\u201c负分滚粗\u201d · \u201c零分\u201d"
+  value: "“负分滚粗” · “零分”"
 - label: 粉丝量
   sub: 巅峰
   value: <span class="hg">1300万</span>
@@ -183,11 +183,11 @@ ribbon:
   num: 2026.3
   note: <span class="hr">"东北网红数量减一"</span>
 scores:
-  popularity: 8
-  dispute: 8
-  absurdity: 8
-  slice: 9
-  narrative: 9
+  popularity: 6
+  dispute: 7
+  absurdity: 7
+  slice: 8
+  narrative: 7
   native: 10
 subtitle: 初代网红 · 负分滚粗 · 再见爱人4 · 张雪峰事件
 tags:
@@ -229,3 +229,20 @@ timeline:
 - text: 微博账号被禁止关注；这场坠落被广泛视为其"毒舌"逻辑的必然终点
   year: 2026.3.26
 title: 留几手
+clearance: B
+relics:
+- name: '"负分滚粗"评分模板'
+  desc: 留几手在微博时代使用的评分模板原稿。四个字的判词决定了一个网红的生死。
+- name: 蜂群文化工牌
+  desc: 留几手作为蜂群文化联合创始人的身份凭证。从点评网红到制造网红，他用了十年。
+- name: 《再见爱人4》嘉宾胸牌
+  desc: 留几手参加综艺的嘉宾身份牌。从幕后操盘手到台前嘉宾——从流量裁判到流量选手。
+glossary:
+- key: 负分滚粗
+  val: 留几手的标志性判词。在微博时代这四个字可以终结一个网红的职业生涯。
+- key: 留几手
+  val: 初代网红的标志性ID。豆瓣时代、微博时代、MCN时代、综艺时代——每个阶段都有他的印记。
+- key: 张雪峰事件
+  val: 留几手职业生涯中最具争议的事件。线上互怼演变成线下冲突，最后以张雪峰猝逝收场。
+- key: L型人生
+  val: 留几手对自己人生的总结。从巅峰到谷底再到重回巅峰的完整叙事弧光。

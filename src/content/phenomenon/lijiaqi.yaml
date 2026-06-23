@@ -176,7 +176,22 @@ home_metadata:
 scores:
   popularity: 10
   dispute: 7
-  absurdity: 6
+  absurdity: 7
   slice: 8
   narrative: 9
   native: 5
+clearance: D
+relics:
+- name: 79元花西子眉笔
+  desc: 李佳琦直播间的79元花西子眉笔实物。一支普通的眉笔促成了中国直播电商史上最戏剧性的人设崩塌——"哪里贵了"四个字，值掉百万粉丝。
+- name: OMG金句录音带
+  desc: 李佳琦直播间"OMG！买它！"的原始录音。三个字母让他从柜台BA变成直播带货一哥。
+- name: 年度主播奖杯
+  desc: 李佳琦连续多年获得的年度主播奖杯。粉丝堆起来的王座，粉丝也能拆掉。
+glossary:
+- key: OMG买它
+  val: 李佳琦的标志性带货口号。三个字母是直播电商时代最响亮的冲锋号。
+- key: 79元眉笔
+  val: 2024年李佳琦直播翻车的导火索。"有没有认真工作"的反问点燃了全民对精英傲慢的情绪火药桶。
+- key: 所有女生
+  val: 李佳琦对观众的称呼。这个温暖的称谓在79元事件后被重新解读。

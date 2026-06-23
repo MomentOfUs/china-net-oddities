@@ -146,9 +146,24 @@ home_metadata:
   - val: 超级形态
     label: yygq持续
 scores:
-  popularity: 6
+  popularity: 4
   dispute: 5
-  absurdity: 9
+  absurdity: 8
   slice: 6
-  narrative: 8
+  narrative: 7
   native: 9
+clearance: D
+relics:
+- name: 直播打人监控录像
+  desc: 神鹰黑手直播间发生的殴打事件的监控录像。从用嘴抽象到动手抽象——他用真实的暴力为"抽象"重新下了定义。
+- name: B站永封通知
+  desc: 神鹰黑手在B站的永久封禁通知。B站用这种方式告诉所有人抽象也是有底线的。
+- name: 抽象圣经文字稿
+  desc: 神鹰黑手在直播中创造的"抽象圣经"文字转录稿。以极致的语言暴力完成了对直播这种媒介形态的终极嘲弄。
+glossary:
+- key: 神鹰黑手
+  val: 抽象文化圈最极端的代表人物。当其他抽象主播还在玩语言梗的时候，他选择了物理层面的抽象。
+- key: 抽象圣经
+  val: 神鹰黑手在直播间的经典言论总称。他是抽象文化研究中最不可绕过的标本之一。
+- key: 永封
+  val: 他是少数被所有平台同时永久拉黑的博主——不是因为说了什么，而是因为做了什么。

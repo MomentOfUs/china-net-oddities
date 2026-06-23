@@ -110,11 +110,11 @@ ribbon:
 - text: 爱国流量
   type: warning
 scores:
-  popularity: 6
-  dispute: 9
-  absurdity: 9
-  slice: 7
-  narrative: 9
+  popularity: 4
+  dispute: 6
+  absurdity: 7
+  slice: 5
+  narrative: 7
   native: 9
 tags: []
 timeline:
@@ -147,3 +147,20 @@ home_metadata:
     label: 全网
   hero_tag: 金牌讲师·偷渡要饭·爱国流量
   hero_type: 互联网奇观标本
+  tag: 金牌讲师 · 偷渡要饭 · 爱国流量
+  meta: 雷森 · 丁胖子金牌讲师 · <span class="hl">~1990 —</span>
+clearance: C
+relics:
+- name: 美国街头免费餐盒
+  desc: 丁胖子在美国街头领取的救济餐盒实物影像。从中国偷渡客到美国流浪汉，一个餐盒就是他的全部尊严。
+- name: 残破的中国护照
+  desc: 雷森偷渡美国时持有的中国护照。这本被剪角的证件见证了一场跨国荒诞迁徙。
+- name: 直播打赏收入截屏
+  desc: 丁胖子在美国街头直播时收到的打赏记录截图。在中国偷电瓶车的人在美国靠要饭月入20万。
+glossary:
+- key: 金牌讲师
+  val: 丁胖子的自封称号。一个偷渡客在美国街头自称"讲师"——荒诞感来自它的真诚。
+- key: 偷渡
+  val: 丁胖子前往美国的方式。从盗窃到偷渡，他完成了最不可思议的身份升级。
+- key: 美式要饭
+  val: 网友的戏称。领取救济餐、露天睡觉、手机直播——"要饭"这个中国土词和美国街头产生了奇妙的化学反应。

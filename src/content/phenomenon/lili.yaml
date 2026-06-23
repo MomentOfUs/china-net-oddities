@@ -149,9 +149,24 @@ home_metadata:
   - val: 快手
     label: 永久封禁
 scores:
-  popularity: 7
-  dispute: 8
+  popularity: 5
+  dispute: 7
   absurdity: 9
-  slice: 7
+  slice: 6
   narrative: 8
   native: 10
+clearance: D
+relics:
+- name: 电动徒步杖
+  desc: 丽丽"徒步中国"系列中实际使用的电动助力徒步杖。一根明明可以靠电力前进的登山杖，象征着他"全网最假徒步博主"的永恒标签。
+- name: aqa巴累语录手稿
+  desc: 丽丽创造的无意义拟音词"aqa巴累"的文字记录。一个毫无意义的音节组合获得了传播学上的不朽地位。
+- name: 快手封禁通知
+  desc: 丽丽被快手永久封禁的官方通知。从徒步造假到连麦骂人，他突破了平台的底线。
+glossary:
+- key: aqa巴累
+  val: 丽丽在连麦骂人时创造的无意义拟声词。与"giao"一样——没有含义就是最好的含义。
+- key: 拷打
+  val: 丽丽的直播核心内容——连麦对骂。"拷打"从暴力行为变成了一种娱乐形式。
+- key: 戴维董事长
+  val: 丽丽的另一个身份。一个被永久封禁的主播自称"董事长"——互联网给了每个人15分钟当董事长的机会。

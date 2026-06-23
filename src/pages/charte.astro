@@ -20,6 +20,7 @@ const sortedEntries = rawEntries.map(item => {
 <Layout title="入选标准 · 互联网奇观 · 人物档案馆">
   <div class="wrap">
     <div class="hero">
+      <div class="top-back"><a href="/">← 返 回 档 案 馆</a></div>
       <h1>入 选 标 准</h1>
       <div class="sub">评 价 体 系</div>
       <div class="desc">为什么是他/她？凭什么入馆？<br />这里有一套标准，但不迷信标准。</div>
@@ -523,6 +524,23 @@ const sortedEntries = rawEntries.map(item => {
   .hero{
     padding:72px 30px 40px;text-align:center;position:relative;
     border-bottom:1px solid rgba(197,168,128,0.18)
+  }
+  .top-back {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 100;
+  }
+  .top-back a {
+    font-size: 10px;
+    color: #7a6a5a;
+    text-decoration: none;
+    letter-spacing: 4px;
+    font-weight: 300;
+    transition: color 0.3s;
+  }
+  .top-back a:hover {
+    color: #c5a880;
   }
   .hero::after{
     content:'';position:absolute;bottom:-1px;left:32px;right:32px;height:1px;

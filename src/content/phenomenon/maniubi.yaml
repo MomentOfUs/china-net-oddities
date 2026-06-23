@@ -179,11 +179,11 @@ ribbon:
   num: 18年
   note: 2006-2024
 scores:
-  popularity: 7
-  dispute: 6
+  popularity: 5
+  dispute: 5
   absurdity: 10
-  slice: 9
-  narrative: 7
+  slice: 7
+  narrative: 6
   native: 10
 subtitle: 社牛鼻祖 · 初代整活 · 纯天然尴尬
 tags:
@@ -216,3 +216,18 @@ timeline:
 - text: 仍在活跃创作，从2006到2024用同一个表情演了十八年
   year: 至今
 title: 马牛逼
+clearance: D
+relics:
+- name: '"我马牛逼什么人"签名照'
+  desc: 马牛逼在直播中反复强调自己身份时的签名道具。一个自称"牛逼"的人用最浮夸的方式解构了"牛逼"这个词本身。
+- name: 直播连麦PK惨败录像
+  desc: 马牛逼在连麦PK中被对面主播碾压的录像。越说自己牛逼，输得越惨——这种反差构成了他全部喜剧效果的核心引擎。
+- name: 破损的直播设备
+  desc: 马牛逼激情直播时砸坏的设备合集。每一件都是他"牛逼"人设的祭品。
+glossary:
+- key: 马牛逼
+  val: 一个靠自称"牛逼"走红的主播。越声称自己牛逼，越显得不牛逼——但观众恰恰是冲着这份不牛逼来的。
+- key: 我马牛逼什么人
+  val: 马牛逼的口头禅。潜台词是"你不知道我有多牛逼"。
+- key: 直播PK
+  val: 马牛逼的核心内容形式。永远在吹嘘，永远输得一塌糊涂——重复的失败本身就是一种行为艺术。

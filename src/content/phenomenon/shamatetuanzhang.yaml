@@ -147,9 +147,26 @@ home_metadata:
   - val: 寸头
     label: 回归平凡
 scores:
-  popularity: 7
-  dispute: 6
-  absurdity: 9
-  slice: 9
-  narrative: 9
-  native: 8
+  popularity: 5
+  dispute: 4
+  absurdity: 8
+  slice: 8
+  narrative: 7
+  native: 7
+clearance: C
+relics:
+- name: 彩色爆炸头发套
+  desc: 杀马特团长的标志性发套。一顶五彩缤纷的假发代表着中国底层青年在主流审美之外建立的自治美学帝国。
+- name: 工厂流水线工牌
+  desc: 杀马特团长在广东工厂工作时的工牌。他们在工厂里是编号，在网络上才是有名字的人。
+- name: 贴吧杀马特家族合影
+  desc: 杀马特文化巅峰时期各家族的合影照片合集。这些照片成了中国社会变迁最珍贵的影像档案。
+glossary:
+- key: 杀马特
+  val: 源自英文"smart"的音译。爆炸头、烟熏妆、金属配饰——它是青年亚文化史上最被低估的美学运动。
+- key: 杀马特团长
+  val: 从杀马特教父到学术研究对象再到文化解读者——三重身份的转换。
+- key: 非主流
+  val: QQ空间时代的视觉文化。底层青年在互联网上第一次拥有了自己的话语权和审美权。
+- key: 工厂里的审美自治
+  val: 当工厂要求所有人都穿一样的工服时，发型和发色成了最后的自由。
