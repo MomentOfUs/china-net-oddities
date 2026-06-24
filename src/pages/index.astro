@@ -254,8 +254,9 @@ const entries = rawEntries.map(item => {
                 <span class="stamp-inner">{entry.clearance}级解密</span>
               </div>
               <div class="fc-photo-wrap">
+                <div class="fc-hidden-photo" style={`background-image: url(${entry.avatar})`}></div>
                 {entry.avatar && entry.avatar.endsWith('.svg') ? (
-                  <img src={entry.avatar} alt={entry.title} class="fc-img" width={360} height={360} />
+                  <img src={entry.avatar} alt={entry.title} class="fc-img fc-main-photo" width={360} height={360} />
                 ) : (
                 <Image 
                   src={entry.avatar} 
@@ -266,7 +267,7 @@ const entries = rawEntries.map(item => {
                   inferSize={true}
                   loading="lazy"
                   decoding="async"
-                  class="fc-img" 
+                  class="fc-img fc-main-photo" 
                 />
                 )}
               </div>
@@ -365,7 +366,7 @@ const entries = rawEntries.map(item => {
         }
       }
 
-      // 2.2 绑定卡片翻页
+      // 2.2 绑定卡片翻页与悬停音效
       const cards = document.querySelectorAll('.phenomenon-card a');
       cards.forEach(card => {
         if (!card.dataset.bound) {
@@ -387,6 +388,14 @@ const entries = rawEntries.map(item => {
                 window.location.href = targetUrl;
               }
             }, 0);
+          });
+
+          card.addEventListener('mouseenter', () => {
+            try {
+              if (window.__archiveAudio && window.__archiveAudio.playPaperHoverSound) {
+                window.__archiveAudio.playPaperHoverSound();
+              }
+            } catch(err){}
           });
         }
       });
@@ -1404,11 +1413,12 @@ const entries = rawEntries.map(item => {
       inset 0 0 6px rgba(13, 71, 161, 0.08);
   }
   .featured:hover .clearance-stamp {
-    transform: rotate(-10deg) scale(1.04);
+    transform: rotate(-10deg) scale(1.06);
     box-shadow: 
-      0 4px 10px rgba(0,0,0,0.45),
-      inset 0 0 8px rgba(0,0,0,0.05);
+      0 0 14px currentColor, /* 基于印泥自身颜色的荧光发光效果 */
+      inset 0 0 8px rgba(255,255,255,0.3);
     opacity: 1;
+    filter: drop-shadow(0 0 2.5px currentColor);
   }
 
   .entries-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin:0 48px 24px}
@@ -1417,20 +1427,21 @@ const entries = rawEntries.map(item => {
   .featured .folder-tab {
     position: absolute;
     top: 0;
-    left: 0;
-    background: linear-gradient(180deg, #3a2e22 0%, #2c2016 100%);
-    border: 1px solid #1a1008;
+    left: 18px;
+    background: linear-gradient(180deg, #c5a880 0%, #8c704c 100%);
+    border: 1px solid #3e2612;
     border-top: none;
-    border-left: none;
+    color: #1a1008;
     font-size: 8px;
-    color: var(--c-gold);
-    padding: 3px 12px;
-    letter-spacing: 2px;
-    font-family: 'Noto Serif SC', serif;
-    font-weight: 700;
-    z-index: 5;
-    border-radius: 0 0 4px 0;
-    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.25);
+    padding: 2px 8px 3px;
+    letter-spacing: 1px;
+    font-family: var(--font-mono);
+    font-weight: 900;
+    box-shadow: 
+      0 1px 3px rgba(0,0,0,0.4),
+      inset 0 1px 0 rgba(255,255,255,0.2);
+    border-radius: 0 0 2px 2px;
+    z-index: 10;
     text-transform: uppercase;
   }
 
@@ -1576,6 +1587,25 @@ const entries = rawEntries.map(item => {
     justify-content: center;
     align-items: center;
     z-index: 2;
+    perspective: 800px; /* 提供 3D 深度 */
+  }
+
+  /* 底层隐藏现场照片 */
+  .fc-hidden-photo {
+    position: absolute;
+    top: 16px;
+    left: 14%;
+    width: 72%;
+    aspect-ratio: 3/4;
+    background-size: cover;
+    background-position: center 20%;
+    filter: grayscale(1) sepia(0.25) contrast(1.3) brightness(0.5) blur(0.3px); /* 强烈黑白做旧质感 */
+    border: 1px solid rgba(0,0,0,0.55);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    z-index: 1;
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.4s ease;
+    transform: rotate(-1.5deg);
+    opacity: 0.85;
   }
 
   /* 金属回形针 */
@@ -1634,21 +1664,29 @@ const entries = rawEntries.map(item => {
       0 4px 12px rgba(0,0,0,0.4),
       0 0 0 1px rgba(197, 168, 128, 0.15),
       inset 0 0 12px rgba(0,0,0,0.35);
-    transition: all 0.4s ease, opacity 0.5s ease;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.5s ease;
     z-index: 2;
     opacity: 0;
     position: relative;
+    transform-style: preserve-3d;
   }
   .featured .fc-img.img-loaded {
     opacity: 1;
   }
-  .featured:hover .fc-img {
-    filter: grayscale(0.2) sepia(0.1) contrast(1.05) brightness(0.92) saturate(0.85);
-    transform: scale(1.01) translateY(-2px);
+
+  /* 悬停时照片 3D 浮起，底图向右下角偏转滑出 */
+  .featured:hover .fc-main-photo {
+    filter: grayscale(0.25) sepia(0.12) contrast(1.08) brightness(0.92) saturate(0.85);
+    transform: perspective(600px) rotateX(10deg) rotateY(-6deg) translateZ(10px);
     box-shadow: 
-      0 8px 18px rgba(0,0,0,0.5),
-      0 0 0 1px rgba(197, 168, 128, 0.2),
+      0 12px 24px rgba(0,0,0,0.5),
+      0 0 0 1px rgba(197, 168, 128, 0.25),
       inset 0 0 8px rgba(0,0,0,0.2);
+  }
+  .featured:hover .fc-hidden-photo {
+    transform: translate(16px, 14px) rotate(6deg) scale(0.96);
+    opacity: 1;
+    box-shadow: 3px 8px 18px rgba(0,0,0,0.65);
   }
 
   .featured .fc-body {
@@ -1689,8 +1727,37 @@ const entries = rawEntries.map(item => {
     line-height: 1.5;
   }
   .featured .fc-meta .hl {
-    color: #d05a40;
+    color: transparent; /* 默认隐藏字迹 */
+    text-shadow: 0 0 4.5px rgba(189, 176, 160, 0.7); /* 稍微模糊可见 */
+    position: relative;
     font-weight: 700;
+    transition: color 0.35s ease, text-shadow 0.35s ease;
+    display: inline-block;
+    padding: 0 2px;
+  }
+  .featured .fc-meta .hl::before {
+    content: '';
+    position: absolute;
+    left: -2px;
+    right: -2px;
+    top: 2px;
+    bottom: 2px;
+    background: #110906; /* 碳黑墨汁涂抹块 */
+    box-shadow: 0 1px 2px rgba(0,0,0,0.7);
+    border-radius: 1px;
+    transform: scaleX(1);
+    transform-origin: left center;
+    transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s ease;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .featured:hover .fc-meta .hl {
+    color: #d05a40; /* 悬停解密显影原本的红色/金色高亮 */
+    text-shadow: none;
+  }
+  .featured:hover .fc-meta .hl::before {
+    transform: scaleX(0); /* 墨线向左退缩 */
+    opacity: 0;
   }
   .featured .fc-stats {
     display: flex;

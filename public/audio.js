@@ -356,6 +356,41 @@
     } catch (_) {}
   }
 
+  /* ── 纸张微弱滑动声/Hover反馈 (lightweight paper slide) ── */
+  function playPaperHoverSound() {
+    if (isMuted()) return;
+    const ac = getCtx();
+    if (!ac) return;
+    try {
+      const dur = 0.15;
+      const bufferSize = ac.sampleRate * dur;
+      const buffer = ac.createBuffer(1, bufferSize, ac.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+      const noise = ac.createBufferSource();
+      noise.buffer = buffer;
+
+      const filter = ac.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(1200, ac.currentTime);
+      filter.Q.value = 1.0;
+
+      const gain = ac.createGain();
+      gain.gain.setValueAtTime(0.001, ac.currentTime);
+      gain.gain.linearRampToValueAtTime(0.012, ac.currentTime + 0.03); // 极轻微音量
+      gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + dur);
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(ac.destination);
+
+      noise.start();
+      noise.stop(ac.currentTime + dur);
+    } catch (_) {}
+  }
+
   /* ── 静音按钮自动渲染 ── */
   function renderMuteToggle() {
     var existing = document.getElementById('archive-mute-btn');
@@ -398,6 +433,7 @@
     playTypewriterBellSound: playTypewriterBellSound,
     playWaxSealCrackSound: playWaxSealCrackSound,
     playStringUnwrapSound: playStringUnwrapSound,
+    playPaperHoverSound: playPaperHoverSound,
     isMuted: isMuted,
     toggleMute: function () {
       try {
