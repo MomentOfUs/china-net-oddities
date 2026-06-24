@@ -181,6 +181,13 @@ const entries = rawEntries.map(item => {
           </div>
         ))}
       </div>
+
+      <!-- 搜索空状态 -->
+      <div id="searchEmpty" class="search-empty" style="display:none">
+        <div class="empty-icon">🔍</div>
+        <div class="empty-title">未找到相关人物档案</div>
+        <div class="empty-desc">建议更换姓名、拼音缩写或特征词重新检索</div>
+      </div>
     </div>
 
     <!-- ── Suggestion Wall ── -->
@@ -279,6 +286,8 @@ const entries = rawEntries.map(item => {
           });
         }
       });
+      // 页面初始化或返回时同步检索状态
+      applyFilters();
     }
 
     if (document.readyState === 'loading') {
@@ -410,18 +419,27 @@ const entries = rawEntries.map(item => {
     }
     function applyFilters() {
       const cards = document.querySelectorAll('.phenomenon-card');
-      const searchQuery = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+      const inputEl = document.getElementById('searchInput');
+      const searchQuery = (inputEl?.value || '').toLowerCase().trim();
       let visibleCount = 0;
+
+      // 同步清除按钮状态
+      const clearBtn = document.getElementById('searchClear');
+      if (clearBtn && inputEl) {
+        clearBtn.style.opacity = inputEl.value ? '1' : '0';
+      }
 
       cards.forEach(card => {
         let searchMatch = true;
         if (searchQuery) {
           const searchData = (card.getAttribute('data-search') || '').toLowerCase();
-          searchMatch = searchData.indexOf(searchQuery) !== -1;
+          const queryWords = searchQuery.split(/\s+/).filter(Boolean);
+          searchMatch = queryWords.every(word => searchData.indexOf(word) !== -1);
         }
 
         if (searchMatch) {
           card.classList.remove('filtered-out');
+          card.classList.add('card-visible');
           visibleCount++;
         } else {
           card.classList.add('filtered-out');
@@ -432,14 +450,15 @@ const entries = rawEntries.map(item => {
       if (countEl) {
         countEl.textContent = visibleCount + ' / ' + cards.length;
       }
+
+      // 控制空状态显隐
+      const emptyEl = document.getElementById('searchEmpty');
+      if (emptyEl) {
+        emptyEl.style.display = (searchQuery && visibleCount === 0) ? 'block' : 'none';
+      }
     }
 
     window.doSearch = function() {
-      const input = document.getElementById('searchInput');
-      const clearBtn = document.getElementById('searchClear');
-      if (input && clearBtn) {
-        clearBtn.style.opacity = input.value ? '1' : '0';
-      }
       applyFilters();
     }
 
@@ -977,9 +996,36 @@ const entries = rawEntries.map(item => {
     transition: opacity 0.35s ease, transform 0.35s ease;
   }
   .fc-wrapper.filtered-out {
-    opacity: 0;
-    transform: scale(0.95);
-    pointer-events: none;
+    display: none !important;
+  }
+
+  /* ── 搜索空状态 ── */
+  .search-empty {
+    text-align: center;
+    padding: 60px 24px;
+    border: 1px dashed rgba(197, 168, 128, 0.2);
+    background: rgba(34, 24, 16, 0.4);
+    border-radius: 4px;
+    margin: 24px 48px;
+    font-family: 'Noto Serif SC', serif;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.4);
+  }
+  .empty-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    opacity: 0.65;
+  }
+  .empty-title {
+    font-size: 16px;
+    color: var(--c-gold-bright);
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .empty-desc {
+    font-size: 12px;
+    color: var(--c-text-faint-light);
+    letter-spacing: 1px;
   }
   .featured {
     display: flex;
