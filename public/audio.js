@@ -377,7 +377,7 @@
     btn.addEventListener('click', function () {
       var nowMuted = window.__archiveAudio.toggleMute();
       btn.textContent = nowMuted ? '🔇' : '🔊';
-      btn.title = nowMuted ? '音效开启 · 点击静音';
+      btn.title = nowMuted ? '已静音 · 点击取消' : '音效开启 · 点击静音';
     });
     footer.appendChild(btn);
   }
