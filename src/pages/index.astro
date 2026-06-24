@@ -22,39 +22,63 @@ const getCategory = (tag) => {
 };
 
 // 从 english_name 派生全拼、逐字首字母、英文别名、分词拼音
-// e.g. "Ma Baoguo" → "mabaoguo mbg ma baoguo ma bao guo"
-// e.g. "Sun Xiaochuan (DD Master)" → "sunxiaochuan sxc dd master sun xiaochuan sun xiao chuan"
+// 深度支持括号内/外及多段拼音的分词提取 (如 "Chen E (Basket Boy / Dai Lanzi)" -> ce, dlz, chene, dailanzi)
 function getPinyinTokens(englishName) {
   if (!englishName) return '';
-  const pinyinPart = englishName.split(/[\(\（]/)[0].trim();
-
-  // 全拼（去空格 + 去连字符）："sunxiaochuan"
-  const fullPinyin = pinyinPart.replace(/[\s-]+/g, '').toLowerCase();
-
-  // 拼音音节拆分（Baoguo → bao, guo）—— 用正则切出合法的拼音声母+韵母组合
-  const syllableRe = /(zh|ch|sh|[bpmfdtnlgkhjqxzcsryw])?(iang|iong|uang|uai|ian|iao|ang|eng|ing|ong|ueng|[aeiouv]{1,2}(?:ng|n)?)/gi;
-  const allSyllables = pinyinPart.split(/\s+/).flatMap(w => {
-    const syllables = w.toLowerCase().match(syllableRe);
-    return syllables && syllables.length > 0 ? syllables : [w.toLowerCase()];
+  
+  let parts = [];
+  
+  // 提取括号/中文括号内的内容
+  const parenRe = /[\(\（](.+?)[\)\）]/g;
+  let match;
+  const rawAliasList = [];
+  while ((match = parenRe.exec(englishName)) !== null) {
+    rawAliasList.push(match[1]);
+  }
+  
+  // 移除括号部分得到括号外的主体
+  const rawMain = englishName.replace(/[\(\（].+?[\)\）]/g, ' ').trim();
+  
+  // 支持以斜杠、分号、逗号、加号或竖线拆分为子项
+  const splitRe = /[\/,\;\+\|]/;
+  
+  if (rawMain) {
+    rawMain.split(splitRe).forEach(s => parts.push(s.trim()));
+  }
+  rawAliasList.forEach(alias => {
+    alias.split(splitRe).forEach(s => parts.push(s.trim()));
   });
+  
+  const tokens = new Set();
+  // 拼音音节切割正则
+  const syllableRe = /(zh|ch|sh|[bpmfdtnlgkhjqxzcsryw])?(iang|iong|uang|uai|ian|iao|ang|eng|ing|ong|ueng|[aeiouv]{1,2}(?:ng|n)?)/gi;
 
-  // 逐字首字母：Baoguo → b + g = bg
-  const initials = allSyllables.map(s => (s[0] || '').toLowerCase()).join('');
-
-  // 英文别名（括号内内容）："tai chi master"
-  const aliasMatch = englishName.match(/[\(\（](.+?)[\)\）]/);
-  const englishAlias = aliasMatch ? aliasMatch[1].toLowerCase() : '';
-
-  // 返回多种 token 形式，空格分隔
-  return [
-    fullPinyin,
-    initials,
-    englishAlias,
-    pinyinPart.toLowerCase(),
-    allSyllables.join(' ').toLowerCase(),
-    // 额外加入去连字符版本（应对 "A-Giao" 这种写法）
-    pinyinPart.replace(/[\s-]+/g, ' ').toLowerCase(),
-  ].filter(Boolean).join(' ');
+  parts.forEach(part => {
+    // 移除非英数字、空白和连字符
+    const cleanPart = part.toLowerCase().replace(/[^a-z0-9\s-]/g, '').trim();
+    if (!cleanPart) return;
+    
+    const words = cleanPart.split(/[\s-]+/).filter(Boolean);
+    if (words.length === 0) return;
+    
+    tokens.add(cleanPart);
+    tokens.add(words.join(''));
+    
+    const syllables = words.flatMap(w => {
+      const ms = w.match(syllableRe);
+      return ms && ms.length > 0 ? ms : [w];
+    });
+    
+    if (syllables.length > 0) {
+      tokens.add(syllables.join(' '));
+      const initials = syllables.map(s => s[0] || '').join('');
+      if (initials) {
+        tokens.add(initials);
+      }
+    }
+  });
+  
+  return Array.from(tokens).filter(Boolean).join(' ');
 }
 
 // 按照 home_metadata 进行列表整理
