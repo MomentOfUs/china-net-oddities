@@ -540,9 +540,11 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
       // 0.5 播放翻书声音
       if (wrap) {
         try {
-          window.__archiveAudio.playBookFlipSound();
+          if (window.__archiveAudio && window.__archiveAudio.playPaperRustleSound) {
+            window.__archiveAudio.playPaperRustleSound();
+          }
         } catch(e) {
-          console.error(e);
+          console.error("Page load audio error:", e);
         }
       }
 
@@ -556,7 +558,11 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
           if (wrap && wrap.classList.contains('page-closing')) return;
           
           try {
-            window.__archiveAudio.playBookFlipSound();
+            if (window.__archiveAudio && window.__archiveAudio.playPaperRustleSound) {
+              window.__archiveAudio.playPaperRustleSound();
+            } else if (window.__archiveAudio && window.__archiveAudio.playBookFlipSound) {
+              window.__archiveAudio.playBookFlipSound();
+            }
           } catch(err) {
             console.error("Flip sound error:", err);
           }

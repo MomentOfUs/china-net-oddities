@@ -215,7 +215,13 @@ const entries = rawEntries.map(item => {
             const wrap = document.querySelector('.wrap');
             if (wrap && wrap.classList.contains('page-flipping')) return;
 
-            window.__archiveAudio.playBookFlipSound();
+            try {
+              if (window.__archiveAudio && window.__archiveAudio.playBookFlipSound) {
+                window.__archiveAudio.playBookFlipSound();
+              }
+            } catch(err) {
+              console.error("Oracle audio error:", err);
+            }
             if (wrap) wrap.classList.add('page-flipping');
 
             // 编号闪烁：No.?? 快速跳动
@@ -256,9 +262,19 @@ const entries = rawEntries.map(item => {
           card.addEventListener('click', (e) => {
             e.preventDefault();
             const targetUrl = card.getAttribute('href');
-            window.__archiveAudio.playBookFlipSound();
+            try {
+              if (window.__archiveAudio && window.__archiveAudio.playPaperRustleSound) {
+                window.__archiveAudio.playPaperRustleSound();
+              } else if (window.__archiveAudio && window.__archiveAudio.playBookFlipSound) {
+                window.__archiveAudio.playBookFlipSound();
+              }
+            } catch(err) {
+              console.error("Card click audio error:", err);
+            }
             setTimeout(() => {
-              window.location.href = targetUrl;
+              if (targetUrl) {
+                window.location.href = targetUrl;
+              }
             }, 0);
           });
         }

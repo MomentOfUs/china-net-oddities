@@ -116,6 +116,84 @@
     } catch (_) { /* 静默忽略 */ }
   }
 
+  /* ── 纸张摩擦声 (bandpass noise sweep with micro variation) ── */
+  function playPaperRustleSound() {
+    if (isMuted()) return;
+    const ac = getCtx();
+    if (!ac) return;
+    try {
+      const bufferSize = ac.sampleRate * 0.45;
+      const buffer = ac.createBuffer(1, bufferSize, ac.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+      const noise = ac.createBufferSource();
+      noise.buffer = buffer;
+
+      const filter = ac.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(900, ac.currentTime);
+      filter.frequency.exponentialRampToValueAtTime(1400, ac.currentTime + 0.35);
+      filter.Q.value = 1.6;
+
+      const gain = ac.createGain();
+      gain.gain.setValueAtTime(0.001, ac.currentTime);
+      gain.gain.linearRampToValueAtTime(0.08, ac.currentTime + 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.43);
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(ac.destination);
+
+      noise.start();
+      noise.stop(ac.currentTime + 0.45);
+    } catch (_) { /* 静默忽略 */ }
+  }
+
+  /* ── 金属敲击声/回形针敲击 (highpitch decay + transient noise) ── */
+  function playMetalClickSound() {
+    if (isMuted()) return;
+    const ac = getCtx();
+    if (!ac) return;
+    try {
+      const osc = ac.createOscillator();
+      const gainOsc = ac.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(2600, ac.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(700, ac.currentTime + 0.04);
+      gainOsc.gain.setValueAtTime(0.08, ac.currentTime);
+      gainOsc.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.05);
+
+      osc.connect(gainOsc);
+      gainOsc.connect(ac.destination);
+
+      const bufferSize = ac.sampleRate * 0.02;
+      const buffer = ac.createBuffer(1, bufferSize, ac.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+      const noise = ac.createBufferSource();
+      noise.buffer = buffer;
+      const filter = ac.createBiquadFilter();
+      filter.type = 'highpass';
+      filter.frequency.value = 4000;
+      const gainNoise = ac.createGain();
+      gainNoise.gain.setValueAtTime(0.05, ac.currentTime);
+      gainNoise.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.015);
+
+      noise.connect(filter);
+      filter.connect(gainNoise);
+      gainNoise.connect(ac.destination);
+
+      osc.start();
+      osc.stop(ac.currentTime + 0.06);
+      noise.start();
+      noise.stop(ac.currentTime + 0.02);
+    } catch (_) { /* 静默忽略 */ }
+  }
+
   /* ── 静音按钮自动渲染 ── */
   function renderMuteToggle() {
     var existing = document.getElementById('archive-mute-btn');
@@ -137,7 +215,7 @@
     btn.addEventListener('click', function () {
       var nowMuted = window.__archiveAudio.toggleMute();
       btn.textContent = nowMuted ? '🔇' : '🔊';
-      btn.title = nowMuted ? '已静音 · 点击取消' : '音效开启 · 点击静音';
+      btn.title = nowMuted ? '音效开启 · 点击静音';
     });
     footer.appendChild(btn);
   }
@@ -152,6 +230,8 @@
   window.__archiveAudio = {
     playBookFlipSound: playBookFlipSound,
     playStampSound: playStampSound,
+    playPaperRustleSound: playPaperRustleSound,
+    playMetalClickSound: playMetalClickSound,
     isMuted: isMuted,
     toggleMute: function () {
       try {
