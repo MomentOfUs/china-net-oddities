@@ -350,6 +350,39 @@ const { title } = Astro.props;
       .fc-img { filter: none !important; }
       .hero-portrait :global(img) { filter: none !important; }
     }
+
+    /* ── 🕯️ 烛光模式全局氛围与光影摇曳 ── */
+    body.mode-candle::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: rgba(253, 184, 19, 0.05);
+      mix-blend-mode: color-burn;
+      pointer-events: none;
+      z-index: 999999;
+      animation: candle-light-glow 2.2s infinite alternate ease-in-out;
+    }
+    body.mode-candle {
+      animation: candle-light-flicker 2.5s infinite ease-in-out;
+    }
+    @keyframes candle-light-glow {
+      0%, 100% { background: rgba(253, 184, 19, 0.05); }
+      30% { background: rgba(253, 184, 19, 0.075); }
+      70% { background: rgba(253, 184, 19, 0.04); }
+    }
+    @keyframes candle-light-flicker {
+      0%, 100% { filter: brightness(0.985) contrast(1.005); }
+      20% { filter: brightness(1.006) contrast(0.995); }
+      40% { filter: brightness(0.975) contrast(1.012); }
+      60% { filter: brightness(1.012) contrast(0.99); }
+      80% { filter: brightness(0.99) contrast(1.0); }
+    }
+    
+    /* ── 🚨 红外暗房模式偏色 ── */
+    body.mode-darkroom {
+      background: #050202 !important;
+      filter: grayscale(0.55) sepia(0.85) hue-rotate(-60deg) saturate(2.3) contrast(1.15) brightness(0.72) !important;
+    }
   </style>
 </head>
 <body>
@@ -471,6 +504,14 @@ const { title } = Astro.props;
     <span class="tag-text">回顶</span>
   </button>
   <script is:inline>
+    // 立即执行模式初始化防闪烁
+    (function(){
+      var currentMode = localStorage.getItem('archive-read-mode') || 'normal';
+      if (currentMode !== 'normal') {
+        document.body.classList.add('mode-' + currentMode);
+      }
+    })();
+
     (function(){
       var btn = document.getElementById('back-to-top');
       if (!btn) return;
@@ -493,6 +534,70 @@ const { title } = Astro.props;
           behavior: 'smooth'
         });
       });
+    })();
+
+    // 动态渲染模式切换按钮至页脚
+    (function(){
+      var currentMode = localStorage.getItem('archive-read-mode') || 'normal';
+      
+      function renderModeToggle() {
+        var existing = document.getElementById('archive-mode-btn');
+        if (existing) return;
+        var footer = document.querySelector('.footer');
+        if (!footer) {
+          setTimeout(renderModeToggle, 300);
+          return;
+        }
+        var btn = document.createElement('span');
+        btn.id = 'archive-mode-btn';
+        updateBtnUI(btn, currentMode);
+        btn.style.cssText = 'cursor:pointer;margin-left:14px;font-size:10px;opacity:0.5;transition:opacity 0.2s;';
+        
+        btn.addEventListener('mouseenter', function () { btn.style.opacity = '1'; });
+        btn.addEventListener('mouseleave', function () { btn.style.opacity = '0.5'; });
+        btn.addEventListener('click', function () {
+          try {
+            if (window.__archiveAudio) {
+              window.__archiveAudio.playMetalClickSound();
+            }
+          } catch(e){}
+          
+          document.body.classList.remove('mode-' + currentMode);
+          if (currentMode === 'normal') {
+            currentMode = 'candle';
+          } else if (currentMode === 'candle') {
+            currentMode = 'darkroom';
+          } else {
+            currentMode = 'normal';
+          }
+          
+          if (currentMode !== 'normal') {
+            document.body.classList.add('mode-' + currentMode);
+          }
+          localStorage.setItem('archive-read-mode', currentMode);
+          updateBtnUI(btn, currentMode);
+        });
+        footer.appendChild(btn);
+      }
+      
+      function updateBtnUI(el, mode) {
+        if (mode === 'normal') {
+          el.textContent = '💡 正常阅读';
+          el.title = '当前：常规阅读模式 · 点击切换至烛光模式';
+        } else if (mode === 'candle') {
+          el.textContent = '🕯️ 烛光模式';
+          el.title = '当前：烛光晃动模式 · 点击切换至红外暗房';
+        } else if (mode === 'darkroom') {
+          el.textContent = '🚨 暗房模式';
+          el.title = '当前：红外暗室模式 · 点击恢复正常阅读';
+        }
+      }
+      
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', renderModeToggle);
+      } else {
+        renderModeToggle();
+      }
     })();
   </script>
 

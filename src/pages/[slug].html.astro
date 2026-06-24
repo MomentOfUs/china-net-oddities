@@ -59,6 +59,38 @@ const prevEntry = currentIndex > 0 ? sortedEntries[currentIndex - 1] : null;
 const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[currentIndex + 1] : null;
 ---
 <Layout title={`${data.title} · 互联网奇观 · 人物档案馆`}>
+  <!-- 案卷分页索引标签插片 -->
+  <div class="archive-binder-tabs">
+    <div class="binder-tab active" data-target="hero">
+      <span class="tab-char">案</span>
+      <span class="tab-tooltip">基本案卷</span>
+    </div>
+    {data.quote && (
+      <div class="binder-tab" data-target="pull-quote">
+        <span class="tab-char">录</span>
+        <span class="tab-tooltip">经典语录</span>
+      </div>
+    )}
+    {data.comment && (
+      <div class="binder-tab" data-target="cmt">
+        <span class="tab-char">注</span>
+        <span class="tab-tooltip">档案注脚</span>
+      </div>
+    )}
+    {data.essay && (
+      <div class="binder-tab" data-target="essay">
+        <span class="tab-char">按</span>
+        <span class="tab-tooltip">编者按</span>
+      </div>
+    )}
+    {data.relics && data.relics.length > 0 && (
+      <div class="binder-tab" data-target="relics-cabinet">
+        <span class="tab-char">证</span>
+        <span class="tab-tooltip">物证展柜</span>
+      </div>
+    )}
+  </div>
+
   <a class="back-link" href="/">← 返回</a>
   <div class="wrap" id="main-content">
     <!-- 盖章降临组件 -->
@@ -856,6 +888,64 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
         }
       });
     }
+
+    /* ── 案卷右侧分页索引插片联动 ── */
+    (function(){
+      var tabs = document.querySelectorAll('.binder-tab');
+      if (tabs.length === 0) return;
+      
+      tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          var targetClass = tab.getAttribute('data-target');
+          var targetEl = document.querySelector('.' + targetClass);
+          if (targetEl) {
+            try {
+              if (window.__archiveAudio) {
+                window.__archiveAudio.playPaperRustleSound();
+              }
+            } catch(e){}
+            
+            targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        });
+      });
+
+      var targets = [];
+      tabs.forEach(function(tab) {
+        var targetClass = tab.getAttribute('data-target');
+        var targetEl = document.querySelector('.' + targetClass);
+        if (targetEl) {
+          targets.push({ tab: tab, el: targetEl });
+        }
+      });
+
+      if (typeof IntersectionObserver !== 'undefined') {
+        var observer = new IntersectionObserver(function(entries) {
+          var visibleTargets = entries.filter(function(entry) { return entry.isIntersecting; });
+          if (visibleTargets.length > 0) {
+            var bestEntry = visibleTargets.reduce(function(prev, curr) {
+              return (curr.intersectionRatio > prev.intersectionRatio) ? curr : prev;
+            });
+            
+            targets.forEach(function(item) {
+              if (item.el === bestEntry.target) {
+                item.tab.classList.add('active');
+              } else {
+                item.tab.classList.remove('active');
+              }
+            });
+          }
+        }, {
+          root: null,
+          rootMargin: '-25% 0px -25% 0px',
+          threshold: [0, 0.2, 0.4, 0.6, 0.8, 1.0]
+        });
+
+        targets.forEach(function(item) {
+          observer.observe(item.el);
+        });
+      }
+    })();
   </script>
 </Layout>
 
@@ -2341,5 +2431,113 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     .section, .essay, .cmt, .qlist { padding-left: 16px !important; padding-right: 16px !important; }
     .ct :global(.glossary-term::after), .essay :global(.glossary-term::after) { width: 140px; left: -20px; }
     .ct :global(.glossary-term::before), .essay :global(.glossary-term::before) { left: 5px; }
+  }
+
+  /* ── 案卷侧边索引插片标签 ── */
+  .archive-binder-tabs {
+    position: fixed;
+    right: 0;
+    top: 20%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 999;
+  }
+  .binder-tab {
+    position: relative;
+    width: 32px;
+    height: 48px;
+    background: #cdaf82;
+    border-radius: 4px 0 0 4px / 6px 0 0 6px;
+    border: 1px solid #a89069;
+    border-right: none;
+    box-shadow: -2px 3px 6px rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), background 0.3s;
+    user-select: none;
+  }
+  .binder-tab:nth-child(even) {
+    background: #be9e71;
+  }
+  .binder-tab:hover {
+    background: #e2cfae;
+    transform: translateX(-4px);
+  }
+  .binder-tab.active {
+    background: #e5caa2;
+    border-color: #c0a070;
+    transform: translateX(-8px);
+    box-shadow: -4px 4px 10px rgba(0, 0, 0, 0.5);
+  }
+  .tab-char {
+    writing-mode: vertical-rl;
+    font-size: 11px;
+    font-weight: 700;
+    color: #4a3221;
+    font-family: 'Noto Serif SC', serif;
+    letter-spacing: 2px;
+  }
+  .tab-tooltip {
+    position: absolute;
+    right: 38px;
+    top: 50%;
+    transform: translateY(-50%) translateX(10px);
+    background: #23160e;
+    color: #e5caa2;
+    border: 1.2px solid #5a402a;
+    font-size: 9px;
+    padding: 3px 8px;
+    border-radius: 2px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s, transform 0.22s;
+    box-shadow: -2px 2px 5px rgba(0,0,0,0.5);
+    font-family: 'Noto Serif SC', serif;
+  }
+  .binder-tab:hover .tab-tooltip {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+  
+  @media (max-width: 768px) {
+    .archive-binder-tabs {
+      position: fixed;
+      right: auto;
+      left: 50%;
+      bottom: 0;
+      top: auto;
+      transform: translateX(-50%);
+      flex-direction: row;
+      gap: 6px;
+      z-index: 999;
+      background: rgba(14, 10, 8, 0.94);
+      border-top: 1.5px solid rgba(197, 168, 128, 0.18);
+      padding: 6px 16px 14px;
+      border-radius: 12px 12px 0 0;
+      box-shadow: 0 -5px 15px rgba(0,0,0,0.85);
+    }
+    .binder-tab {
+      width: 44px;
+      height: 28px;
+      border-radius: 4px 4px 0 0 / 6px 6px 0 0;
+      border: 1px solid #a89069;
+      border-bottom: none;
+      box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.3);
+    }
+    .binder-tab.active {
+      transform: translateY(-6px);
+      box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.45);
+    }
+    .tab-char {
+      writing-mode: horizontal-tb;
+      font-size: 10px;
+    }
+    .tab-tooltip {
+      display: none;
+    }
   }
 </style>

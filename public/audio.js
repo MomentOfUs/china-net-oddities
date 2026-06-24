@@ -194,6 +194,168 @@
     } catch (_) { /* 静默忽略 */ }
   }
 
+  /* ── 打字机击键声 (transient key click + noise sweep) ── */
+  function playTypewriterClickSound(isBackspace) {
+    if (isMuted()) return;
+    const ac = getCtx();
+    if (!ac) return;
+    try {
+      const osc = ac.createOscillator();
+      const gainOsc = ac.createGain();
+      osc.type = isBackspace ? 'triangle' : 'sine';
+      const baseFreq = isBackspace ? 320 : 880;
+      const endFreq = isBackspace ? 80 : 180;
+      const dur = isBackspace ? 0.055 : 0.03;
+
+      osc.frequency.setValueAtTime(baseFreq, ac.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(endFreq, ac.currentTime + dur);
+      
+      gainOsc.gain.setValueAtTime(isBackspace ? 0.06 : 0.08, ac.currentTime);
+      gainOsc.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + dur);
+      
+      osc.connect(gainOsc);
+      gainOsc.connect(ac.destination);
+
+      // 击键机械撞击噪声
+      const bufferSize = ac.sampleRate * 0.012;
+      const buffer = ac.createBuffer(1, bufferSize, ac.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+      const noise = ac.createBufferSource();
+      noise.buffer = buffer;
+      const filter = ac.createBiquadFilter();
+      filter.type = 'highpass';
+      filter.frequency.value = isBackspace ? 2000 : 3500;
+      const gainNoise = ac.createGain();
+      gainNoise.gain.setValueAtTime(isBackspace ? 0.03 : 0.05, ac.currentTime);
+      gainNoise.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.01);
+
+      noise.connect(filter);
+      filter.connect(gainNoise);
+      gainNoise.connect(ac.destination);
+
+      osc.start();
+      osc.stop(ac.currentTime + dur);
+      noise.start();
+      noise.stop(ac.currentTime + 0.012);
+    } catch (_) {}
+  }
+
+  /* ── 打字机换行铃声 (dual-sine brass bell decay) ── */
+  function playTypewriterBellSound() {
+    if (isMuted()) return;
+    const ac = getCtx();
+    if (!ac) return;
+    try {
+      const dur = 0.32;
+      const now = ac.currentTime;
+
+      // 泛音铜铃
+      const osc1 = ac.createOscillator();
+      const osc2 = ac.createOscillator();
+      const gain1 = ac.createGain();
+      const gain2 = ac.createGain();
+
+      osc1.type = 'sine';
+      osc1.frequency.setValueAtTime(1900, now);
+      gain1.gain.setValueAtTime(0.045, now);
+      gain1.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(2280, now);
+      gain2.gain.setValueAtTime(0.03, now);
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + dur - 0.04);
+
+      osc1.connect(gain1);
+      gain1.connect(ac.destination);
+      osc2.connect(gain2);
+      gain2.connect(ac.destination);
+
+      osc1.start(now);
+      osc1.stop(now + dur);
+      osc2.start(now);
+      osc2.stop(now + dur);
+    } catch (_) {}
+  }
+
+  /* ── 火漆封缄碎裂声 (micro high-pass noise crackles) ── */
+  function playWaxSealCrackSound() {
+    if (isMuted()) return;
+    const ac = getCtx();
+    if (!ac) return;
+    try {
+      const now = ac.currentTime;
+      // 级联爆发4次碎片微小破裂声
+      for (let i = 0; i < 4; i++) {
+        const delay = i * 0.02 + Math.random() * 0.012;
+        const clickTime = now + delay;
+        const dur = 0.008 + Math.random() * 0.006;
+        
+        const bufferSize = ac.sampleRate * dur;
+        const buffer = ac.createBuffer(1, bufferSize, ac.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let j = 0; j < bufferSize; j++) {
+          data[j] = Math.random() * 2 - 1;
+        }
+        const noise = ac.createBufferSource();
+        noise.buffer = buffer;
+        const filter = ac.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.value = 3200 + Math.random() * 800;
+        
+        const gain = ac.createGain();
+        gain.gain.setValueAtTime(0.12, clickTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, clickTime + dur);
+        
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(ac.destination);
+        
+        noise.start(clickTime);
+        noise.stop(clickTime + dur);
+      }
+    } catch (_) {}
+  }
+
+  /* ── 缠绕线绳松开声 (low-band noise unwrap scrape) ── */
+  function playStringUnwrapSound() {
+    if (isMuted()) return;
+    const ac = getCtx();
+    if (!ac) return;
+    try {
+      const now = ac.currentTime;
+      const dur = 0.25;
+      const bufferSize = ac.sampleRate * dur;
+      const buffer = ac.createBuffer(1, bufferSize, ac.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+      const noise = ac.createBufferSource();
+      noise.buffer = buffer;
+
+      const filter = ac.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(600, now);
+      filter.frequency.exponentialRampToValueAtTime(900, now + dur);
+      filter.Q.value = 2.2;
+
+      const gain = ac.createGain();
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.05, now + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(ac.destination);
+
+      noise.start(now);
+      noise.stop(now + dur);
+    } catch (_) {}
+  }
+
   /* ── 静音按钮自动渲染 ── */
   function renderMuteToggle() {
     var existing = document.getElementById('archive-mute-btn');
@@ -232,6 +394,10 @@
     playStampSound: playStampSound,
     playPaperRustleSound: playPaperRustleSound,
     playMetalClickSound: playMetalClickSound,
+    playTypewriterClickSound: playTypewriterClickSound,
+    playTypewriterBellSound: playTypewriterBellSound,
+    playWaxSealCrackSound: playWaxSealCrackSound,
+    playStringUnwrapSound: playStringUnwrapSound,
     isMuted: isMuted,
     toggleMute: function () {
       try {
