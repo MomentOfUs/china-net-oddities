@@ -1374,42 +1374,42 @@ const entries = rawEntries.map(item => {
     text-transform: uppercase;
     transform: rotate(-14.5deg);
     border-radius: 4px 6px 3px 5px / 5px 3px 6px 4px; /* 不规则边缘，模拟手剪牛皮标签纸 */
-    mix-blend-mode: multiply; /* 混合墨迹，渗入纸张纹理 */
+    mix-blend-mode: normal; /* 恢复为 normal 混合，确保在黑色背景照片上字迹极佳的可读性 */
     pointer-events: none;
-    opacity: 0.92;
+    opacity: 0.96;
     transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
   .stamp-level-A {
     border: 2px solid var(--c-red-stamp);
     color: var(--c-red-stamp);
-    /* 带噪点与不规则厚度的拟物油墨贴底色 */
-    background: #e5d1b3 var(--texture-stamp-ink);
+    /* 采用明亮温暖的牛皮底色，与印章噪点相融，提供优秀的实体贴纸质感 */
+    background: #ebdcb9 var(--texture-stamp-ink);
     box-shadow: 
-      0 2px 4px rgba(0,0,0,0.25),
+      0 1.5px 3.5px rgba(0,0,0,0.45), /* 纸张贴在卡片上的实物切边阴影 */
       inset 0 0 6px rgba(183, 28, 28, 0.08);
   }
   .stamp-level-B {
     border: 2px solid var(--c-orange);
     color: var(--c-orange);
-    background: #e5d1b3 var(--texture-stamp-ink);
+    background: #ebdcb9 var(--texture-stamp-ink);
     box-shadow: 
-      0 2px 4px rgba(0,0,0,0.25),
+      0 1.5px 3.5px rgba(0,0,0,0.45),
       inset 0 0 6px rgba(216, 67, 21, 0.08);
   }
   .stamp-level-C {
     border: 2px dashed var(--c-amber);
     color: var(--c-amber);
-    background: #e5d1b3 var(--texture-stamp-ink);
+    background: #ebdcb9 var(--texture-stamp-ink);
     box-shadow: 
-      0 2px 4px rgba(0,0,0,0.25),
+      0 1.5px 3.5px rgba(0,0,0,0.45),
       inset 0 0 6px rgba(230, 81, 0, 0.08);
   }
   .stamp-level-D {
     border: 3px double var(--c-blue);
     color: var(--c-blue);
-    background: #e5d1b3 var(--texture-stamp-ink);
+    background: #ebdcb9 var(--texture-stamp-ink);
     box-shadow: 
-      0 2px 4px rgba(0,0,0,0.25),
+      0 1.5px 3.5px rgba(0,0,0,0.45),
       inset 0 0 6px rgba(13, 71, 161, 0.08);
   }
   .featured:hover .clearance-stamp {
@@ -1608,7 +1608,7 @@ const entries = rawEntries.map(item => {
     opacity: 0.85;
   }
 
-  /* 金属回形针 */
+  /* 金属回形针 - 别在照片边缘 */
   .fc-photo-wrap::after {
     content: '';
     position: absolute;
@@ -1619,13 +1619,15 @@ const entries = rawEntries.map(item => {
     border: 1.5px solid #a8a7a5;
     border-radius: 6px;
     box-shadow: 
-      1px 2px 3px rgba(0,0,0,0.55),
+      1px 1.5px 3px rgba(0,0,0,0.45),
       inset 0 0 0 1.5px #605f5d,
       inset 0 0 0 3px #c8c7c5;
     transform: rotate(-15deg);
     z-index: 4;
     pointer-events: none;
     background: transparent;
+    /* 核心穿插咬合剪切：底部铁环穿入背面被白边纸张遮挡，正面只露出两根夹纸直铁轨，空间咬合感拉满 */
+    clip-path: polygon(0 0, 100% 0, 100% 21px, 0 21px);
   }
 
   /* 文档纸质感叠加层 */
@@ -1657,13 +1659,13 @@ const entries = rawEntries.map(item => {
     object-position: center 20%;
     display: block;
     filter: grayscale(0.65) sepia(0.3) contrast(1.15) brightness(0.75) saturate(0.65);
-    border: 1px solid rgba(197, 168, 128, 0.25);
-    padding: 3px;
-    background: #251c14;
+    /* 模拟老照片洗印时的发黄相纸白衬边与物理厚度 */
+    border: 1px solid #c0b298;
+    padding: 6px 6px 12px 6px; /* 底部多出留白，还原旧冲印人像相纸特色 */
+    background: #ebdcb9; /* 稍微氧化黄的旧相纸纸基色 */
     box-shadow: 
-      0 4px 12px rgba(0,0,0,0.4),
-      0 0 0 1px rgba(197, 168, 128, 0.15),
-      inset 0 0 12px rgba(0,0,0,0.35);
+      0 2px 5px rgba(0,0,0,0.4), /* 卡纸背面的物理投影 */
+      inset 0 0 10px rgba(0,0,0,0.06);
     transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.5s ease;
     z-index: 2;
     opacity: 0;
@@ -1698,17 +1700,23 @@ const entries = rawEntries.map(item => {
   }
   .featured .fc-tag {
     font-size: 8px;
-    color: #f4eae1;
-    background: #8a2a18;
-    letter-spacing: 2px;
+    color: #e5cca2; /* 做旧淡米黄色 */
+    /* 融入复古暗红色以及细密 stamp-classification 印章噪点纹理 */
+    background: linear-gradient(135deg, #7c1a0e 0%, #681207 100%) var(--texture-stamp-classification);
+    letter-spacing: 1.5px;
     font-weight: 700;
     display: inline-block;
-    padding: 1px 6px;
-    margin-bottom: 4px;
+    padding: 3px 10px; /* 增加内边距使其更有真实纸胶带比例 */
+    margin-bottom: 8px;
     align-self: flex-start;
     text-transform: uppercase;
-    border-radius: 1px;
-    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.35);
+    /* 不规则不对称边角裁边，完美模拟手工粗糙剪裁或撕扯落的红色泥章胶条 */
+    border-radius: 2px 5px 3px 6px / 4px 3px 5px 3px;
+    box-shadow: 
+      0 1.5px 3.5px rgba(0, 0, 0, 0.4), /* 纸胶带在牛皮面上的边缘微投影 */
+      inset 0 1px 0 rgba(255,255,255,0.06);
+    border: 1px solid rgba(139, 45, 45, 0.25);
+    filter: brightness(0.95);
   }
   .featured .fc-title {
     font-size: 17px;
