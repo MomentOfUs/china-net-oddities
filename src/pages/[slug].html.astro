@@ -1383,6 +1383,17 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     font-style: italic;
     text-shadow: 0 0.5px 0.5px rgba(255, 255, 255, 0.3);
   }
+  /* 经典语录便签选中状态覆盖 */
+  .pull-quote :global(::selection) {
+    background: #463223; /* 深褐色油墨底色 */
+    color: #e5caa2;      /* 便签本色字 */
+    text-shadow: none;
+  }
+  .pull-quote :global(::-moz-selection) {
+    background: #463223;
+    color: #e5caa2;
+    text-shadow: none;
+  }
 
   /* ── Num Strip ── */
   .num-strip{
@@ -1488,7 +1499,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
   }
   .essay :global(p) {
     font-size: 15px;
-    color: #382c20; /* 炭褐打字墨迹 */
+    color: #1e1610; /* 加深为深炭黑墨迹，提升可读性 */
     line-height: 2.1;
     text-align: justify;
     margin-bottom: 20px;
@@ -1496,6 +1507,17 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     font-weight: 400;
     letter-spacing: 0.8px;
     font-family: 'Courier New', Courier, 'Noto Serif SC', serif;
+  }
+  /* 局部覆盖选中色：防强光背景下金色字体“隐形” */
+  .essay :global(::selection) {
+    background: #3e2a1c; /* 炭褐油墨深底 */
+    color: #f8f5eb;      /* 纸张本色字 */
+    text-shadow: none;
+  }
+  .essay :global(::-moz-selection) {
+    background: #3e2a1c;
+    color: #f8f5eb;
+    text-shadow: none;
   }
   /* 首字下沉 —— 老报纸排版 */
   .essay :global(p:first-of-type) {
