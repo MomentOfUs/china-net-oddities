@@ -288,7 +288,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     {data.quote && (
       <div class="section" style="padding:20px 34px">
         <div class="st">▎经典语录</div>
-        <div class="pull-quote" style="border:none;padding:0">
+        <div class="pull-quote">
           <div class="pq" set:html={data.quote.text}></div>
           <div class="ps" set:html={data.quote.source}></div>
         </div>
@@ -309,7 +309,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     {data.quote_list && data.quote_list.length > 0 && (
       <div class="section" style="padding:20px 34px">
         <div class="st">▎更多言论</div>
-        <div class="qlist" style="border:none;padding:0">
+        <div class="qlist">
           <div class="qs">
             {data.quote_list.map(q => (
               <Fragment set:html={q} /><br /><br />
@@ -322,7 +322,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     {data.video && (
       <div class="section" style="padding:20px 34px">
         <div class="st">▎相关视频</div>
-        <div class="video-wrap" style="border:none;padding:0">
+        <div class="video-wrap">
           <iframe src={`${data.video}&autoplay=0`} allowfullscreen></iframe>
         </div>
       </div>
@@ -331,7 +331,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     {data.comment && (
       <div class="section" style="padding:20px 34px">
         <div class="st">▎档案注脚</div>
-        <div class="cmt" style="border:none;padding:0">
+        <div class="cmt">
           <div class="ct" set:html={commentHtml} />
         </div>
       </div>
@@ -347,7 +347,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     {data.tags && data.tags.length > 0 && (
       <div class="section" style="padding:20px 34px">
         <div class="st">▎标签</div>
-        <div class="tag-strip" style="border:none;padding:0">
+        <div class="tag-strip">
           {data.tags.map(t => <span>{t}</span>)}
         </div>
       </div>
@@ -356,7 +356,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     {data.end_section && data.end_section.length > 0 && (
       <div class="section" style="padding:20px 34px">
         <div class="st">▎档案印象</div>
-        <div class="end-section" style="border:none;padding:0">
+        <div class="end-section">
           {data.end_section.map(e => (
             <div>
               <div class="en" set:html={e.num}></div>
@@ -372,6 +372,10 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
       <div class="section" style="padding:20px 34px">
         <div class="st">▎时代物证陈列柜</div>
         <div class="relics-cabinet">
+          <div class="cabinet-corner tl"></div>
+          <div class="cabinet-corner tr"></div>
+          <div class="cabinet-corner bl"></div>
+          <div class="cabinet-corner br"></div>
           {data.relics.map((relic, index) => (
             <div class="relic-cell">
               <div class="relic-glass"></div>
@@ -1309,26 +1313,76 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
   .tl-item .td :global(b){color:var(--c-text);font-weight:700}.tl-item .td :global(.hr){color:var(--c-red);font-weight:600}
 
   /* ── Pull Quote ── */
-  .pull-quote{
-    padding:48px 40px 44px;text-align:center;
-    border-bottom:1px solid rgba(197,168,128,0.18);position:relative;
-    background: radial-gradient(circle at center, rgba(197, 168, 128, 0.02) 0%, transparent 70%);
+  .pull-quote {
+    margin: 36px auto;
+    max-width: 92%;
+    padding: 48px 36px 40px;
+    text-align: center;
+    position: relative;
+    /* 温暖厚实的牛皮纸背景，微斜径向渐变增强立体感 */
+    background: linear-gradient(135deg, #e5caa2 0%, #d4b280 100%);
+    border-radius: 2px 4px 6px 3px / 4px 3px 5px 2px;
+    border: 1px solid #bf9f70;
+    box-shadow: 
+      2px 6px 18px rgba(0, 0, 0, 0.45),
+      inset 0 0 30px rgba(255, 255, 255, 0.15);
+    z-index: 1;
   }
-  .pull-quote::before{
-    content:'\275D';font-size:72px;color:rgba(197,168,128,0.12);position:absolute;top:10px;left:20px;
-    font-family:Georgia,'Times New Roman',serif;line-height:1;font-weight:400
+  /* 3D 金属别针 */
+  .pull-quote::before {
+    content: '';
+    position: absolute;
+    top: -12px;
+    left: 45px;
+    width: 13px;
+    height: 38px;
+    border: 1.5px solid #959492;
+    border-radius: 6px;
+    background: transparent;
+    box-shadow: 
+      1.5px 2px 3px rgba(0, 0, 0, 0.4),
+      inset 0 0 0 1px #5a5957,
+      inset 0 0 0 2px #d8d7d5;
+    z-index: 10;
+    transform: rotate(-12deg);
   }
-  .pull-quote::after{
-    content:'\275E';font-size:72px;color:rgba(197,168,128,0.12);position:absolute;bottom:10px;right:20px;
-    font-family:Georgia,'Times New Roman',serif;line-height:1;font-weight:400
+  /* 右下角纸张微翘立体投影 */
+  .pull-quote::after {
+    content: '';
+    position: absolute;
+    bottom: 6px;
+    right: 8px;
+    width: 70px;
+    height: 16px;
+    background: rgba(0, 0, 0, 0.55);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.65);
+    transform: skew(10deg) rotate(4deg);
+    z-index: -1;
+    filter: blur(4px);
   }
-  .pull-quote .pq{
-    font-size:24px;font-weight:400;color:var(--c-gold);
-    letter-spacing:12px;position:relative;z-index:1;line-height:1.8;
-    font-family:'ZCOOL XiaoWei','Noto Serif SC',serif;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  .pull-quote .pq {
+    font-size: 22px;
+    font-weight: 500;
+    color: #402c1f; /* 深褐色铅印墨迹 */
+    letter-spacing: 7px;
+    position: relative;
+    z-index: 1;
+    line-height: 1.8;
+    font-family: 'ZCOOL XiaoWei', 'Noto Serif SC', serif;
+    /* 物理下凹铅印凹入字影 */
+    text-shadow: 
+      0 -0.5px 0.5px rgba(0, 0, 0, 0.35),
+      0 0.8px 1px rgba(255, 255, 255, 0.45);
   }
-  .pull-quote .ps{font-size:10px;color:var(--c-text-faint-light);margin-top:12px;letter-spacing:5px;font-weight:300;font-style:italic}
+  .pull-quote .ps {
+    font-size: 11px;
+    color: #644934; /* 浅褐油墨 */
+    margin-top: 14px;
+    letter-spacing: 4px;
+    font-weight: 600;
+    font-style: italic;
+    text-shadow: 0 0.5px 0.5px rgba(255, 255, 255, 0.3);
+  }
 
   /* ── Num Strip ── */
   .num-strip{
@@ -1354,7 +1408,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
   .num-strip .nl{font-size:7px;color:var(--c-text-muted);margin-top:4px;letter-spacing:2px;font-weight:300}
 
   /* ── Quote List ── */
-  .qlist{padding:20px 34px;border-bottom:1px solid rgba(197,168,128,0.18)}
+  .qlist{padding:0;border:none}
   .qlist .qs{font-size:14px;color:#b8a898;line-height:2.0;font-weight:400;letter-spacing:.4px}
   .qlist .qs :global(.hl){color:var(--c-gold);font-weight:600}
 
@@ -1364,23 +1418,84 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
   .video-wrap::after{content:'';position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 50px rgba(0,0,0,.7)}
 
   /* ── Comment ── */
-  .cmt{padding:20px 34px;border-top:1px solid rgba(197,168,128,0.18);border-bottom:1px solid rgba(197,168,128,0.18)}
+  .cmt{padding:0;border:none}
   .cmt .ct{font-size:14px;color:#b8a898;line-height:2.0;font-weight:400;letter-spacing:.4px}
   .cmt .ct :global(b){color:var(--c-text);font-weight:700}.cmt .ct :global(.hlg){color:var(--c-gold);font-weight:600}.cmt .ct :global(.hlr){color:var(--c-red);font-weight:600}
 
   /* ── Essay ── */
-  .essay{padding:20px 36px 26px;border-bottom:1px solid rgba(197,168,128,0.18)}
-  .essay .et{
-    font-size:12px;color:var(--c-text-muted);letter-spacing:6px;text-transform:uppercase;font-weight:500;
-    margin-bottom:14px;padding-bottom:10px;position:relative;font-family:'Times New Roman',Georgia,serif
+  .essay {
+    margin: 40px auto;
+    max-width: 94%;
+    padding: 44px 36px 36px;
+    background: #f8f5eb; /* 更加温暖古旧的黄白纸张色 */
+    border-left: 1.2px solid #e1dbcb;
+    border-right: 1.2px solid #e1dbcb;
+    box-shadow: 
+      2px 8px 24px rgba(0, 0, 0, 0.52),
+      inset 0 0 40px rgba(0, 0, 0, 0.02);
+    transform: rotate(-0.6deg);
+    position: relative;
   }
-  .essay .et::after{
-    content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
-    background:linear-gradient(90deg,rgba(197,168,128,0.25) 20%,rgba(197,168,128,0.05) 50%,transparent)
+  /* 顶部撕纸锯齿 */
+  .essay::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: -1.2px;
+    right: -1.2px;
+    height: 6px;
+    background-image: 
+      linear-gradient(-45deg, #f8f5eb 3px, transparent 0), 
+      linear-gradient(45deg, #f8f5eb 3px, transparent 0);
+    background-size: 6px 6px;
+    background-repeat: repeat-x;
+    z-index: 2;
   }
-  .essay :global(p){
-    font-size:15px;color:#b8a898;line-height:2.0;text-align:justify;margin-bottom:16px;
-    text-indent:2em;font-weight:400;letter-spacing:.5px
+  /* 底部撕纸锯齿 */
+  .essay::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: -1.2px;
+    right: -1.2px;
+    height: 6px;
+    background-image: 
+      linear-gradient(-135deg, #f8f5eb 3px, transparent 0), 
+      linear-gradient(135deg, #f8f5eb 3px, transparent 0);
+    background-size: 6px 6px;
+    background-repeat: repeat-x;
+    z-index: 2;
+  }
+  .essay .et {
+    font-size: 13px;
+    color: #8c7c69; /* 打字机墨色标题 */
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    position: relative;
+    font-family: 'Noto Serif SC', serif;
+  }
+  .essay .et::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(140, 124, 105, 0.3) 20%, rgba(140, 124, 105, 0.1) 50%, transparent);
+  }
+  .essay :global(p) {
+    font-size: 15px;
+    color: #382c20; /* 炭褐打字墨迹 */
+    line-height: 2.1;
+    text-align: justify;
+    margin-bottom: 20px;
+    text-indent: 2em;
+    font-weight: 400;
+    letter-spacing: 0.8px;
+    font-family: 'Courier New', Courier, 'Noto Serif SC', serif;
   }
   /* 首字下沉 —— 老报纸排版 */
   .essay :global(p:first-of-type) {
@@ -1389,19 +1504,19 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
   .essay :global(p:first-of-type::first-letter) {
     float: left;
     font-family: 'ZCOOL XiaoWei', 'Noto Serif SC', serif;
-    font-size: 3.8em;
+    font-size: 3.5em;
     font-weight: 900;
-    line-height: 0.75;
-    color: var(--c-gold);
-    padding: 5px 10px 0 0;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.5), 0 0 20px rgba(197,168,128,0.2);
+    line-height: 0.85;
+    color: #92322a; /* 深红戳泥色 */
+    padding: 2px 8px 0 0;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.15);
   }
   .essay :global(p:last-child){margin-bottom:0}
 
   /* ── Tags ── */
   .tag-strip{
-    padding:14px 24px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;
-    border-bottom:1px solid rgba(197,168,128,0.18)
+    padding:8px 0 0;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;
+    border:none
   }
   .tag-strip span{
     font-size:8px;color:var(--c-text-muted);padding:3px 12px;border:1px solid rgba(197,168,128,0.2);
@@ -1412,7 +1527,7 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
   /* ── End Section ── */
   .end-section{
     display:grid;grid-template-columns:1fr 1fr 1fr;
-    border-bottom:1px solid rgba(197,168,128,0.18)
+    border:none
   }
   .end-section>div{
     text-align:center;padding:28px 15px 24px;border-right:1px solid rgba(197,168,128,0.15);
@@ -1699,11 +1814,15 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
  
   /* 砸下并留在原位 */
   .impact-stamp.landed {
-    opacity: 0.96;
+    opacity: 0.94;
     transform: scale(1) rotate(-14.5deg);
+    /* 紧贴纸张表面的微弱物理阴影 */
     box-shadow: 
-      0 4px 12px rgba(0,0,0,0.45),
-      inset 0 0 8px rgba(0,0,0,0.05);
+      0 1px 2px rgba(0, 0, 0, 0.22),
+      0 1px 1px rgba(0, 0, 0, 0.1),
+      inset 0 0 5px rgba(0, 0, 0, 0.05);
+    /* 配合原 SVG 湍流滤镜，额外添加同色晕染效果，实现油泥洇湿感 */
+    filter: url(#stamp-filter) drop-shadow(0 0 0.4px currentColor);
   }
  
   /* ── 时代黑话便利贴 ── */
@@ -1786,22 +1905,55 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 20px;
     margin-top: 18px;
-    border: 6px solid #24190f;
+    /* 红木厚框，利用 linear-gradient 模拟斜角拼接 */
+    border: 12px solid #3c2415;
+    border-image: linear-gradient(135deg, #4d2f1a 0%, #201107 50%, #4d2f1a 100%) 12;
     border-radius: 4px;
     background: #080503;
     box-shadow: 
-      inset 0 10px 30px rgba(0,0,0,0.9), 
-      0 5px 15px rgba(0,0,0,0.5);
+      inset 0 10px 30px rgba(0,0,0,0.95), 
+      0 10px 25px rgba(0,0,0,0.65);
     padding: 24px;
+    position: relative;
   }
+  
+  /* 古铜防撞包角 */
+  .cabinet-corner {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, #bf9c5e 0%, #806233 100%);
+    box-shadow: 
+      1px 1px 2px rgba(0,0,0,0.5),
+      inset 0.5px 0.5px 0px rgba(255,255,255,0.25);
+    z-index: 10;
+    border-radius: 1px;
+    pointer-events: none;
+  }
+  .cabinet-corner::before {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: radial-gradient(circle, #f0d59e 0%, #59421f 100%);
+    border-radius: 50%;
+    box-shadow: 0.5px 0.5px 1px rgba(0,0,0,0.4);
+    top: 8px;
+    left: 8px;
+  }
+  .cabinet-corner.tl { top: -12px; left: -12px; border-right: 2.2px solid #5a421b; border-bottom: 2.2px solid #5a421b; }
+  .cabinet-corner.tr { top: -12px; right: -12px; border-left: 2.2px solid #5a421b; border-bottom: 2.2px solid #5a421b; }
+  .cabinet-corner.bl { bottom: -12px; left: -12px; border-right: 2.2px solid #5a421b; border-top: 2.2px solid #5a421b; }
+  .cabinet-corner.br { bottom: -12px; right: -12px; border-left: 2.2px solid #5a421b; border-top: 2.2px solid #5a421b; }
+
   .relic-cell {
     position: relative;
     height: 190px;
-    background: radial-gradient(circle at 50% 40%, #1e1109 0%, #080402 100%);
-    border: 2px solid #140d08;
+    background: radial-gradient(circle at 50% 40%, #1c0f07 0%, #060302 100%);
+    border: 3px solid #23140a; /* 稍厚的红木隔板 */
     box-shadow: 
-      inset 0 0 20px rgba(0,0,0,0.95), 
-      0 1px 3px rgba(0,0,0,0.6);
+      inset 0 0 24px rgba(0,0,0,0.98), 
+      0 2px 4px rgba(0,0,0,0.7);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -1812,26 +1964,29 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
   .relic-glass {
     position: absolute;
     inset: 0;
+    /* 玻璃边缘内嵌白边反光 + 斜切高光 */
     background:
-      linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.03) 100%),
-      linear-gradient(45deg, transparent 35%, rgba(255,255,255,0.07) 38%, rgba(255,255,255,0.07) 42%, transparent 45%);
-    background-size: 100% 100%, 200% 200%;
-    background-position: 0 0, -50% -50%;
+      linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 40%, rgba(255,255,255,0.04) 100%),
+      linear-gradient(45deg, transparent 38%, rgba(255,255,255,0.09) 40%, rgba(255,255,255,0.09) 43%, transparent 45%),
+      radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 60%);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); /* 极细内嵌边缘高光，模拟厚玻璃板切面 */
+    background-size: 100% 100%, 200% 200%, 100% 100%;
+    background-position: 0 0, -50% -50%, 0 0;
     z-index: 5;
     pointer-events: none;
-    transition: transform 0.4s ease, opacity 0.4s;
-    animation: glass-shimmer 5s ease-in-out infinite;
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s;
+    animation: glass-shimmer 6s ease-in-out infinite;
   }
   @keyframes glass-shimmer {
-    0%, 100% { background-position: 0 0, -50% -50%; }
-    50%      { background-position: 0 0, 120% 120%; }
+    0%, 100% { background-position: 0 0, -50% -50%, 0 0; }
+    50%      { background-position: 0 0, 120% 120%, 0 0; }
   }
   .relic-cell:hover .relic-glass {
     animation: none;
   }
   .relic-cell:hover .relic-glass {
-    transform: translate(25px, 25px);
-    opacity: 0.08;
+    transform: translate(20px, 20px);
+    opacity: 0.06;
   }
   .relic-showcase {
     display: flex;
@@ -1863,17 +2018,21 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
     height: 100%;
   }
   .relic-label-paper {
-    background: #fdfcf9;
-    border: 1px solid #dcd7c5;
-    color: #3d3329;
-    font-family: monospace;
+    background: #e2c092; /* 浅红褐牛皮纸色 */
+    border: 1px dashed #bfa37c;
+    color: #362215; /* 炭褐油墨 */
+    font-family: 'Courier New', monospace;
     font-size: 8px;
-    padding: 3px 8px;
-    transform: rotate(-1.5deg);
+    padding: 4px 10px;
+    transform: rotate(-2.5deg);
     margin-top: 10px;
-    box-shadow: 1px 3px 5px rgba(0,0,0,0.4);
+    box-shadow: 
+      1px 2px 4px rgba(0,0,0,0.5),
+      inset 0 0 8px rgba(0,0,0,0.08);
     border-radius: 1px;
     transition: transform 0.3s ease;
+    /* 机打凹入字影 */
+    text-shadow: 0 0.5px 0.5px rgba(255, 255, 255, 0.3);
   }
   .relic-cell:hover .relic-label-paper {
     transform: rotate(0deg) scale(1.02);
