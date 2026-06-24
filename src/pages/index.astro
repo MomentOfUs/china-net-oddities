@@ -1365,42 +1365,42 @@ const entries = rawEntries.map(item => {
     text-transform: uppercase;
     transform: rotate(-14.5deg);
     border-radius: 4px 6px 3px 5px / 5px 3px 6px 4px; /* 不规则边缘，模拟手剪牛皮标签纸 */
-    mix-blend-mode: normal;
+    mix-blend-mode: multiply; /* 混合墨迹，渗入纸张纹理 */
     pointer-events: none;
-    opacity: 0.96;
+    opacity: 0.92;
     transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
   .stamp-level-A {
     border: 2px solid var(--c-red-stamp);
     color: var(--c-red-stamp);
-    /* 带噪点与不规则厚度的拟物牛皮纸贴底色 */
-    background: #fbf8ee var(--texture-stamp-ink);
+    /* 带噪点与不规则厚度的拟物油墨贴底色 */
+    background: #e5d1b3 var(--texture-stamp-ink);
     box-shadow: 
-      0 2px 5px rgba(0,0,0,0.35),
+      0 2px 4px rgba(0,0,0,0.25),
       inset 0 0 6px rgba(183, 28, 28, 0.08);
   }
   .stamp-level-B {
     border: 2px solid var(--c-orange);
     color: var(--c-orange);
-    background: #fbf8ee var(--texture-stamp-ink);
+    background: #e5d1b3 var(--texture-stamp-ink);
     box-shadow: 
-      0 2px 5px rgba(0,0,0,0.35),
+      0 2px 4px rgba(0,0,0,0.25),
       inset 0 0 6px rgba(216, 67, 21, 0.08);
   }
   .stamp-level-C {
     border: 2px dashed var(--c-amber);
     color: var(--c-amber);
-    background: #fbf8ee var(--texture-stamp-ink);
+    background: #e5d1b3 var(--texture-stamp-ink);
     box-shadow: 
-      0 2px 5px rgba(0,0,0,0.35),
+      0 2px 4px rgba(0,0,0,0.25),
       inset 0 0 6px rgba(230, 81, 0, 0.08);
   }
   .stamp-level-D {
     border: 3px double var(--c-blue);
     color: var(--c-blue);
-    background: #fbf8ee var(--texture-stamp-ink);
+    background: #e5d1b3 var(--texture-stamp-ink);
     box-shadow: 
-      0 2px 5px rgba(0,0,0,0.35),
+      0 2px 4px rgba(0,0,0,0.25),
       inset 0 0 6px rgba(13, 71, 161, 0.08);
   }
   .featured:hover .clearance-stamp {
@@ -1497,8 +1497,10 @@ const entries = rawEntries.map(item => {
     color: var(--c-text);
     position: relative;
     background: 
+      var(--texture-paper-grain), /* 牛皮纸质感颗粒 */
       radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.02) 0%, transparent 80%),
       linear-gradient(180deg, #382b20 0%, var(--c-bg-card) 100%);
+    background-size: 200px 200px, 100% 100%, 100% 100%;
     border: 1px solid #181008;
     border-radius: 3px 5px 3px 4px / 4px 3px 5px 3px;
     box-shadow: 
@@ -1521,11 +1523,31 @@ const entries = rawEntries.map(item => {
     background: linear-gradient(180deg, #3c2e22 0%, #281d14 100%);
     border-color: #523f2b;
     box-shadow:
-      0 6px 18px rgba(0,0,0,0.7),
-      0 16px 40px rgba(0,0,0,0.55),
-      0 0 20px rgba(197, 168, 128, 0.12),
+      0 12px 28px rgba(0,0,0,0.65), /* 更加深虚的物理悬浮投影 */
+      0 24px 55px rgba(0,0,0,0.45),
+      0 0 25px rgba(197, 168, 128, 0.15),
       inset 0 0 20px rgba(0,0,0,0.5);
-    transform: translateY(-4px) rotate(0.6deg) scale(1.015);
+    transform: translateY(-6px) rotate(0.8deg) scale(1.018); /* 稍微增加倾斜和挑起 */
+  }
+
+  /* 胶贴在照片右上角的半透明旧牛皮胶带，模拟零碎案卷物理质感 */
+  .featured::after {
+    content: '';
+    position: absolute;
+    top: 22px;
+    right: 36px;
+    width: 46px;
+    height: 13px;
+    background: rgba(212, 175, 120, 0.24); /* 半透明老化胶带色 */
+    backdrop-filter: blur(0.5px);
+    box-shadow: 
+      0 1.5px 3px rgba(0, 0, 0, 0.15),
+      inset 0 0 3px rgba(255, 255, 255, 0.1);
+    transform: rotate(32deg);
+    z-index: 8;
+    pointer-events: none;
+    border-left: 1px dashed rgba(255, 255, 255, 0.2);
+    border-right: 1px dashed rgba(255, 255, 255, 0.2);
   }
   /* ── 保密级别差异化辉光 ── */
   .phenomenon-card[data-clearance="A"] .featured:hover {
