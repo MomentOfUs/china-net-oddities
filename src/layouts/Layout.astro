@@ -82,6 +82,7 @@ const { title } = Astro.props;
     }
 
     body{
+      position: relative; /* 保证底盘道具在 body 内部准确定位 */
       background:
         radial-gradient(circle at 50% 30%, rgba(70, 48, 36, 0.22) 0%, var(--c-bg-deep) 100%),
         repeating-linear-gradient(90deg, rgba(139, 115, 85, 0.02) 0px, rgba(139, 115, 85, 0.02) 2px, transparent 2px, transparent 30px),
@@ -199,59 +200,7 @@ const { title } = Astro.props;
       to   { background-position: 0 8px; }
     }
 
-    /* ── 背景音乐播放器 ── */
-    .bgm-player {
-      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .bgm-toggle {
-      width: 40px; height: 40px; border-radius: 50%;
-      background: rgba(26, 19, 14, 0.85);
-      border: 1px solid rgba(197, 168, 128, 0.25);
-      color: var(--c-gold-dim); cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.2s ease;
-      backdrop-filter: blur(4px);
-    }
-    .bgm-toggle:hover {
-      color: var(--c-gold); border-color: rgba(197, 168, 128, 0.5);
-      background: rgba(26, 19, 14, 0.95);
-    }
-    .bgm-toggle.playing {
-      color: var(--c-gold-bright);
-      border-color: rgba(197, 168, 128, 0.4);
-      box-shadow: 0 0 8px rgba(197, 168, 128, 0.15);
-    }
-    .bgm-volume-wrap {
-      width: 0; overflow: hidden;
-      transition: width 0.25s ease;
-    }
-    .bgm-player:hover .bgm-volume-wrap {
-      width: 80px;
-    }
-    .bgm-volume {
-      -webkit-appearance: none; appearance: none;
-      width: 80px; height: 4px;
-      background: rgba(197, 168, 128, 0.15);
-      border-radius: 2px; outline: none;
-      cursor: pointer;
-    }
-    .bgm-volume::-webkit-slider-thumb {
-      -webkit-appearance: none; appearance: none;
-      width: 12px; height: 12px; border-radius: 50%;
-      background: var(--c-gold-dim);
-      border: 1px solid rgba(197, 168, 128, 0.3);
-      cursor: pointer; transition: background 0.15s;
-    }
-    .bgm-volume::-webkit-slider-thumb:hover {
-      background: var(--c-gold);
-    }
-    .bgm-volume::-moz-range-thumb {
-      width: 12px; height: 12px; border-radius: 50%;
-      background: var(--c-gold-dim);
-      border: 1px solid rgba(197, 168, 128, 0.3);
-      cursor: pointer;
-    }
+
 
     /* ── 回到顶部便签挂件 ── */
     .back-to-top {
@@ -383,6 +332,137 @@ const { title } = Astro.props;
       background: #050202 !important;
       filter: grayscale(0.55) sepia(0.85) hue-rotate(-60deg) saturate(2.3) contrast(1.15) brightness(0.72) !important;
     }
+
+    /* ── 桌面案头案台散落道具 ── */
+    @media(min-width: 1360px) {
+      .desk-props {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        overflow: hidden;
+        z-index: 1;
+      }
+      /* 别在侧面的精致 3D 三层回形针 */
+      .prop-paperclip {
+        position: absolute;
+        width: 13px;
+        height: 36px;
+        border: 1.5px solid #a6a4a2;
+        border-radius: 6px;
+        box-shadow: 
+          1.5px 2.5px 3.5px rgba(0,0,0,0.65),
+          inset 0.5px 0.5px 0.5px rgba(255,255,255,0.4);
+        opacity: 0.85;
+      }
+      .prop-paperclip::before {
+        content: '';
+        position: absolute;
+        top: 5px;
+        left: 2px;
+        right: 2px;
+        bottom: 11px;
+        border: 1.2px solid #8e8c8a;
+        border-top: none;
+        border-radius: 0 0 4px 4px;
+      }
+      .prop-paperclip::after {
+        content: '';
+        position: absolute;
+        top: 12px;
+        left: 4.5px;
+        right: 4.5px;
+        bottom: 5px;
+        border: 1.2px solid #a6a4a2;
+        border-bottom: none;
+        border-radius: 3px 3px 0 0;
+      }
+      .prop-paperclip.prop1 {
+        top: 240px;
+        left: max(16px, calc(50% - 700px));
+        transform: rotate(-38deg);
+      }
+      .prop-paperclip.prop2 {
+        top: 780px;
+        right: max(16px, calc(50% - 710px));
+        transform: rotate(68deg);
+      }
+      /* 剥落散落的火漆碎片残渣（高精度径向渐变） */
+      .prop-wax-crumb {
+        position: absolute;
+        width: 7px;
+        height: 7px;
+        background: radial-gradient(circle at 35% 35%, #b52b2b 0%, #701010 80%, #400606 100%);
+        border-radius: 40% 60% 50% 55% / 50% 45% 65% 50%;
+        box-shadow: 
+          1px 2px 3px rgba(0,0,0,0.7),
+          inset 0.8px 0.8px 0.5px rgba(255,255,255,0.35);
+        opacity: 0.9;
+      }
+      .prop-wax-crumb.crumb1 {
+        top: 140px;
+        right: max(24px, calc(50% - 690px));
+        transform: rotate(18deg);
+      }
+      .prop-wax-crumb.crumb2 {
+        top: 149px;
+        right: max(16px, calc(50% - 698px));
+        width: 5px;
+        height: 5px;
+        transform: rotate(-55deg);
+      }
+      /* 编织质感红绳线头 */
+      .prop-red-thread {
+        position: absolute;
+        top: 520px;
+        left: max(12px, calc(50% - 710px));
+        width: 32px;
+        height: 12px;
+        border: 2.2px solid #9e2222;
+        border-top: none;
+        border-right: none;
+        border-radius: 0 0 16px 12px / 0 0 12px 10px;
+        opacity: 0.8;
+        transform: rotate(28deg);
+        filter: drop-shadow(1.5px 2px 2px rgba(0,0,0,0.7));
+      }
+    }
+    @media(max-width: 1359px) {
+      .desk-props { display: none; }
+    }
+
+    /* ── 底栏复古操作印记按钮 ── */
+    .footer-action-btn {
+      cursor: pointer;
+      margin-left: 14px;
+      font-size: 11px;
+      font-family: var(--font-body);
+      color: var(--c-text-dim);
+      border: 1px dashed rgba(197, 168, 128, 0.22);
+      background: rgba(13, 11, 9, 0.5);
+      padding: 3px 9px;
+      border-radius: 2px;
+      transition: all 0.25s ease;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+      box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5);
+      user-select: none;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1.2;
+    }
+    .footer-action-btn:hover {
+      color: var(--c-gold-bright);
+      border-color: rgba(197, 168, 128, 0.5);
+      background: rgba(34, 24, 16, 0.65);
+      box-shadow: 
+        0 2px 5px rgba(0, 0, 0, 0.5),
+        inset 0 0 2px rgba(197, 168, 128, 0.2);
+    }
+    .footer-action-btn:active {
+      transform: translateY(0.5px);
+    }
   </style>
 </head>
 <body>
@@ -436,85 +516,7 @@ const { title } = Astro.props;
       });
     })();
   </script>
-  <!-- 背景音乐播放器 -->
-  <div id="bgm-player" class="bgm-player" title="背景音乐">
-    <button id="bgm-toggle" class="bgm-toggle" aria-label="播放/暂停背景音乐">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M9 18V5l12-2v13" />
-        <circle cx="6" cy="18" r="3" />
-        <circle cx="18" cy="16" r="3" />
-      </svg>
-    </button>
-    <div id="bgm-volume-wrap" class="bgm-volume-wrap">
-      <input type="range" id="bgm-volume" class="bgm-volume" min="0" max="1" step="0.05" value="0.3" aria-label="音量">
-    </div>
-  </div>
-  <script is:inline>
-    (function(){
-      var audio = new Audio('/audio/bgm.mp3');
-      audio.loop = true;
-      audio.volume = 0.3;
-      var toggle = document.getElementById('bgm-toggle');
-      var volInput = document.getElementById('bgm-volume');
-      var isPlaying = false;
 
-      // 读取之前的播放状态
-      try {
-        var savedTime = localStorage.getItem('archive-bgm-time');
-        var savedVol = localStorage.getItem('archive-bgm-vol');
-        var wasPlaying = localStorage.getItem('archive-bgm-playing') === '1';
-        if (savedVol !== null) {
-          audio.volume = parseFloat(savedVol);
-          volInput.value = audio.volume;
-        }
-        if (savedTime !== null && !isNaN(parseFloat(savedTime))) {
-          audio.currentTime = parseFloat(savedTime);
-        }
-        if (wasPlaying) {
-          audio.play().then(function(){ isPlaying = true; toggle.classList.add('playing'); }).catch(function(){});
-        }
-      } catch(e){}
-
-      toggle.addEventListener('click', function(){
-        if (isPlaying) {
-          audio.pause();
-          isPlaying = false;
-          toggle.classList.remove('playing');
-        } else {
-          audio.play().then(function(){
-            isPlaying = true;
-            toggle.classList.add('playing');
-          }).catch(function(){});
-        }
-      });
-
-      volInput.addEventListener('input', function(){
-        audio.volume = parseFloat(volInput.value);
-        try { localStorage.setItem('archive-bgm-vol', audio.volume); } catch(e){}
-      });
-
-      // 定时保存播放进度
-      setInterval(function(){
-        if (isPlaying) {
-          try {
-            localStorage.setItem('archive-bgm-time', audio.currentTime);
-            localStorage.setItem('archive-bgm-playing', '1');
-          } catch(e){}
-        }
-      }, 5000);
-
-      window.addEventListener('beforeunload', function(){
-        if (isPlaying) {
-          try {
-            localStorage.setItem('archive-bgm-time', audio.currentTime);
-            localStorage.setItem('archive-bgm-playing', '1');
-          } catch(e){}
-        } else {
-          try { localStorage.setItem('archive-bgm-playing', '0'); } catch(e){}
-        }
-      });
-    })();
-  </script>
 
   <!-- 回到顶部挂件 -->
   <button id="back-to-top" class="back-to-top" aria-label="回到顶部" title="回到顶部">
@@ -568,11 +570,9 @@ const { title } = Astro.props;
         }
         var btn = document.createElement('span');
         btn.id = 'archive-mode-btn';
+        btn.className = 'footer-action-btn';
         updateBtnUI(btn, currentMode);
-        btn.style.cssText = 'cursor:pointer;margin-left:14px;font-size:10px;opacity:0.5;transition:opacity 0.2s;';
         
-        btn.addEventListener('mouseenter', function () { btn.style.opacity = '1'; });
-        btn.addEventListener('mouseleave', function () { btn.style.opacity = '0.5'; });
         btn.addEventListener('click', function () {
           try {
             if (window.__archiveAudio) {
@@ -600,13 +600,13 @@ const { title } = Astro.props;
       
       function updateBtnUI(el, mode) {
         if (mode === 'normal') {
-          el.textContent = '💡 正常阅读';
+          el.textContent = '◈ 常规光源';
           el.title = '当前：常规阅读模式 · 点击切换至烛光模式';
         } else if (mode === 'candle') {
-          el.textContent = '🕯️ 烛光模式';
+          el.textContent = '◈ 烛光摇曳';
           el.title = '当前：烛光晃动模式 · 点击切换至红外暗房';
         } else if (mode === 'darkroom') {
-          el.textContent = '🚨 暗房模式';
+          el.textContent = '◈ 红外暗房';
           el.title = '当前：红外暗室模式 · 点击恢复正常阅读';
         }
       }
@@ -618,6 +618,15 @@ const { title } = Astro.props;
       }
     })();
   </script>
+
+  <!-- 案头散落的拟物杂物，增加桌面沉浸氛围（仅宽屏下可见，绝对定位以随网页上下滚动） -->
+  <div class="desk-props" aria-hidden="true">
+    <div class="prop-paperclip prop1"></div>
+    <div class="prop-paperclip prop2"></div>
+    <div class="prop-wax-crumb crumb1"></div>
+    <div class="prop-wax-crumb crumb2"></div>
+    <div class="prop-red-thread"></div>
+  </div>
 
 </body>
 </html>

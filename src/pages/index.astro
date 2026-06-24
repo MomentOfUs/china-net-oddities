@@ -152,45 +152,6 @@ const entries = rawEntries.map(item => {
 }).sort((a, b) => a.title.localeCompare(b.title, 'zh-cn'));
 ---
 <Layout title="中国互联网奇观 · 人物档案馆">
-  <!-- 档案袋封面 -->
-  <div id="archive-envelope" class="archive-envelope-overlay">
-    <div class="envelope-body">
-      <div class="envelope-content">
-        <!-- 封口线绳绕扣 -->
-        <div class="string-tie-box">
-          <div class="string-button upper-button" id="envelope-button-upper"></div>
-          <svg class="tie-thread-svg" width="100" height="120" viewBox="0 0 100 120">
-            <path id="tie-thread-path" d="M 50 10 L 50 110" stroke="#5d4b3c" stroke-width="2" stroke-dasharray="3 3" fill="none" />
-          </svg>
-          <div class="string-button lower-button" id="envelope-button-lower"></div>
-        </div>
-
-        <!-- 机密封缄火漆印 -->
-        <div class="wax-seal" id="envelope-seal">
-          <div class="seal-inner">
-            <span class="seal-mark">极密</span>
-          </div>
-        </div>
-
-        <!-- 封皮印章 -->
-        <div class="envelope-stamp">
-          <div class="e-stamp-inner">
-            <div class="e-stamp-title">DECLASSIFIED</div>
-            <div class="e-stamp-level">网络奇观案卷</div>
-            <div class="e-stamp-date">No. ARCHIVE-2026</div>
-          </div>
-        </div>
-
-        <!-- 封皮纸标签 -->
-        <div class="envelope-label">
-          <div class="label-title">中国互联网奇观人物档案馆</div>
-          <div class="label-meta">馆藏卷宗 · 肆拾肆件全</div>
-          <div class="label-action-hint">点击火漆印或绕线扣启封</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div class="wrap" id="main-content">
     <div class="hero">
       <a href="/charte" class="charte-link">入选标准</a>
@@ -218,6 +179,13 @@ const entries = rawEntries.map(item => {
 
       <div class="search-section">
         <div class="search-bar">
+          <!-- 复古黄铜板夹扣件，夹在检索表单公文便签的顶边正中 -->
+          <div class="board-clip" aria-hidden="true">
+            <div class="clip-handle"></div>
+            <div class="clip-bracket"></div>
+            <div class="clip-screw left"></div>
+            <div class="clip-screw right"></div>
+          </div>
           <span class="search-label">▎档案检索</span>
           <div class="search-inner">
             <input type="text" id="searchInput" class="search-input" placeholder="姓名 · 标签 · 关键词" oninput="doSearch()" autocomplete="off" />
@@ -308,7 +276,7 @@ const entries = rawEntries.map(item => {
 
     <div class="footer">
       <span id="vcounter" style="cursor:help;color:var(--c-text-faint);letter-spacing:5px" title="同IP每小时只计1次">◈ 访客 − ◈</span>
-      <br /><span style="opacity:.4">🦞 麻辣小龙虾 · 持续更新</span>
+      <br /><span style="opacity:.3; font-size: 11px;">「麻辣小龙虾调查局」 · 持续更新</span>
     </div>
   </div>
 
@@ -682,344 +650,11 @@ const entries = rawEntries.map(item => {
       });
     })();
 
-    /* ── 机密档案袋启封仪式感控制 ── */
-    (function(){
-      var envelope = document.getElementById('archive-envelope');
-      if (!envelope) return;
-      
-      var isOpened = sessionStorage.getItem('archive-envelope-opened') === '1';
-      if (isOpened) {
-        envelope.style.display = 'none';
-      } else {
-        envelope.style.display = 'flex';
-        envelope.classList.remove('opened');
-        // 锁定滚动条以获得完整沉浸感
-        document.documentElement.style.overflow = 'hidden';
-        document.body.style.overflow = 'hidden';
-      }
 
-      var seal = document.getElementById('envelope-seal');
-      var btnUpper = document.getElementById('envelope-button-upper');
-      var btnLower = document.getElementById('envelope-button-lower');
-      var thread = document.querySelector('.tie-thread-svg');
-
-      var unwrapping = false;
-
-      function triggerUnwrap() {
-        if (unwrapping) return;
-        unwrapping = true;
-        
-        // 阶段 1: 火漆印碎裂
-        if (window.__archiveAudio) {
-          window.__archiveAudio.playWaxSealCrackSound();
-        }
-        if (seal) {
-          seal.classList.add('cracked');
-        }
-        
-        setTimeout(function() {
-          // 阶段 2: 绕扣线绳转动松开
-          if (window.__archiveAudio) {
-            window.__archiveAudio.playStringUnwrapSound();
-          }
-          if (thread) {
-            thread.classList.add('unwrapping');
-          }
-          
-          // 阶段 3: 案卷上下飞退，信封开启
-          setTimeout(function() {
-            if (window.__archiveAudio) {
-              window.__archiveAudio.playPaperRustleSound();
-            }
-            envelope.classList.add('opened');
-            
-            // 恢复页面滚动条
-            document.documentElement.style.overflow = '';
-            document.body.style.overflow = '';
-            sessionStorage.setItem('archive-envelope-opened', '1');
-            
-            setTimeout(function() {
-              envelope.style.display = 'none';
-            }, 800);
-          }, 1200); // 绕线两圈的时长
-        }, 300);
-      }
-
-      if (seal) seal.addEventListener('click', triggerUnwrap);
-      if (btnUpper) btnUpper.addEventListener('click', triggerUnwrap);
-      if (btnLower) btnLower.addEventListener('click', triggerUnwrap);
-    })();
-
-    /* ── 重新封存案卷按钮 ── */
-    (function(){
-      function renderRecloseBtn() {
-        var existing = document.getElementById('envelope-reclose-btn');
-        if (existing) return;
-        var footer = document.querySelector('.footer');
-        if (!footer) {
-          setTimeout(renderRecloseBtn, 300);
-          return;
-        }
-        var btn = document.createElement('span');
-        btn.id = 'envelope-reclose-btn';
-        btn.textContent = '🔒 重新封存案卷';
-        btn.title = '重新封存并体验档案袋开箱仪式';
-        btn.style.cssText = 'cursor:pointer;margin-left:14px;font-size:10px;opacity:0.5;transition:opacity 0.2s;';
-        
-        btn.addEventListener('mouseenter', function () { btn.style.opacity = '1'; });
-        btn.addEventListener('mouseleave', function () { btn.style.opacity = '0.5'; });
-        btn.addEventListener('click', function () {
-          try {
-            if (window.__archiveAudio) {
-              window.__archiveAudio.playStampSound();
-            }
-          } catch(e){}
-          
-          sessionStorage.removeItem('archive-envelope-opened');
-          window.location.reload();
-        });
-        footer.appendChild(btn);
-      }
-      
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', renderRecloseBtn);
-      } else {
-        renderRecloseBtn();
-      }
-    })();
   </script>
 </Layout>
 
 <style>
-  /* ── 首页档案启封袋 ── */
-  .archive-envelope-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 100000;
-    background: #110c08;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    transition: opacity 0.8s ease;
-  }
-  .envelope-body {
-    position: relative;
-    width: 600px;
-    height: 800px;
-    max-width: 95%;
-    max-height: 90vh;
-    background: #d4c5a9; /* 古拙黄褐色牛皮纸 */
-    box-shadow: 
-      0 12px 40px rgba(0, 0, 0, 0.85),
-      inset 0 0 50px rgba(0, 0, 0, 0.08);
-    border: 1px solid #bdae91;
-    border-radius: 4px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
-  }
-  .envelope-content {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    padding: 60px 40px;
-    box-sizing: border-box;
-    z-index: 5;
-  }
-  
-  /* 上下开口飞退动画类 */
-  .archive-envelope-overlay.opened {
-    opacity: 0;
-    pointer-events: none;
-  }
-  .archive-envelope-overlay.opened .envelope-body {
-    transform: scale(0.9) translateY(40px);
-  }
-
-  /* 封口线绳绕扣 */
-  .string-tie-box {
-    position: absolute;
-    top: 50%;
-    left: 10%;
-    transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    z-index: 10;
-  }
-  .string-button {
-    width: 32px;
-    height: 32px;
-    background: radial-gradient(circle, #f0dfc5 0%, #b29d7c 100%);
-    border: 1.5px solid #8e7c61;
-    border-radius: 50%;
-    position: relative;
-    cursor: pointer;
-    box-shadow: 
-      0 3px 5px rgba(0,0,0,0.35),
-      inset 0 1px 0 rgba(255,255,255,0.4);
-  }
-  /* 扣子中心的金属小钉 */
-  .string-button::after {
-    content: '';
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    width: 9px;
-    height: 9px;
-    background: radial-gradient(circle, #ecd09e 0%, #684f2c 100%);
-    border-radius: 50%;
-    box-shadow: inset 0.5px 0.5px 0px rgba(255,255,255,0.3);
-  }
-  .tie-thread-svg {
-    height: 120px;
-    margin: 4px 0;
-    pointer-events: none;
-    transition: transform 0.6s ease;
-  }
-  /* 松线绕线动画 */
-  .tie-thread-svg.unwrapping {
-    animation: thread-spin 0.6s 2 linear forwards;
-  }
-  @keyframes thread-spin {
-    0% { transform: rotate(0deg); opacity: 0.9; }
-    100% { transform: rotate(-360deg); opacity: 0.2; }
-  }
-
-  /* 火漆印 (Wax Seal) */
-  .wax-seal {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 96px;
-    height: 96px;
-    background: radial-gradient(circle, #c62828 0%, #b71c1c 80%, #7f0000 100%);
-    border-radius: 48% 52% 51% 49% / 50% 48% 52% 50%; /* 模拟手捏火漆不规则圆形 */
-    box-shadow: 
-      0 4px 10px rgba(0,0,0,0.55),
-      inset 0 2px 4px rgba(255,255,255,0.25);
-    cursor: pointer;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s, opacity 0.5s ease;
-  }
-  .wax-seal:hover {
-    transform: translate(-50%, -50%) scale(1.03);
-  }
-  .wax-seal:active {
-    transform: translate(-50%, -50%) scale(0.97);
-  }
-  .seal-inner {
-    width: 72px;
-    height: 72px;
-    border: 2px dashed rgba(255, 255, 255, 0.4);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .seal-mark {
-    font-family: 'ZCOOL XiaoWei', 'Noto Serif SC', serif;
-    font-size: 26px;
-    font-weight: 900;
-    color: rgba(255, 255, 255, 0.78);
-    letter-spacing: 4px;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
-    transform: rotate(-10deg);
-  }
-  /* 火漆印开裂特效 */
-  .wax-seal.cracked {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(1.2);
-    pointer-events: none;
-  }
-
-  /* 复古钢印 */
-  .envelope-stamp {
-    width: 80%;
-    border: 1px solid rgba(139, 45, 45, 0.35);
-    border-radius: 2px;
-    padding: 18px;
-    box-sizing: border-box;
-    color: #8f2c2c;
-    font-family: 'ZCOOL XiaoWei', 'Noto Serif SC', serif;
-    text-align: center;
-    transform: rotate(-3deg);
-    margin-top: 20px;
-    background: rgba(143, 44, 44, 0.02);
-    box-shadow: inset 0 0 10px rgba(143, 44, 44, 0.05);
-  }
-  .e-stamp-title {
-    font-size: 11px;
-    letter-spacing: 5px;
-    font-weight: 700;
-    border-bottom: 1px dashed rgba(143, 44, 44, 0.3);
-    padding-bottom: 4px;
-    margin-bottom: 4px;
-  }
-  .e-stamp-level {
-    font-size: 20px;
-    letter-spacing: 8px;
-    font-weight: 900;
-  }
-  .e-stamp-date {
-    font-size: 8px;
-    font-family: monospace;
-    opacity: 0.8;
-  }
-
-  /* 牛皮标签纸 */
-  .envelope-label {
-    width: 85%;
-    background: #e2cfae;
-    border: 1px solid #c8ba9d;
-    padding: 24px;
-    box-sizing: border-box;
-    box-shadow: 
-      2px 4px 10px rgba(0,0,0,0.15),
-      inset 0 0 20px rgba(255,255,255,0.2);
-    text-align: center;
-    border-radius: 1px;
-    margin-bottom: 20px;
-  }
-  .label-title {
-    font-family: 'Noto Serif SC', serif;
-    font-size: 18px;
-    color: #4a3221;
-    font-weight: 900;
-    letter-spacing: 3px;
-    border-bottom: 1.2px solid rgba(74, 50, 33, 0.2);
-    padding-bottom: 6px;
-    margin-bottom: 8px;
-  }
-  .label-meta {
-    font-size: 9px;
-    color: #6d4f3b;
-    letter-spacing: 4px;
-    font-weight: 600;
-  }
-  .label-action-hint {
-    font-size: 8px;
-    color: #9c27b0;
-    margin-top: 14px;
-    letter-spacing: 2px;
-    animation: text-pulse 1.8s infinite alternate ease-in-out;
-  }
-  @keyframes text-pulse {
-    0% { opacity: 0.45; }
-    100% { opacity: 0.95; }
-  }
-
   /* ── 排序切换（档案柜钢丝标签架） ── */
   .sort-tabs {
     display: flex;
@@ -1225,6 +860,7 @@ const entries = rawEntries.map(item => {
     align-items: flex-start;
     gap: 24px;
     margin: 0 48px 20px;
+    padding-top: 12px; /* 留出顶部配合压片 */
   }
   .search-bar {
     flex: 1;
@@ -1234,7 +870,61 @@ const entries = rawEntries.map(item => {
     padding: 12px 18px;
     background: rgba(13,11,9,0.4);
     border: 1px solid rgba(197,168,128,0.08);
+    position: relative; /* 定位基准 */
   }
+  .board-clip {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 180px;
+    height: 23px;
+    background: linear-gradient(90deg, #5b462a 0%, #a4865e 20%, #ebd7b2 45%, #ebd7b2 55%, #a4865e 80%, #5b462a 100%);
+    border: 1px solid #33200b;
+    border-radius: 3px 3px 0 0;
+    box-shadow: 
+      0 4px 8px rgba(0,0,0,0.55),
+      inset 0 1px 0 rgba(255,255,255,0.22);
+    z-index: 5;
+    pointer-events: none;
+  }
+  .clip-handle {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 36px;
+    height: 14px;
+    border: 2.5px solid #856a46;
+    border-bottom: none;
+    border-radius: 18px 18px 0 0;
+    box-shadow: 
+      0 -1px 2px rgba(0,0,0,0.4),
+      inset 0 1px 0 rgba(255,255,255,0.15);
+  }
+  .clip-bracket {
+    width: 32px;
+    height: 10px;
+    background: radial-gradient(circle, transparent 3.5px, #3a2a16 4px);
+    border-bottom: 1.5px solid #4a3821;
+    position: absolute;
+    top: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .clip-screw {
+    position: absolute;
+    top: 8px;
+    width: 7px;
+    height: 7px;
+    background: radial-gradient(circle, #fcdfa9 10%, #856a46 60%, #302010 100%);
+    border-radius: 50%;
+    box-shadow: 
+      0 1px 2px rgba(0,0,0,0.65),
+      inset 0.5px 0.5px 0px rgba(255,255,255,0.3);
+  }
+  .clip-screw.left { left: 16px; }
+  .clip-screw.right { right: 16px; }
   .search-label{font-size:10px;color:var(--c-text-faint-light);letter-spacing:5px;text-transform:uppercase;white-space:nowrap;font-family:'Times New Roman',Georgia,serif;border-right:1px solid rgba(197,168,128,0.12);padding-right:14px}
   .search-inner{flex:1;display:flex;align-items:center;gap:8px}
   .search-input{flex:1;padding:8px 10px;background:rgba(8,7,6,0.6);border:1px solid transparent;color:var(--c-text-body);font-family:'Noto Serif SC',serif;font-size:13px;letter-spacing:2px;outline:none;transition:all .3s}
@@ -1457,6 +1147,16 @@ const entries = rawEntries.map(item => {
   .phenomenon-card.card-visible {
     animation: card-enter 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
+  /* 静态下卡片物理无序微偏斜，打破像素对齐的死板，hover时恢复摆正 */
+  .phenomenon-card:nth-child(3n+1) .featured {
+    transform: rotate(-1.1deg) translateY(2px) translateX(-1px);
+  }
+  .phenomenon-card:nth-child(3n+2) .featured {
+    transform: rotate(0.85deg) translateY(-1.5px) translateX(2px);
+  }
+  .phenomenon-card:nth-child(3n+3) .featured {
+    transform: rotate(-0.6deg) translateY(1.2px) translateX(-2px);
+  }
 
   .fc-wrapper {
     display: flex;
@@ -1533,11 +1233,11 @@ const entries = rawEntries.map(item => {
     background: linear-gradient(180deg, #3c2e22 0%, #281d14 100%);
     border-color: #523f2b;
     box-shadow:
-      0 12px 28px rgba(0,0,0,0.65), /* 更加深虚的物理悬浮投影 */
-      0 24px 55px rgba(0,0,0,0.45),
-      0 0 25px rgba(197, 168, 128, 0.15),
+      0 16px 36px rgba(0,0,0,0.75), /* 更加深虚的物理悬浮投影 */
+      0 28px 70px rgba(0,0,0,0.55),
+      0 0 30px rgba(197, 168, 128, 0.2),
       inset 0 0 20px rgba(0,0,0,0.5);
-    transform: translateY(-6px) rotate(0.8deg) scale(1.018); /* 稍微增加倾斜和挑起 */
+    transform: translateY(-8px) rotate(0deg) scale(1.022); /* 稍微增加倾斜和挑起，hover时摆正 */
   }
 
   /* 胶贴在照片右上角的半透明旧牛皮胶带，模拟零碎案卷物理质感 */
