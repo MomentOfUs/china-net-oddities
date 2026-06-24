@@ -604,7 +604,7 @@ const sortedEntries = rawEntries.map(item => {
   .criteria-item{background:rgba(13,11,9,0.35);border:1px solid rgba(197,168,128,0.15);padding:16px 18px}
   .criteria-item .ci-name{font-size:13px;color:var(--c-gold);letter-spacing:6px;margin-bottom:4px}
   .criteria-item .ci-desc{font-size:11px;color:var(--c-text-muted);letter-spacing:2px;line-height:1.8;font-weight:300}
-  .score-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:11px;filter:url(#stamp-filter)}
+  .score-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:11px}
   .score-table th{background:rgba(13,11,9,0.6);color:var(--c-text-muted);font-weight:400;letter-spacing:3px;padding:8px 6px;border:1px solid rgba(197,168,128,0.2);text-align:center}
   .score-table td{padding:7px 6px;border:1px solid rgba(197,168,128,0.15);text-align:center;color:#a89a8a;letter-spacing:1px}
   .score-table td:first-child{color:var(--c-gold);letter-spacing:3px;text-align:left;padding-left:12px}
@@ -674,8 +674,4 @@ const sortedEntries = rawEntries.map(item => {
     .score-table td, .score-table th{padding:5px 3px}
   }
   
-  /* ── 评分实验室油墨滤镜 ── */
-  .lab-radar-box, .lab-score-num, .lab-status-badge {
-    filter: url(#stamp-filter);
-  }
 </style>

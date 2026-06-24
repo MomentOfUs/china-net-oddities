@@ -386,6 +386,24 @@ const { title } = Astro.props;
   </style>
 </head>
 <body>
+  <!-- 全局拟物印章滤镜：必须置于最顶端以防后置渲染造成浏览器解析引用失效 -->
+  <svg style="position: absolute; width: 0; height: 0;" width="0" height="0" aria-hidden="true">
+    <filter id="stamp-filter" x="-5%" y="-5%" width="110%" height="110%">
+      <!-- 1. 极轻微的边缘变形，scale设为1.2，确保细小文字笔画绝对清晰不模糊 -->
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" result="noise" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.2" xChannelSelector="R" yChannelSelector="G" result="displaced" />
+      <!-- 2. 极细小的斑驳颗粒，不进行大面积挖空，仅产生印泥厚度微弱不均的颗粒感 -->
+      <feTurbulence type="fractalNoise" baseFrequency="0.18" numOctaves="2" result="grain" />
+      <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 4 -1.6" result="grain-contrast" />
+      <feComposite operator="in" in="displaced" in2="grain-contrast" result="textured" />
+      <!-- 3. 将原 displaced 图与 textured 斑驳图混合，使磨损处呈半透明暗红色，透出底纸，而绝不彻底抠空 -->
+      <feMerge>
+        <feMergeNode in="displaced" />
+        <feMergeNode in="textured" />
+      </feMerge>
+    </filter>
+  </svg>
+
   <a href="#main-content" class="skip-link">跳转到主要内容</a>
   <div id="konami-overlay" class="konami-overlay" aria-hidden="true">
     <div class="konami-text">TOP SECRET<br/><span>ACCESS GRANTED</span></div>
@@ -600,26 +618,6 @@ const { title } = Astro.props;
       }
     })();
   </script>
-
-  <!-- 全局拟物印章滤镜：微弱边缘起伏以确保文字清晰，混合斑驳颗粒模拟半透明油墨 -->
-  <svg style="position: absolute; width: 0; height: 0;" width="0" height="0" aria-hidden="true">
-    <filter id="stamp-filter" x="-5%" y="-5%" width="110%" height="110%">
-      <!-- 1. 极轻微的边缘变形，scale设为1.2，确保细小文字笔画绝对清晰不模糊 -->
-      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" result="noise" />
-      <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.2" xChannelSelector="R" yChannelSelector="G" result="displaced" />
-      <!-- 2. 极细小的斑驳颗粒，不进行大面积挖空，仅产生印泥厚度微弱不均的颗粒感 -->
-      <feTurbulence type="fractalNoise" baseFrequency="0.18" numOctaves="2" result="grain" />
-      <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 4 -1.6" result="grain-contrast" />
-      <feComposite operator="in" in="displaced" in2="grain-contrast" result="textured" />
-      <!-- 3. 将原 displaced 图与 textured 斑驳图混合，使磨损处呈半透明暗红色，透出底纸，而绝不彻底抠空 -->
-      <feMerge>
-        <feMergeNode in="displaced" />
-        <feMergeNode in="textured" />
-      </feMerge>
-    </filter>
-  </svg>
-
-
 
 </body>
 </html>
