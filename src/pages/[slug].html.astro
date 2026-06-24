@@ -2084,29 +2084,32 @@ const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[curren
       color: #6a5c4a;
     }
     .file-nav-home-text {
-      font-size: 0 !important;
+      display: none !important;
     }
-    .file-nav-home-text::after {
+    .file-nav-home::after {
       content: '目录';
       font-size: 9px;
       letter-spacing: 2px;
       color: #6a5c4a;
+      transition: color 0.3s;
     }
-    .file-nav-home:hover .file-nav-home-text::after {
+    .file-nav-home:hover::after {
       color: var(--c-gold);
     }
     .file-nav-label {
-      font-size: 0 !important;
+      display: none !important;
     }
-    .file-nav-prev .file-nav-label::after {
+    .file-nav-prev::before {
       content: '← 前卷';
       font-size: 8px;
       letter-spacing: 1px;
+      color: #5a4c3a;
     }
-    .file-nav-next .file-nav-label::after {
+    .file-nav-next::after {
       content: '后卷 →';
       font-size: 8px;
       letter-spacing: 1px;
+      color: #5a4c3a;
     }
     .file-nav-title {
       font-size: 12px;
